@@ -13,14 +13,3 @@
     }
   ]
 }
-```
-
-## Steps
-
-1. Go to your repo → click on `vercel.json`
-2. Click the **pencil icon** to edit
-3. Delete these lines:
-```
-   "env": {
-     "ANTHROPIC_API_KEY": "@anthropic-api-key"
-   }
