@@ -1,20 +1,20 @@
-// Vercel Serverless Function for Milestone 0 Assessment Chat
-// This replaces the Express server with a Vercel-native serverless function
+// Verified Vercel Serverless Function for Milestone 0 Assessment
+// This file goes in: /api/chat.js
 
-module.exports = async (req, res) => {
-  // Only allow POST requests
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
-
-  // Enable CORS
+export default async function handler(req, res) {
+  // CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  // Handle preflight
+  // Handle preflight requests
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
+  }
+
+  // Only allow POST
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
   }
 
   try {
@@ -27,7 +27,7 @@ module.exports = async (req, res) => {
       });
     }
 
-    // Check API key is configured
+    // Check API key
     const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
     if (!ANTHROPIC_API_KEY) {
       console.error('ANTHROPIC_API_KEY not configured');
@@ -36,7 +36,7 @@ module.exports = async (req, res) => {
       });
     }
 
-    // System prompt for assessment
+    // System prompt
     const systemPrompt = `You are an encouraging AI tutor conducting the Milestone 0 baseline assessment for a Data Analyst Bootcamp. Your goal is to evaluate whether students have the foundational skills needed to START learning data analysis.
 
 ## YOUR ROLE
@@ -214,4 +214,4 @@ Be warm, encouraging, and natural!`;
       message: error.message 
     });
   }
-};
+}
