@@ -1,8 +1,0 @@
-{
-  "name": "data-analyst-bootcamp",
-  "version": "1.0.0",
-  "description": "AI-powered Data Analyst Bootcamp Assessment",
-  "engines": {
-    "node": "24.x"
-  }
-}
