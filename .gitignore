@@ -5,6 +5,11 @@
 .env.local
 .env.production
 
+# Database files (contain user data - never commit!)
+*.db
+*.sqlite
+*.sqlite3
+
 # Node modules
 node_modules/
 npm-debug.log*
@@ -42,3 +47,5 @@ temp/
 package-lock.json
 yarn.lock
 pnpm-lock.yaml
+.vercel
+.env*.local

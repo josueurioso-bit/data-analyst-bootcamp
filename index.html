@@ -65,7 +65,7 @@
       const [messages, setMessages] = useState([
         {
           role: 'assistant',
-          content: "Hi! I'm your AI tutor for the Data Analyst Bootcamp. 👋\n\nI'm here to help you discover if you're ready to start learning data analysis, or if you need a bit of prep work first. This isn't a test you can fail - it's just a conversation to find your starting point.\n\nNo pressure, and I'll be supportive throughout. Ready to begin?"
+          content: "Hi! I'm your AI tutor for the Data Analyst Bootcamp.\n\nI'm here to help you discover if you're ready to start learning data analysis, or if you need a bit of prep work first. This isn't a test you can fail - it's just a conversation to find your starting point.\n\nNo pressure, and I'll be supportive throughout. Ready to begin?"
         }
       ]);
       const [input, setInput] = useState('');
@@ -73,6 +73,10 @@
       const [assessmentResults, setAssessmentResults] = useState(null);
       const [error, setError] = useState(null);
       const messagesEndRef = useRef(null);
+
+      // CONSENT STATE - User can opt out of data collection
+      // Default is true (opt-out model, not opt-in)
+      const [consentGiven, setConsentGiven] = useState(true);
 
       const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -101,7 +105,9 @@
               messages: [...messages.filter(m => m.role !== 'system'), userMessage].map(m => ({
                 role: m.role,
                 content: m.content
-              }))
+              })),
+              // Pass consent status to backend - only save data if user consented
+              consentGiven: consentGiven
             })
           });
 
@@ -186,6 +192,37 @@
                 Milestone 0 Assessment
               </h1>
               <p className="text-sm text-gray-600">Baseline Skills Check - Data Analyst Bootcamp</p>
+            </div>
+          </div>
+
+          {/* Consent Banner */}
+          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-blue-200 px-4 py-3">
+            <div className="max-w-4xl mx-auto">
+              <label className="flex items-start gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={consentGiven}
+                  onChange={(e) => setConsentGiven(e.target.checked)}
+                  className="mt-1 w-5 h-5 text-purple-600 border-gray-300 rounded focus:ring-purple-500 cursor-pointer"
+                />
+                <span className="text-sm text-gray-700">
+                  <span className="font-medium">I consent to my anonymous assessment scores being used to improve the bootcamp curriculum.</span>
+                  {' '}
+                  <a
+                    href="privacy.html"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-purple-600 hover:text-purple-800 underline"
+                  >
+                    Learn more
+                  </a>
+                </span>
+              </label>
+              <p className="text-xs text-gray-500 mt-1 ml-8">
+                {consentGiven
+                  ? "Your scores will help us identify common skill gaps and improve our curriculum."
+                  : "You can still take the quiz - your results just won't be saved to our database."}
+              </p>
             </div>
           </div>
 

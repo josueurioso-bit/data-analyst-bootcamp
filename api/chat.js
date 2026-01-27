@@ -1,6 +1,34 @@
 // Verified Vercel Serverless Function for Milestone 0 Assessment
 // This file goes in: /api/chat.js
 
+import crypto from 'crypto';
+
+/**
+ * Hash IP address for privacy
+ *
+ * TEACHING MOMENT: We NEVER store raw IP addresses.
+ * SHA-256 is a one-way hash - you can't reverse it to get the original IP.
+ * This protects user privacy while still allowing us to detect duplicates.
+ */
+function hashIp(ip) {
+  if (!ip) return null;
+  return crypto.createHash('sha256').update(ip).digest('hex');
+}
+
+/**
+ * Extract client IP from request headers
+ *
+ * TEACHING MOMENT: When behind a proxy (like Vercel), the real client IP
+ * is in the x-forwarded-for header, not the socket address.
+ */
+function getClientIp(req) {
+  const xfwd = req.headers['x-forwarded-for'];
+  if (xfwd) {
+    return xfwd.split(',')[0].trim();
+  }
+  return req.socket?.remoteAddress || null;
+}
+
 export default async function handler(req, res) {
   // CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -18,12 +46,15 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { messages } = req.body;
+    // Extract messages and consent status from request
+    // TEACHING MOMENT: consentGiven will be added by frontend in Session 3
+    // For now, we default to true (will save data)
+    const { messages, consentGiven = true } = req.body;
 
     // Validate request
     if (!messages || !Array.isArray(messages)) {
-      return res.status(400).json({ 
-        error: 'Invalid request: messages array required' 
+      return res.status(400).json({
+        error: 'Invalid request: messages array required'
       });
     }
 
@@ -205,6 +236,73 @@ Be warm, encouraging, and natural!`;
     }
 
     const data = await response.json();
+
+    // =========================================================
+    // DATABASE SAVE LOGIC
+    // TEACHING MOMENT: We check if this response contains final
+    // assessment results. The AI returns JSON with "assessment_complete": true
+    // when the quiz is finished.
+    // =========================================================
+
+    const aiText = data.content?.[0]?.text || '';
+    let assessmentResults = null;
+
+    // Try to extract JSON assessment results from the AI response
+    try {
+      // Look for JSON object with assessment_complete: true
+      const jsonMatch = aiText.match(/\{[\s\S]*"assessment_complete":\s*true[\s\S]*\}/);
+      if (jsonMatch) {
+        assessmentResults = JSON.parse(jsonMatch[0]);
+        console.log('[Chat] Assessment complete detected');
+      }
+    } catch (parseError) {
+      // Not a final result, just a normal conversation turn - that's fine
+      console.log('[Chat] No assessment results in this response (normal)');
+    }
+
+    // If we have completed assessment results AND user consented, save to database
+    if (assessmentResults && assessmentResults.assessment_complete && consentGiven === true) {
+      try {
+        // Dynamic import of database helper (CommonJS module)
+        const { insertAssessment } = await import('./lib/db.js');
+
+        const clientIp = getClientIp(req);
+        const ipHash = hashIp(clientIp);
+        const pillars = assessmentResults.pillars || {};
+
+        // Prepare assessment data for database
+        const assessmentData = {
+          sessionId: `session_${Date.now()}_${Math.random().toString(36).substring(7)}`,
+          numeracyScore: pillars.numeracy?.score || 0,
+          readingScore: pillars.reading?.score || 0,
+          computerScore: pillars.computer?.score || 0,
+          logicScore: pillars.logic?.score || 0,
+          communicationScore: pillars.communication?.score || 0,
+          mindsetScore: pillars.mindset?.score || 0,
+          readinessLevel: assessmentResults.readiness_level || 0,
+          readinessTitle: assessmentResults.readiness_title || '',
+          ipHash: ipHash,
+          consentGiven: true
+        };
+
+        const success = await insertAssessment(assessmentData);
+
+        if (success) {
+          console.log('[Chat] Assessment saved to database (user consented)');
+        } else {
+          console.error('[Chat] Failed to save assessment to database');
+        }
+      } catch (dbError) {
+        // TEACHING MOMENT: Database errors should NOT break the quiz!
+        // The user still gets their results even if we can't save them.
+        console.error('[Chat] Database error (quiz still works):', dbError.message);
+      }
+    } else if (assessmentResults && assessmentResults.assessment_complete) {
+      // Assessment complete but user opted out
+      console.log('[Chat] Assessment NOT saved (user opted out of data collection)');
+    }
+
+    // Always return the AI response to the frontend
     return res.status(200).json(data);
 
   } catch (error) {

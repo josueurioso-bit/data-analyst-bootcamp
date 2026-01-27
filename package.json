@@ -1,0 +1,18 @@
+{
+  "name": "data-analyst-bootcamp-backend",
+  "version": "1.0.0",
+  "description": "Backend for bootcamp assessment analytics",
+  "main": "api/chat.js",
+  "scripts": {
+    "seed": "node scripts/seed-data.js",
+    "analyze": "node scripts/verify-patterns.js",
+    "test-db": "node test-db.js"
+  },
+  "dependencies": {
+    "sql.js": "^1.11.0"
+  },
+  "devDependencies": {},
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
