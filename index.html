@@ -15,6 +15,24 @@
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
     }
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border-width: 0;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
   </style>
 </head>
 <body>
@@ -29,7 +47,7 @@
 
     // SVG Icons as components
     const SendIcon = () => (
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
         <line x1="22" y1="2" x2="11" y2="13"></line>
         <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
       </svg>
@@ -73,6 +91,7 @@
       const [assessmentResults, setAssessmentResults] = useState(null);
       const [error, setError] = useState(null);
       const messagesEndRef = useRef(null);
+      const inputRef = useRef(null);
 
       // CONSENT STATE - User can opt out of data collection
       // Default is true (opt-out model, not opt-in)
@@ -85,6 +104,11 @@
       useEffect(() => {
         scrollToBottom();
       }, [messages]);
+
+      // Autofocus input on mount
+      useEffect(() => {
+        inputRef.current?.focus();
+      }, []);
 
       const sendMessage = async () => {
         if (!input.trim() || isLoading) return;
@@ -145,6 +169,8 @@
           }]);
         } finally {
           setIsLoading(false);
+          // Refocus input after send completes
+          setTimeout(() => inputRef.current?.focus(), 0);
         }
       };
 
@@ -186,26 +212,28 @@
           background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)'
         }}>
           {/* Header */}
-          <div className="bg-white shadow-sm border-b border-gray-200">
+          <header className="bg-white shadow-sm border-b border-gray-200">
             <div className="max-w-4xl mx-auto px-4 py-4">
               <h1 className="text-2xl font-bold text-gray-900" style={{ fontFamily: 'Georgia, serif' }}>
                 Milestone 0 Assessment
               </h1>
-              <p className="text-sm text-gray-600">Baseline Skills Check - Data Analyst Bootcamp</p>
+              <p className="text-sm text-gray-700">Baseline Skills Check - Data Analyst Bootcamp</p>
             </div>
-          </div>
+          </header>
 
           {/* Consent Banner */}
           <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-blue-200 px-4 py-3">
             <div className="max-w-4xl mx-auto">
-              <label className="flex items-start gap-3 cursor-pointer">
+              <label htmlFor="consent-checkbox" className="flex items-start gap-3 cursor-pointer">
                 <input
+                  id="consent-checkbox"
                   type="checkbox"
                   checked={consentGiven}
                   onChange={(e) => setConsentGiven(e.target.checked)}
-                  className="mt-1 w-5 h-5 text-purple-600 border-gray-300 rounded focus:ring-purple-500 cursor-pointer"
+                  aria-describedby="consent-description"
+                  className="mt-1 w-5 h-5 text-purple-600 border-gray-300 rounded focus:ring-purple-500 focus:ring-offset-2 cursor-pointer"
                 />
-                <span className="text-sm text-gray-700">
+                <span className="text-sm text-gray-800">
                   <span className="font-medium">I consent to my anonymous assessment scores being used to improve the bootcamp curriculum.</span>
                   {' '}
                   <a
@@ -218,7 +246,7 @@
                   </a>
                 </span>
               </label>
-              <p className="text-xs text-gray-500 mt-1 ml-8">
+              <p id="consent-description" className="text-xs text-gray-600 mt-1 ml-8">
                 {consentGiven
                   ? "Your scores will help us identify common skill gaps and improve our curriculum."
                   : "You can still take the quiz - your results just won't be saved to our database."}
@@ -233,7 +261,7 @@
                 <p className="text-sm text-red-800">⚠️ {error}</p>
                 <button
                   onClick={() => setError(null)}
-                  className="text-red-600 hover:text-red-800 text-sm underline"
+                  className="text-red-600 hover:text-red-800 text-sm underline focus:ring-2 focus:ring-red-500 focus:ring-offset-2 rounded"
                 >
                   Dismiss
                 </button>
@@ -242,8 +270,8 @@
           )}
 
           {/* Messages Container */}
-          <div className="flex-1 overflow-y-auto px-4 py-6">
-            <div className="max-w-4xl mx-auto space-y-4">
+          <main className="flex-1 overflow-y-auto px-4 py-6" aria-label="Chat conversation">
+            <div className="max-w-4xl mx-auto space-y-4" role="log" aria-live="polite" aria-relevant="additions">
               {messages.map((message, idx) => (
                 <div
                   key={idx}
@@ -255,6 +283,7 @@
                         ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white'
                         : 'bg-white text-gray-800 border border-gray-200'
                     }`}
+                    aria-label={message.role === 'user' ? 'Your message' : 'AI tutor message'}
                   >
                     <p className="whitespace-pre-wrap leading-relaxed" style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
                       {message.content}
@@ -274,7 +303,7 @@
 
               <div ref={messagesEndRef} />
             </div>
-          </div>
+          </main>
 
           {/* Results Dashboard */}
           {assessmentResults && (
@@ -282,7 +311,7 @@
               <div className="max-w-4xl mx-auto">
                 <div className="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-2xl p-8 shadow-xl border border-purple-200">
                   <h2 className="text-3xl font-bold mb-2" style={{ fontFamily: 'Georgia, serif' }}>
-                    Assessment Complete! 🎉
+                    Assessment Complete! <span aria-hidden="true">🎉</span>
                   </h2>
                   <p className={`text-xl font-semibold mb-6 ${getReadinessColor(assessmentResults.readiness_level)}`}>
                     {assessmentResults.readiness_title}
@@ -361,7 +390,7 @@
                   <div className="mt-6 text-center">
                     <button
                       onClick={resetAssessment}
-                      className="px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg font-semibold hover:from-purple-700 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl"
+                      className="px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg font-semibold hover:from-purple-700 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
                     >
                       Take Assessment Again
                     </button>
@@ -373,28 +402,34 @@
 
           {/* Input Area */}
           {!assessmentResults && (
-            <div className="bg-white border-t border-gray-200 px-4 py-4">
+            <footer className="bg-white border-t border-gray-200 px-4 py-4">
               <div className="max-w-4xl mx-auto flex items-end space-x-3">
+                <label htmlFor="chat-input" className="sr-only">Type your response</label>
                 <textarea
+                  ref={inputRef}
+                  id="chat-input"
+                  autoFocus
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyPress={handleKeyPress}
                   placeholder="Type your response..."
+                  aria-label="Type your response"
                   disabled={isLoading}
                   rows="2"
-                  className="flex-1 px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none disabled:bg-gray-100 disabled:cursor-not-allowed transition-all"
+                  className="flex-1 px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:border-transparent resize-none disabled:bg-gray-100 disabled:cursor-not-allowed transition-all"
                   style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}
                 />
                 <button
                   onClick={sendMessage}
                   disabled={!input.trim() || isLoading}
-                  className="px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl font-semibold hover:from-purple-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl flex items-center space-x-2"
+                  aria-label="Send message"
+                  className="px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl font-semibold hover:from-purple-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl flex items-center space-x-2 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
                 >
                   <span>Send</span>
                   <SendIcon />
                 </button>
               </div>
-            </div>
+            </footer>
           )}
         </div>
       );
