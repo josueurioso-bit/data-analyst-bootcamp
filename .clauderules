@@ -1,0 +1,110 @@
+# Claude Code Rules for Data School Readiness Engine
+# This file is the "Permanent System Prompt" for all AI-assisted development
+
+## CRITICAL: Read These Documents First
+Before making ANY changes to the codebase:
+1. Read `docs/PRD_DataSRE.md` — Product vision and features
+2. Read `docs/TRD_DataSRE.md` — Technical architecture
+3. Read `docs/SRD_DataSRE.md` — Safety requirements
+4. Read `docs/DATA_ANALYST_CONTEXT.md` — Existing codebase history
+
+## Tech Stack Constraints (DO NOT DEVIATE)
+- **Frontend:** Static HTML + React 18 (CDN) + Tailwind CSS (CDN)
+  - NO build step, NO webpack, NO vite, NO npm scripts for frontend
+  - NO TypeScript (not in MVP scope)
+  - All React code must work with Babel transpiler in-browser
+- **Backend:** Vercel Serverless Functions (Node.js 20+)
+  - CommonJS (`require`) for now, ESM migration is Phase 0
+- **Database:** Supabase PostgreSQL (NOT SQLite after Phase 0)
+- **AI Provider:** Google Gemini (free tier) with Anthropic Claude fallback
+  - ALWAYS use `api/lib/llm.js` adapter, NEVER call providers directly
+- **Hosting:** Vercel (free tier)
+
+## Architectural Integrity Rules
+1. **Adapter Pattern Required:** All LLM calls go through `api/lib/llm.js`
+2. **No Direct Provider Calls:** Never import `@anthropic-ai/sdk` or `@google/generative-ai` in feature code
+3. **Stateless Functions:** All serverless functions are stateless; state lives in Supabase
+4. **No Build Tools:** Frontend must work by opening `index.html` directly
+5. **Single Entry Point:** All UI lives in one `index.html` file
+
+## Code Change Guidelines
+- **Minimize Changes:** Only modify code directly related to the current task
+- **No Refactoring Sprees:** Don't "clean up" unrelated code
+- **Preserve Comments:** Keep all "TEACHING MOMENT" comments
+- **No Secret Commits:** Never hardcode API keys; use `process.env.VAR_NAME`
+- **Graceful Degradation:** Errors should degrade gracefully, never crash the app
+
+## Security Mandates (From SRD)
+- **IP Hashing:** Always use SHA-256, never store raw IPs
+- **Consent Checks:** Data only saved when `consentGiven === true`
+- **Prompt Injection Guards:** All LLM system prompts must include guard blocks
+- **Input Validation:** Validate all user input before database writes
+- **Rate Limiting:** All endpoints that call LLMs or write to DB must be rate limited
+- **CORS Restriction:** Never use `Access-Control-Allow-Origin: *` in production
+
+## Privacy (Five C's Framework)
+- **Consent:** Users must opt-in to data collection
+- **Collection Limits:** Never collect PII (no names, emails, phone numbers)
+- **Confidentiality:** IP addresses hashed with SHA-256
+- **Control:** Users can opt out without losing functionality
+- **Communication:** Privacy policy explains all practices in plain language
+
+## Development Workflow
+1. **Plan Before Coding:** Show proposed changes, get approval from Josue
+2. **One Feature at a Time:** Complete vertical slices, not scattered partials
+3. **Test Incrementally:** Verify each change works before moving on
+4. **Commit Frequently:** Commit after each working feature
+5. **Update Docs:** When decisions are made, update the relevant document
+
+## File Naming and Organization
+- API routes: `/api/[feature-name].js`
+- Shared libs: `/api/lib/[module-name].js`
+- Datasets: `/data/sprint-[n]-[description].csv`
+- Docs: `/docs/[PURPOSE]_[TOPIC].md`
+- Scripts: `/scripts/[action]-[noun].js` (e.g., `generate-dataset.js`)
+
+## Testing Patterns
+- **Manual First:** Use curl/fetch to test API routes before UI integration
+- **Browser Console:** Check for errors in browser console after every change
+- **Database Verification:** Query Supabase dashboard to verify data writes
+- **End-to-End Smoke Test:** Complete user flow must work before marking phase done
+
+## When to Push Back
+If Josue asks for something that conflicts with:
+- The SRD security requirements → Explain the risk, suggest alternatives
+- The TRD architecture constraints → Point to the constraint, propose workaround
+- The "No Build Step" principle → Remind about deployment simplicity goal
+- The Five C's privacy framework → Explain privacy violation, offer fix
+
+## Communication Style with Josue
+- **Non-Technical Explanations:** Josue is a "vibecoder," not a CS grad
+- **Show, Don't Assume:** Explain WHY you're doing something, not just WHAT
+- **Teaching Moments:** Add comments explaining patterns for future reference
+- **One Step at a Time:** Break complex tasks into small, verifiable chunks
+- **Visual Progress:** Show diffs, examples, and before/after comparisons
+
+## Red Flags (STOP and Ask First)
+- Adding new npm dependencies → Check if really needed, propose alternatives
+- Changing database schema → Confirm migration strategy exists
+- Modifying existing API routes → Verify backward compatibility
+- Introducing new providers (auth, storage, etc.) → Verify free tier limits
+- Suggesting "we should rebuild this in [framework]" → This violates the no-build-step constraint
+
+## Phase-Specific Constraints
+Refer to `docs/TRD_DataSRE.md` Section 10 for phase-specific implementation order.
+- **Phase 0:** Foundation fixes only (rate limiting, Supabase migration, error boundaries)
+- **Phase 1:** Assessment expansion (Phase B diagnostic)
+- **Phase 2:** Sprint system (Sprints 1-2 only)
+- **Phase 3:** Portfolio generation
+- **Phase 4:** Remaining sprints (3-6)
+- **Phase 5:** Polish and launch
+
+Do NOT implement features from future phases. Stay in sequence.
+
+## Remember
+- This is a **learning project** — prioritize Josue's education over optimal code
+- This is a **portfolio piece** — prioritize working demos over perfect architecture
+- This is a **zero-cost operation** — prioritize free tiers over paid services
+- This is a **solo project** — prioritize simplicity over scalability
+
+When in doubt, ask Josue. Don't make assumptions.
