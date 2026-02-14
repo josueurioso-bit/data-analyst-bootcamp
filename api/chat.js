@@ -45,6 +45,20 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
+  // Rate limiting — 20 requests per hour per IP
+  const { checkRateLimit } = await import('./lib/rateLimiter.js');
+  const clientIpForLimit = getClientIp(req);
+  const ipHashForLimit = hashIp(clientIpForLimit);
+  const rateCheck = checkRateLimit(ipHashForLimit);
+
+  if (!rateCheck.allowed) {
+    res.setHeader('Retry-After', rateCheck.retryAfterSeconds);
+    return res.status(429).json({
+      error: 'Too many requests. Please try again later.',
+      retryAfterSeconds: rateCheck.retryAfterSeconds
+    });
+  }
+
   try {
     // Extract messages and consent status from request
     // TEACHING MOMENT: consentGiven will be added by frontend in Session 3
