@@ -421,6 +421,66 @@
                     </div>
                   )}
 
+                  {/* Phase B: Data Skills Breakdown */}
+                  {assessmentResults.phase_b && assessmentResults.phase_b.skills && (
+                    <div className="bg-indigo-50 rounded-xl p-6 mb-4 border border-indigo-200">
+                      <h3 className="font-bold text-indigo-900 mb-4">Data Skills Placement</h3>
+                      <div className="grid md:grid-cols-2 gap-3">
+                        {Object.entries(assessmentResults.phase_b.skills).map(([skill, info]) => {
+                          const levelColors = {
+                            'COMPETENT': 'bg-emerald-100 text-emerald-800 border-emerald-300',
+                            'DEVELOPING': 'bg-yellow-100 text-yellow-800 border-yellow-300',
+                            'BEGINNER': 'bg-orange-100 text-orange-800 border-orange-300',
+                            'NONE': 'bg-red-100 text-red-800 border-red-300'
+                          };
+                          const colorClass = levelColors[info.level] || levelColors['NONE'];
+                          const skillNames = {
+                            excel: 'Excel / Sheets',
+                            sql: 'SQL',
+                            python: 'Python',
+                            visualization: 'Data Visualization',
+                            business_thinking: 'Business Thinking'
+                          };
+                          return (
+                            <div key={skill} className="bg-white rounded-lg p-3 shadow-sm border border-indigo-100 flex items-center justify-between">
+                              <span className="font-medium text-gray-900">{skillNames[skill] || skill}</span>
+                              <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${colorClass}`}>
+                                {info.level}
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Study Plan */}
+                  {assessmentResults.phase_b && (
+                    <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl p-6 mb-4 border border-indigo-200">
+                      <h3 className="font-bold text-indigo-900 mb-3">Your Personalized Study Plan</h3>
+                      <div className="grid md:grid-cols-3 gap-4 mb-4">
+                        <div className="bg-white rounded-lg p-4 text-center shadow-sm">
+                          <p className="text-3xl font-bold text-indigo-600">Sprint {assessmentResults.phase_b.recommended_start_sprint}</p>
+                          <p className="text-sm text-gray-600 mt-1">Starting Point</p>
+                        </div>
+                        <div className="bg-white rounded-lg p-4 text-center shadow-sm">
+                          <p className="text-3xl font-bold text-purple-600">{assessmentResults.phase_b.estimated_completion || '—'}</p>
+                          <p className="text-sm text-gray-600 mt-1">Est. Completion</p>
+                        </div>
+                        <div className="bg-white rounded-lg p-4 text-center shadow-sm">
+                          <p className="text-3xl font-bold text-emerald-600">{assessmentResults.phase_b.sprints_to_skip?.length || 0}</p>
+                          <p className="text-sm text-gray-600 mt-1">Sprints Skipped</p>
+                        </div>
+                      </div>
+                      {assessmentResults.phase_b.sprints_to_focus && assessmentResults.phase_b.sprints_to_focus.length > 0 && (
+                        <p className="text-indigo-800 text-sm">
+                          <span className="font-semibold">Focus sprints:</span>{' '}
+                          {assessmentResults.phase_b.sprints_to_focus.map(s => `Sprint ${s}`).join(', ')}
+                        </p>
+                      )}
+                    </div>
+                  )}
+
                   {/* Next Steps */}
                   <div className="bg-purple-50 rounded-xl p-6 border border-purple-200">
                     <h3 className="font-bold text-purple-900 mb-3">Next Steps</h3>
@@ -433,8 +493,15 @@
                     </div>
                   </div>
 
-                  {/* Reset Button */}
-                  <div className="mt-6 text-center">
+                  {/* Action Buttons */}
+                  <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-4">
+                    {assessmentResults.phase_b && (
+                      <button
+                        className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-lg font-semibold hover:from-emerald-600 hover:to-teal-600 transition-all shadow-lg hover:shadow-xl focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+                      >
+                        Begin Sprint {assessmentResults.phase_b.recommended_start_sprint}
+                      </button>
+                    )}
                     <button
                       onClick={resetAssessment}
                       className="px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg font-semibold hover:from-purple-700 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"

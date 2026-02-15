@@ -83,7 +83,9 @@ async function insertAssessment(assessment) {
         readiness_level: assessment.readinessLevel,
         readiness_title: assessment.readinessTitle,
         user_ip_hash: assessment.ipHash,
-        consent_given: assessment.consentGiven ? true : false
+        consent_given: assessment.consentGiven ? true : false,
+        // Phase B results stored as JSONB (null if Phase B wasn't completed)
+        phase_b_results: assessment.phaseBResults || null
       })
     });
 
