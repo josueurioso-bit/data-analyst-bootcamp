@@ -58,18 +58,51 @@ export default async function handler(req, res) {
     });
   }
 
-  try {
-    // Extract messages and consent status from request
-    // TEACHING MOMENT: consentGiven will be added by frontend in Session 3
-    // For now, we default to true (will save data)
-    const { messages, consentGiven = true } = req.body;
+  // =========================================================
+  // INPUT VALIDATION — reject bad payloads before doing any work
+  //
+  // TEACHING MOMENT: Always validate user input at the "boundary"
+  // (where outside data enters your system). This prevents:
+  // 1. Wasting API calls on garbage data
+  // 2. Injection attacks via malformed payloads
+  // 3. Denial-of-service via oversized requests
+  // =========================================================
 
-    // Validate request
-    if (!messages || !Array.isArray(messages)) {
+  // Check payload size (max 10KB)
+  const bodyStr = JSON.stringify(req.body || {});
+  if (bodyStr.length > 10240) {
+    return res.status(413).json({
+      error: 'Payload too large. Maximum size is 10KB.'
+    });
+  }
+
+  const { messages, consentGiven = true } = req.body || {};
+
+  // Messages must be an array
+  if (!messages || !Array.isArray(messages)) {
+    return res.status(400).json({
+      error: 'Invalid request: messages array required'
+    });
+  }
+
+  // Max 50 messages per conversation
+  if (messages.length > 50) {
+    return res.status(400).json({
+      error: 'Too many messages. Maximum is 50 per conversation.'
+    });
+  }
+
+  // Each message must have role (string) and content (string)
+  for (let i = 0; i < messages.length; i++) {
+    const msg = messages[i];
+    if (typeof msg.role !== 'string' || typeof msg.content !== 'string') {
       return res.status(400).json({
-        error: 'Invalid request: messages array required'
+        error: `Invalid message at index ${i}: each message must have a "role" and "content" string.`
       });
     }
+  }
+
+  try {
 
     // Check API key
     const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
