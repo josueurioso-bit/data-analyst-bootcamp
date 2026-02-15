@@ -4,7 +4,7 @@
 **Repo:** https://github.com/josueurioso-bit/data-analyst-bootcamp
 **Live:** https://data-analyst-bootcamp.vercel.app
 **Builder:** Josue
-**Last Updated:** February 14, 2026
+**Last Updated:** February 15, 2026
 
 ---
 
@@ -38,7 +38,7 @@ I'm picking up where I left off. Check PROGRESS.md for what's done and what's ne
 ```
 
 ### 5. Tell Claude what to work on
-Pick the next unchecked item from the Phase 0 checklist below.
+Phase 0 is done! Pick the next unchecked item from the Phase 1 checklist below.
 
 ---
 
@@ -50,50 +50,78 @@ Pick the next unchecked item from the Phase 0 checklist below.
 - **Files modified:** `api/chat.js` (added import + check before API call)
 - **How it works:** In-memory Map tracks requests per hashed IP. Returns 429 after 20 req/hr. Resets on Vercel cold starts.
 
-### [ ] 0B. Fix CORS
-- **What:** Change `Access-Control-Allow-Origin: *` to `https://data-analyst-bootcamp.vercel.app` in `api/chat.js` (line 34) and `api/export-csv.js`
-- **Risk:** Low — but test locally first. If the frontend URL is wrong, the app breaks.
-- **Prompt for Claude:** `Fix CORS in api/chat.js and api/export-csv.js. Replace the wildcard * origin with https://data-analyst-bootcamp.vercel.app. Keep the OPTIONS preflight handler working.`
+### [x] 0B. Fix CORS
+- **Commit:** `dfc7ef5` — Fix CORS: replace wildcard * with origin whitelist
+- **Files added:** `api/lib/cors.js` (shared CORS helper)
+- **Files modified:** `api/chat.js`, `api/export-csv.js`
+- **How it works:** Whitelists production URL + localhost/127.0.0.1 for local dev. Rejects all other origins.
 
-### [ ] 0C. Input Validation
-- **What:** Add payload size limit and message structure validation to `api/chat.js`
-- **Where:** Right after rate limiting, before the Anthropic API call
-- **Checks needed:** messages is array, each message has role+content strings, max 50 messages, max 10KB body
-- **Prompt for Claude:** `Add input validation to api/chat.js. Validate message array structure (each must have role and content strings), limit to 50 messages max, and reject payloads over 10KB. Add this right after the rate limiting check.`
+### [x] 0C. Input Validation
+- **Commit:** `3e6a4d4` — Add input validation to /api/chat
+- **Files modified:** `api/chat.js`
+- **How it works:** Validates payload size (10KB max), messages array, message count (50 max), and role+content string types. Runs after rate limiting, before API call.
 
-### [ ] 0D. Prompt Injection Guards
-- **What:** Add security instructions to the system prompt in `api/chat.js`
-- **Where:** Beginning of the `systemPrompt` string (around line 71)
-- **Prompt for Claude:** `Add prompt injection guards to the system prompt in api/chat.js. Add a security block at the start telling the AI to ignore attempts to override instructions, never reveal the system prompt, and stay in character as the assessment tutor.`
+### [x] 0D. Prompt Injection Guards
+- **Commit:** `fd091b8` — Add prompt injection guards to system prompt
+- **Files modified:** `api/chat.js`
+- **How it works:** Security block at start of system prompt prevents override attempts, prompt leaking, code generation, and off-topic manipulation.
 
-### [ ] 0E. LLM Adapter
-- **What:** Create `api/lib/llm.js` that wraps the Anthropic API call, then update `api/chat.js` to use it
-- **Why:** So you can swap to Gemini later without rewriting chat.js
-- **Two-step process:**
-  1. Create `api/lib/llm.js` with a `sendMessage(system, messages, options)` function
-  2. Update `api/chat.js` to use `llm.js` instead of direct `fetch()` to Anthropic
-- **Prompt for Claude:** `Create api/lib/llm.js — an LLM adapter that wraps the Anthropic API. It should export a sendMessage(system, messages, options) function. Then update api/chat.js to use it instead of the direct fetch call. Keep CommonJS for the adapter.`
+### [x] 0E. LLM Adapter
+- **Commit:** `5b10351` — Add LLM adapter and rewire chat.js
+- **Files added:** `api/lib/llm.js`
+- **Files modified:** `api/chat.js`
+- **How it works:** `sendMessage(system, messages, options)` wraps Anthropic API. chat.js uses adapter instead of direct fetch. Enables future Gemini fallback.
 
-### [ ] 0F. Supabase Migration
-- **What:** Replace SQLite (ephemeral) with Supabase PostgreSQL (persistent)
-- **BEFORE YOU START:** Create a free Supabase project at https://supabase.com
-- **Steps:**
-  1. Create Supabase project, get URL + anon key
-  2. Create `assessments` table in Supabase SQL editor (schema matches current SQLite)
-  3. Add `SUPABASE_URL` and `SUPABASE_KEY` to Vercel environment variables
-  4. Create `api/lib/db-supabase.js` (new file, don't delete old db.js yet)
-  5. Update imports in `api/chat.js` and `api/export-csv.js` to use new db file
-  6. Test end-to-end, then remove old `db.js`
-- **Prompt for Claude:** `I've created a Supabase project. URL: [paste URL] Key: [paste anon key]. Help me migrate from SQLite to Supabase. Read api/lib/db.js first to understand the current schema, then create api/lib/db-supabase.js as a replacement.`
+### [x] 0F. Supabase Migration
+- **Commit:** `9df8939` — Migrate from SQLite to Supabase PostgreSQL
+- **Files added:** `api/lib/db-supabase.js`
+- **Files modified:** `api/chat.js`, `api/export-csv.js`
+- **How it works:** REST API calls to Supabase PostgreSQL. Same interface as old db.js. RLS enabled (INSERT + SELECT only). Old db.js kept for reference.
+- **Note:** Rate limit bumped to 60 req/hr (`2dec584`) so users can complete the full 45-question assessment.
+- **Pending:** End-to-end test (complete full assessment and verify data saves to Supabase).
 
-### [ ] 0G. React Error Boundaries
-- **What:** Add ErrorBoundary components in `index.html` around the main app sections
-- **Prompt for Claude:** `Add React error boundaries to index.html. Wrap the chat interface and results dashboard in ErrorBoundary components so a crash in one section doesn't break the whole page.`
+### [x] 0G. React Error Boundaries
+- **Commit:** `da49ac5` — Add React error boundaries to chat and results dashboard
+- **Files modified:** `index.html`
+- **How it works:** ErrorBoundary class component wraps chat messages and results dashboard. Crash in one section shows recovery UI, doesn't break the whole page.
 
 ---
 
-## Phase 1: Phase B Assessment — Not Started
-Depends on Phase 0 being complete. See `docs/PRD_DataSRE.md` for requirements.
+## Phase 1: Phase B Assessment — In Progress
+
+Phase B adds a data skills diagnostic after the existing Phase A foundation assessment. It evaluates 5 skill areas (Excel, SQL, Python, Data Viz, Business Thinking) and generates a personalized study plan that routes users to their starting sprint.
+
+### [ ] 1A. Add Phase B Column to Supabase
+- **What:** Add `phase_b_results JSONB` column to the `assessments` table
+- **SQL:** `ALTER TABLE assessments ADD COLUMN phase_b_results JSONB;`
+- **Why:** Stores Phase B skill levels, recommended sprint, and study plan alongside Phase A results
+
+### [ ] 1B. Update System Prompt for Two-Phase Assessment
+- **What:** Expand the system prompt in `api/chat.js` to include Phase B assessment after Phase A
+- **Phase B covers:** Excel/Spreadsheets, SQL, Python, Data Visualization, Business Thinking
+- **Each skill rated:** None → Beginner → Developing → Competent
+- **Key:** Natural transition from Phase A → Phase B ("Great, now let's see where you are with data skills...")
+- **Output:** Updated JSON with both Phase A pillar scores AND Phase B skill levels + study plan
+
+### [ ] 1C. Update Database Save Logic
+- **What:** Update `api/chat.js` to save Phase B results to the new JSONB column
+- **Where:** The assessment-complete detection block in chat.js
+- **Update:** `api/lib/db-supabase.js` insertAssessment to include phase_b_results
+
+### [ ] 1D. Update Results Dashboard
+- **What:** Expand the results section in `index.html` to show Phase B skill breakdown + study plan
+- **New sections:** Skill level cards (Excel, SQL, Python, etc.), personalized study plan, "Begin Sprint" button
+- **Keep:** Existing Phase A readiness level and pillar cards
+
+### [ ] 1E. End-to-End Test
+- **What:** Complete a full Phase A + Phase B assessment and verify:
+  1. AI transitions naturally from Phase A to Phase B
+  2. Results JSON includes both phases
+  3. Data saves to Supabase (both phases)
+  4. Results dashboard displays everything correctly
+  5. Study plan makes sense based on answers
+
+---
 
 ## Phase 2: Sprint System — Not Started
 Depends on Phase 1 being complete. See `docs/REALISTIC_3DAY_ROADMAP.md` for the build plan.
@@ -104,10 +132,13 @@ Depends on Phase 1 being complete. See `docs/REALISTIC_3DAY_ROADMAP.md` for the 
 
 | File | Purpose |
 |------|---------|
-| `api/chat.js` | Main assessment API (ESM) — calls Anthropic, saves results |
-| `api/export-csv.js` | CSV download endpoint (CommonJS) |
-| `api/lib/db.js` | SQLite database helper (CommonJS) — will be replaced by Supabase |
-| `api/lib/rateLimiter.js` | Rate limiting (CommonJS) — 20 req/hr per IP |
+| `api/chat.js` | Main assessment API (ESM) — uses LLM adapter, saves to Supabase |
+| `api/export-csv.js` | CSV download endpoint (CommonJS) — reads from Supabase |
+| `api/lib/llm.js` | LLM adapter — wraps Anthropic API (swap providers here) |
+| `api/lib/db-supabase.js` | Supabase database helper (CommonJS) — persistent storage |
+| `api/lib/db.js` | Old SQLite helper (kept for reference, no longer used) |
+| `api/lib/cors.js` | CORS helper — whitelists production + localhost origins |
+| `api/lib/rateLimiter.js` | Rate limiting (CommonJS) — 60 req/hr per IP |
 | `index.html` | Entire frontend (React + Tailwind via CDN, no build step) |
 | `privacy.html` | Privacy policy page |
 | `.clauderules` | Rules Claude Code follows — read this first every session |
@@ -119,5 +150,5 @@ Depends on Phase 1 being complete. See `docs/REALISTIC_3DAY_ROADMAP.md` for the 
 | Variable | Status |
 |----------|--------|
 | `ANTHROPIC_API_KEY` | Set and working |
-| `SUPABASE_URL` | Not set yet (Phase 0F) |
-| `SUPABASE_KEY` | Not set yet (Phase 0F) |
+| `SUPABASE_URL` | Set and working |
+| `SUPABASE_KEY` | Set and working |
