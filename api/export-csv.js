@@ -13,7 +13,7 @@
  */
 
 // Using CommonJS for simplicity (works with dynamic import too)
-const { getAllAssessments } = require('./lib/db.js');
+const { getAllAssessments } = require('./lib/db-supabase.js');
 
 module.exports = async function handler(req, res) {
   // CORS headers — only allow our production URL and localhost for dev

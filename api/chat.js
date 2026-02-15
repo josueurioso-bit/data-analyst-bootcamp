@@ -289,7 +289,7 @@ Be warm, encouraging, and natural!`;
     if (assessmentResults && assessmentResults.assessment_complete && consentGiven === true) {
       try {
         // Dynamic import of database helper (CommonJS module)
-        const { insertAssessment } = await import('./lib/db.js');
+        const { insertAssessment } = await import('./lib/db-supabase.js');
 
         const clientIp = getClientIp(req);
         const ipHash = hashIp(clientIp);
