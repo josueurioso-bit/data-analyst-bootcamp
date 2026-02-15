@@ -2,7 +2,10 @@
 // Uses in-memory Map — resets on cold starts (acceptable for Vercel free tier)
 
 const WINDOW_MS = 60 * 60 * 1000; // 1 hour
-const MAX_REQUESTS = 20;
+// TEACHING MOMENT: The assessment has ~45 questions, each needing a request.
+// 20 was too low — users couldn't finish. 60 allows a full assessment
+// with room for retries, while still blocking abuse.
+const MAX_REQUESTS = 60;
 
 // Map<ipHash, { count, resetTime }>
 const hits = new Map();
