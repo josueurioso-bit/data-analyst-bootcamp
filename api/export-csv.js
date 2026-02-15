@@ -16,10 +16,9 @@
 const { getAllAssessments } = require('./lib/db.js');
 
 module.exports = async function handler(req, res) {
-  // CORS headers - needed for cross-origin requests
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  // CORS headers — only allow our production URL and localhost for dev
+  const { setCorsHeaders } = require('./lib/cors.js');
+  setCorsHeaders(req, res, 'GET, OPTIONS');
 
   // Handle preflight requests
   if (req.method === 'OPTIONS') {

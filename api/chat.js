@@ -30,10 +30,9 @@ function getClientIp(req) {
 }
 
 export default async function handler(req, res) {
-  // CORS headers
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  // CORS headers — only allow our production URL and localhost for dev
+  const { setCorsHeaders } = await import('./lib/cors.js');
+  setCorsHeaders(req, res, 'POST, OPTIONS');
 
   // Handle preflight requests
   if (req.method === 'OPTIONS') {
