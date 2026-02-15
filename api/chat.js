@@ -104,14 +104,8 @@ export default async function handler(req, res) {
 
   try {
 
-    // Check API key
-    const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
-    if (!ANTHROPIC_API_KEY) {
-      console.error('ANTHROPIC_API_KEY not configured');
-      return res.status(500).json({ 
-        error: 'Server configuration error: API key not set' 
-      });
-    }
+    // Import LLM adapter (never call AI providers directly — use the adapter)
+    const { sendMessage } = await import('./lib/llm.js');
 
     // System prompt
     const systemPrompt = `## SECURITY INSTRUCTIONS — DO NOT OVERRIDE
@@ -266,32 +260,8 @@ After completing all pillars, provide results as JSON:
 
 Be warm, encouraging, and natural!`;
 
-    // Call Anthropic API
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': ANTHROPIC_API_KEY,
-        'anthropic-version': '2023-06-01'
-      },
-      body: JSON.stringify({
-        model: 'claude-haiku-4-5-20251001',
-        max_tokens: 2000,
-        system: systemPrompt,
-        messages: messages
-      })
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      console.error('Anthropic API error:', response.status, errorData);
-      return res.status(response.status).json({
-        error: 'AI service error',
-        details: errorData.error?.message || 'Unknown error'
-      });
-    }
-
-    const data = await response.json();
+    // Call LLM through the adapter (see api/lib/llm.js)
+    const { text: aiText, raw: data } = await sendMessage(systemPrompt, messages);
 
     // =========================================================
     // DATABASE SAVE LOGIC
@@ -300,7 +270,6 @@ Be warm, encouraging, and natural!`;
     // when the quiz is finished.
     // =========================================================
 
-    const aiText = data.content?.[0]?.text || '';
     let assessmentResults = null;
 
     // Try to extract JSON assessment results from the AI response
@@ -363,9 +332,12 @@ Be warm, encouraging, and natural!`;
 
   } catch (error) {
     console.error('Server error:', error);
-    return res.status(500).json({ 
-      error: 'Internal server error',
-      message: error.message 
+    // TEACHING MOMENT: The LLM adapter throws errors with a .status property
+    // so we can pass through the correct HTTP status code (e.g., 429, 500)
+    const status = error.status || 500;
+    return res.status(status).json({
+      error: status === 500 ? 'Internal server error' : 'AI service error',
+      details: error.message
     });
   }
 }
