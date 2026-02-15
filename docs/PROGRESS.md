@@ -4,7 +4,7 @@
 **Repo:** https://github.com/josueurioso-bit/data-analyst-bootcamp
 **Live:** https://data-analyst-bootcamp.vercel.app
 **Builder:** Josue
-**Last Updated:** February 15, 2026
+**Last Updated:** February 15, 2026 (evening)
 
 ---
 
@@ -91,27 +91,22 @@ Phase 0 is done! Pick the next unchecked item from the Phase 1 checklist below.
 
 Phase B adds a data skills diagnostic after the existing Phase A foundation assessment. It evaluates 5 skill areas (Excel, SQL, Python, Data Viz, Business Thinking) and generates a personalized study plan that routes users to their starting sprint.
 
-### [ ] 1A. Add Phase B Column to Supabase
-- **What:** Add `phase_b_results JSONB` column to the `assessments` table
-- **SQL:** `ALTER TABLE assessments ADD COLUMN phase_b_results JSONB;`
-- **Why:** Stores Phase B skill levels, recommended sprint, and study plan alongside Phase A results
+### [x] 1A. Add Phase B Column to Supabase
+- **SQL run:** `ALTER TABLE assessments ADD COLUMN phase_b_results JSONB;`
+- **Status:** Column added to Supabase assessments table
 
-### [ ] 1B. Update System Prompt for Two-Phase Assessment
-- **What:** Expand the system prompt in `api/chat.js` to include Phase B assessment after Phase A
+### [x] 1B. Update System Prompt for Two-Phase Assessment
+- **Commit:** `21b0da6` — System prompt now covers Phase A (45 questions) + Phase B (15-20 questions)
 - **Phase B covers:** Excel/Spreadsheets, SQL, Python, Data Visualization, Business Thinking
 - **Each skill rated:** None → Beginner → Developing → Competent
-- **Key:** Natural transition from Phase A → Phase B ("Great, now let's see where you are with data skills...")
-- **Output:** Updated JSON with both Phase A pillar scores AND Phase B skill levels + study plan
+- **Sprint routing logic included** (skills → recommended starting sprint 1-6)
 
-### [ ] 1C. Update Database Save Logic
-- **What:** Update `api/chat.js` to save Phase B results to the new JSONB column
-- **Where:** The assessment-complete detection block in chat.js
-- **Update:** `api/lib/db-supabase.js` insertAssessment to include phase_b_results
+### [x] 1C. Update Database Save Logic
+- **Commit:** `21b0da6` — chat.js and db-supabase.js updated to save phase_b_results JSONB
 
-### [ ] 1D. Update Results Dashboard
-- **What:** Expand the results section in `index.html` to show Phase B skill breakdown + study plan
-- **New sections:** Skill level cards (Excel, SQL, Python, etc.), personalized study plan, "Begin Sprint" button
-- **Keep:** Existing Phase A readiness level and pillar cards
+### [x] 1D. Update Results Dashboard
+- **Commit:** `21b0da6` — Results page now shows Data Skills Placement cards, Study Plan (starting sprint, est. completion, sprints skipped), and "Begin Sprint X" button
+- **Note:** "Begin Sprint" button is present but non-functional until Phase 2
 
 ### [ ] 1E. End-to-End Test
 - **What:** Complete a full Phase A + Phase B assessment and verify:
