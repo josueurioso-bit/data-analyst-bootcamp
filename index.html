@@ -495,7 +495,7 @@
                       {assessmentResults.phase_b.sprints_to_focus && assessmentResults.phase_b.sprints_to_focus.length > 0 && (
                         <p className="text-indigo-800 text-sm">
                           <span className="font-semibold">Focus sprints:</span>{' '}
-                          {assessmentResults.phase_b.sprints_to_focus.map(s => `Sprint ${s}`).join(', ')}
+                          {assessmentResults.phase_b.sprints_to_focus.map(s => typeof s === 'number' ? `Sprint ${s}` : String(s)).join(', ')}
                         </p>
                       )}
                     </div>
