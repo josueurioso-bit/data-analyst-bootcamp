@@ -4,7 +4,7 @@
 **Repo:** https://github.com/josueurioso-bit/data-analyst-bootcamp
 **Live:** https://data-analyst-bootcamp.vercel.app
 **Builder:** Josue
-**Last Updated:** February 15, 2026 (evening)
+**Last Updated:** February 16, 2026
 
 ---
 
@@ -59,7 +59,7 @@ Phase 0 is done! Pick the next unchecked item from the Phase 1 checklist below.
 ### [x] 0C. Input Validation
 - **Commit:** `3e6a4d4` — Add input validation to /api/chat
 - **Files modified:** `api/chat.js`
-- **How it works:** Validates payload size (10KB max), messages array, message count (50 max), and role+content string types. Runs after rate limiting, before API call.
+- **How it works:** Validates payload size (50KB max), messages array, message count (150 max), and role+content string types. Runs after rate limiting, before API call.
 
 ### [x] 0D. Prompt Injection Guards
 - **Commit:** `fd091b8` — Add prompt injection guards to system prompt
@@ -96,7 +96,7 @@ Phase B adds a data skills diagnostic after the existing Phase A foundation asse
 - **Status:** Column added to Supabase assessments table
 
 ### [x] 1B. Update System Prompt for Two-Phase Assessment
-- **Commit:** `21b0da6` — System prompt now covers Phase A (45 questions) + Phase B (15-20 questions)
+- **Commit:** `21b0da6` — System prompt now covers Phase A + Phase B
 - **Phase B covers:** Excel/Spreadsheets, SQL, Python, Data Visualization, Business Thinking
 - **Each skill rated:** None → Beginner → Developing → Competent
 - **Sprint routing logic included** (skills → recommended starting sprint 1-6)
@@ -108,13 +108,21 @@ Phase B adds a data skills diagnostic after the existing Phase A foundation asse
 - **Commit:** `21b0da6` — Results page now shows Data Skills Placement cards, Study Plan (starting sprint, est. completion, sprints skipped), and "Begin Sprint X" button
 - **Note:** "Begin Sprint" button is present but non-functional until Phase 2
 
-### [ ] 1E. End-to-End Test
+### [x] 1E. Trim Assessment to 22 Questions (~10 minutes)
+- **Commit:** `9a9407e` — Cut from 60+ questions (30+ min) to 22 questions (~10 min)
+- **Phase A:** 10 exact high-signal questions (down from 45) — numeracy 2, reading 1, computer literacy 2, logic 2, communication 1, mindset 2
+- **Phase B:** 12 exact placement questions (down from 15-20) — Excel 2, SQL 2, Python 3, viz 2, business thinking 3
+- **Scoring:** Scales proportionally to same maximums per pillar; JSON output format unchanged
+- **Also:** Message limit bumped from 50 → 150; payload limit already at 50KB
+
+### [ ] 1F. End-to-End Test
 - **What:** Complete a full Phase A + Phase B assessment and verify:
   1. AI transitions naturally from Phase A to Phase B
   2. Results JSON includes both phases
   3. Data saves to Supabase (both phases)
   4. Results dashboard displays everything correctly
   5. Study plan makes sense based on answers
+  6. Assessment completes in ~10 minutes
 
 ---
 
