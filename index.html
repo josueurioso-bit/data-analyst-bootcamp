@@ -187,14 +187,34 @@
           const data = await response.json();
           const assistantMessage = data.content[0].text;
 
-          // Check if assessment is complete
+          // Check if assessment is complete — extract JSON by brace-counting
           try {
-            const jsonMatch = assistantMessage.match(/\{[\s\S]*"assessment_complete":\s*true[\s\S]*\}/);
-            if (jsonMatch) {
-              const results = JSON.parse(jsonMatch[0]);
-              setAssessmentResults(results);
-              
-              const messageWithoutJson = assistantMessage.replace(jsonMatch[0], '').trim();
+            const marker = '"assessment_complete"';
+            const markerIdx = assistantMessage.indexOf(marker);
+            let extracted = null;
+            let jsonStr = null;
+            if (markerIdx !== -1) {
+              let start = -1;
+              for (let i = markerIdx - 1; i >= 0; i--) {
+                if (assistantMessage[i] === '{') { start = i; break; }
+              }
+              if (start !== -1) {
+                let depth = 0;
+                for (let i = start; i < assistantMessage.length; i++) {
+                  if (assistantMessage[i] === '{') depth++;
+                  else if (assistantMessage[i] === '}') depth--;
+                  if (depth === 0) {
+                    jsonStr = assistantMessage.substring(start, i + 1);
+                    const parsed = JSON.parse(jsonStr);
+                    if (parsed.assessment_complete === true) extracted = parsed;
+                    break;
+                  }
+                }
+              }
+            }
+            if (extracted) {
+              setAssessmentResults(extracted);
+              const messageWithoutJson = assistantMessage.replace(jsonStr, '').trim();
               if (messageWithoutJson) {
                 setMessages(prev => [...prev, { role: 'assistant', content: messageWithoutJson }]);
               }

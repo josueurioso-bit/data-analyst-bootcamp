@@ -293,11 +293,33 @@ Be warm, encouraging, and natural throughout both phases!`;
 
     // Try to extract JSON assessment results from the AI response
     try {
-      // Look for JSON object with assessment_complete: true
-      const jsonMatch = aiText.match(/\{[\s\S]*"assessment_complete":\s*true[\s\S]*\}/);
-      if (jsonMatch) {
-        assessmentResults = JSON.parse(jsonMatch[0]);
-        console.log('[Chat] Assessment complete detected');
+      // Find the JSON block by locating "assessment_complete" and counting braces
+      // (The old greedy regex could grab extra text if the AI used {} in conversation)
+      const marker = '"assessment_complete"';
+      const markerIdx = aiText.indexOf(marker);
+      if (markerIdx !== -1) {
+        // Walk backwards to find the opening {
+        let start = -1;
+        for (let i = markerIdx - 1; i >= 0; i--) {
+          if (aiText[i] === '{') { start = i; break; }
+        }
+        if (start !== -1) {
+          // Count braces to find the matching closing }
+          let depth = 0;
+          for (let i = start; i < aiText.length; i++) {
+            if (aiText[i] === '{') depth++;
+            else if (aiText[i] === '}') depth--;
+            if (depth === 0) {
+              const jsonStr = aiText.substring(start, i + 1);
+              const parsed = JSON.parse(jsonStr);
+              if (parsed.assessment_complete === true) {
+                assessmentResults = parsed;
+                console.log('[Chat] Assessment complete detected');
+              }
+              break;
+            }
+          }
+        }
       }
     } catch (parseError) {
       // Not a final result, just a normal conversation turn - that's fine
