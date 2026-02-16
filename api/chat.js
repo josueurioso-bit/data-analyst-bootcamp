@@ -68,11 +68,11 @@ export default async function handler(req, res) {
   // 3. Denial-of-service via oversized requests
   // =========================================================
 
-  // Check payload size (max 10KB)
+  // Check payload size (max 50KB — a full two-phase assessment is ~130 messages)
   const bodyStr = JSON.stringify(req.body || {});
-  if (bodyStr.length > 10240) {
+  if (bodyStr.length > 51200) {
     return res.status(413).json({
-      error: 'Payload too large. Maximum size is 10KB.'
+      error: 'Payload too large. Maximum size is 50KB.'
     });
   }
 
