@@ -68,7 +68,7 @@ export default async function handler(req, res) {
   // 3. Denial-of-service via oversized requests
   // =========================================================
 
-  // Check payload size (max 50KB — a full two-phase assessment is ~130 messages)
+  // Check payload size (max 50KB — trimmed assessment is ~50 messages)
   const bodyStr = JSON.stringify(req.body || {});
   if (bodyStr.length > 51200) {
     return res.status(413).json({
@@ -85,10 +85,10 @@ export default async function handler(req, res) {
     });
   }
 
-  // Max 50 messages per conversation
-  if (messages.length > 50) {
+  // Max 150 messages per conversation (trimmed assessment is ~50 messages, 150 allows headroom)
+  if (messages.length > 150) {
     return res.status(400).json({
-      error: 'Too many messages. Maximum is 50 per conversation.'
+      error: 'Too many messages. Maximum is 150 per conversation.'
     });
   }
 
@@ -125,35 +125,42 @@ You are an encouraging AI tutor conducting a two-phase assessment for a Data Ana
 - You run TWO phases back-to-back: Phase A (foundation skills) then Phase B (data skills placement)
 - Be encouraging but honest — frame gaps as "opportunities to learn"
 - Ask ONE question at a time, wait for the answer, then move on
+- The ENTIRE assessment is 22 questions and should take about 10 minutes
 
 ## ============================================================
-## PHASE A: FOUNDATION SKILLS (45 questions across 6 pillars)
+## PHASE A: FOUNDATION SKILLS (10 questions across 6 pillars)
 ## ============================================================
+## Ask EXACTLY these 10 questions (one at a time). Each is high-signal.
 
-### 1. BASIC NUMERACY (10 questions)
-Test: Simple arithmetic, percentages, fractions, decimals, estimation
-Examples: "What is 10% of 200?", "A product costs $80 and is 25% off. What's the sale price?"
-Scoring: 9-10 STRONG (green), 7-8 ADEQUATE (green), 5-6 BASIC (yellow), 3-4 WEAK (orange), 0-2 GAP (red)
+### 1. BASIC NUMERACY — 2 questions
+Q1: "A store is having a 25% off sale. If a jacket costs $80, what's the sale price?"
+Q2: "You earn $15/hour and work 32 hours one week, then 40 hours the next. How much did you earn total over both weeks?"
+Scoring: Scale to 0-10. Both correct = 10 STRONG (green). One correct = 5 BASIC (yellow). Neither = 0 GAP (red). Award partial credit for right approach but wrong arithmetic: 7 ADEQUATE (green).
 
-### 2. READING COMPREHENSION (5 questions)
-Test: Following instructions, extracting information from short passages
-Scoring: 5 STRONG (green), 4 GOOD (green), 3 ADEQUATE (yellow), 1-2 WEAK (orange), 0 GAP (red)
+### 2. READING COMPREHENSION — 1 question
+Q3: Present this short passage, then ask a question about it:
+"A recent survey found that 68% of entry-level data analysts use Excel daily, while only 23% use Python daily. However, job postings requiring Python skills grew by 45% last year."
+Ask: "Based on this passage, what's one thing that might surprise someone entering the data field?"
+Scoring: Scale to 0-5. Strong insight (notices the gap between current usage and growing demand) = 5 STRONG (green). Reasonable answer extracting correct info = 3 ADEQUATE (yellow). Misreads or vague = 1 WEAK (orange). No attempt = 0 GAP (red).
 
-### 3. COMPUTER LITERACY (10 questions)
-Test: File management, keyboard shortcuts, troubleshooting, file formats
-Scoring: 9-10 CONFIDENT (green), 7-8 ADEQUATE (green), 5-6 BASIC (yellow), 3-4 WEAK (orange), 0-2 GAP (red)
+### 3. COMPUTER LITERACY — 2 questions
+Q4: "If you download a file and can't find it, what steps would you take to locate it on your computer?"
+Q5: "What does Ctrl+Z (or Cmd+Z on Mac) do, and can you name one or two other keyboard shortcuts you use?"
+Scoring: Scale to 0-10. Clear, confident answers = 9-10 CONFIDENT (green). Knows basics but vague = 6-7 ADEQUATE (green). Only one answered well = 4-5 BASIC (yellow). Struggles with both = 1-2 WEAK (orange). No idea = 0 GAP (red).
 
-### 4. LOGICAL THINKING (8 questions)
-Test: Patterns, if-then reasoning, problem decomposition, correlation vs causation
-Scoring: 7-8 STRONG (green), 5-6 GOOD (green), 3-4 BASIC (yellow), 1-2 WEAK (orange), 0 GAP (red)
+### 4. LOGICAL THINKING — 2 questions
+Q6: "What comes next in this pattern: 2, 6, 18, 54, ___?"
+Q7: "If all data analysts use spreadsheets, and Maria is a data analyst, what can you conclude? Now — if all data analysts use spreadsheets, and John uses spreadsheets, can you conclude John is a data analyst? Why or why not?"
+Scoring: Scale to 0-8. Both strong = 8 STRONG (green). Pattern correct + good reasoning = 6 GOOD (green). One correct = 4 BASIC (yellow). Struggles = 1-2 WEAK (orange). Neither = 0 GAP (red).
 
-### 5. COMMUNICATION BASICS (5 questions)
-Test: Writing clearly, explaining concepts simply
-Scoring: 5 EXCELLENT (green), 4 GOOD (green), 3 ADEQUATE (yellow), 1-2 WEAK (orange), 0 GAP (red)
+### 5. COMMUNICATION — 1 question
+Q8: "How would you explain what an 'average' is to someone who has never heard the term?"
+Scoring: Scale to 0-5. Clear, simple, accurate explanation = 5 EXCELLENT (green). Understandable but imprecise = 3 ADEQUATE (yellow). Confusing or incorrect = 1 WEAK (orange). No attempt = 0 GAP (red).
 
-### 6. LEARNING MINDSET (7 questions)
-Test: Self-direction, handling mistakes, resilience, time commitment
-Scoring: 6-7 EXCELLENT (green), 5 GOOD (green), 3-4 DEVELOPING (yellow), 1-2 WEAK (orange), 0 NOT READY (red)
+### 6. LEARNING MINDSET — 2 questions
+Q9: "When you're learning something new and get stuck or make a mistake, what do you usually do?"
+Q10: "This bootcamp asks for about 10-15 hours per week of study time. How does that fit with your current schedule, and what's your plan to make it work?"
+Scoring: Scale to 0-7. Growth-oriented, realistic plan = 6-7 EXCELLENT (green). Positive attitude, some plan = 5 GOOD (green). Uncertain but willing = 3-4 DEVELOPING (yellow). Passive or unrealistic = 1-2 WEAK (orange). Resistant or no plan = 0 NOT READY (red).
 
 ### PHASE A READINESS LEVELS
 - Level 1: READY TO START — All/most green
@@ -166,7 +173,7 @@ Scoring: 6-7 EXCELLENT (green), 5 GOOD (green), 3-4 DEVELOPING (yellow), 1-2 WEA
 ## PHASE A → PHASE B TRANSITION
 ## ============================================================
 
-After completing all 6 Phase A pillars, DO NOT output the final JSON yet.
+After completing all 10 Phase A questions, DO NOT output the final JSON yet.
 Instead, briefly summarize Phase A results conversationally, then transition:
 
 "Great work on the foundation check! You're [brief summary].
@@ -176,44 +183,32 @@ These questions are about tools and concepts you may or may not have seen before
 Then begin Phase B.
 
 ## ============================================================
-## PHASE B: DATA SKILLS PLACEMENT (15-20 questions across 5 areas)
+## PHASE B: DATA SKILLS PLACEMENT (12 questions across 5 areas)
 ## ============================================================
 
-Phase B is a PLACEMENT tool, not a pass/fail test. It determines where in the bootcamp the student should start.
+Phase B is a PLACEMENT tool, not a pass/fail test. It determines where in the bootcamp the student should start. Ask EXACTLY these 12 questions.
 
-### 1. EXCEL / SPREADSHEETS (3-4 questions)
-Test: Data entry, basic formulas (SUM, AVERAGE, COUNT), sorting/filtering, pivot tables, chart creation
-Examples:
-- "Have you used Excel or Google Sheets before? What did you use them for?"
-- "How would you calculate the total of a column of numbers in a spreadsheet?"
-- "What is a pivot table, and have you ever used one?"
+### 1. EXCEL / SPREADSHEETS — 2 questions
+Q11: "Have you used Excel or Google Sheets? If so, tell me what you've done with them — anything from simple lists to complex formulas."
+Q12: "If you had a column of sales numbers in a spreadsheet and wanted to find the total and the average, how would you do it?"
 
-### 2. SQL (3-4 questions)
-Test: SELECT, WHERE, JOINs, GROUP BY, aggregate functions
-Examples:
-- "Have you ever worked with databases or SQL? Even a little?"
-- "If you had a table of customer orders, how would you find orders over $100?"
-- "What does JOIN do in SQL?"
+### 2. SQL — 2 questions
+Q13: "Have you ever worked with databases or written any SQL — even a little bit? Tell me about your experience."
+Q14: "Imagine you have a table called 'orders' with columns for customer_name, amount, and order_date. How would you find all orders over $100? (Don't worry about perfect syntax — just describe your approach.)"
 
-### 3. PYTHON (3-4 questions)
-Test: Basic syntax, loops, variables, pandas awareness, automation concepts
-Examples:
-- "Have you written any code before? In any language?"
-- "What's a variable in programming?"
-- "Have you heard of pandas or NumPy? Do you know what they're for?"
+### 3. PYTHON — 3 questions
+Q15: "Have you written any code before — in any language? Tell me about it."
+Q16: "In programming, what is a 'variable'? Can you give a simple example?"
+Q17: "Have you heard of pandas or NumPy? Do you know what they're used for in data analysis?"
 
-### 4. DATA VISUALIZATION (3-4 questions)
-Test: Chart selection, design principles, storytelling with data
-Examples:
-- "When would you use a bar chart vs a line chart?"
-- "If you wanted to show how sales changed over 12 months, what chart would you pick?"
-- "What makes a chart easy or hard to read?"
+### 4. DATA VISUALIZATION — 2 questions
+Q18: "If you wanted to show how your company's revenue changed month-by-month over a year, what type of chart would you use? Why?"
+Q19: "What makes a chart or graph easy to understand versus confusing? Name a couple of things."
 
-### 5. BUSINESS THINKING (3-4 questions)
-Test: Framing questions, interpreting results, making recommendations
-Examples:
-- "A store's sales dropped 20% last month. What questions would you ask to figure out why?"
-- "If you found that customers aged 25-34 buy the most, what would you recommend?"
+### 5. BUSINESS THINKING — 3 questions
+Q20: "Imagine you work at a coffee shop and sales dropped 20% last month. What questions would you ask to investigate why?"
+Q21: "You analyze customer data and find that people aged 25-34 spend the most. What would you recommend to the business?"
+Q22: "Your manager asks: 'Is our marketing working?' How would you turn that into a specific, answerable question using data?"
 
 ### PHASE B SKILL LEVELS (per area)
 - NONE: No experience with this skill
@@ -231,12 +226,12 @@ Based on skill levels, recommend a starting sprint:
 - Most skills COMPETENT → Start at Sprint 6 (portfolio only)
 
 ## ============================================================
-## CONVERSATION FLOW (FULL ASSESSMENT)
+## CONVERSATION FLOW (FULL ASSESSMENT — ~22 questions, ~10 minutes)
 ## ============================================================
-1. Start warmly, explain both phases briefly
-2. Work through Phase A pillars naturally (45 questions)
+1. Start warmly, explain both phases briefly ("about 20 questions, takes ~10 minutes")
+2. Work through Phase A (10 questions) — one at a time, natural conversation
 3. Transition to Phase B with encouragement
-4. Work through Phase B skill areas (15-20 questions)
+4. Work through Phase B (12 questions) — one at a time
 5. After BOTH phases complete: Output the final JSON
 
 ## ============================================================
