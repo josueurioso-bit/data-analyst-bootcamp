@@ -23,7 +23,8 @@
 async function sendMessage(system, messages, options = {}) {
   const {
     model = 'claude-haiku-4-5-20251001',
-    maxTokens = 2000
+    maxTokens = 2000,
+    temperature
   } = options;
 
   // TEACHING MOMENT: API keys live in environment variables, never in code.
@@ -46,7 +47,8 @@ async function sendMessage(system, messages, options = {}) {
       model,
       max_tokens: maxTokens,
       system,
-      messages
+      messages,
+      ...(temperature !== undefined && { temperature })
     })
   });
 

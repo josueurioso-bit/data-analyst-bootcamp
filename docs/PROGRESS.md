@@ -115,8 +115,9 @@ Phase B adds a data skills diagnostic after the existing Phase A foundation asse
 - **Scoring:** Scales proportionally to same maximums per pillar; JSON output format unchanged
 - **Also:** Message limit bumped from 50 → 150; payload limit already at 50KB
 
-### [ ] 1F. End-to-End Test
-- **What:** Complete a full Phase A + Phase B assessment and verify:
+### [x] 1F. End-to-End Test
+- **Status:** Passed — full assessment completed manually on live site
+- **Verified:**
   1. AI transitions naturally from Phase A to Phase B
   2. Results JSON includes both phases
   3. Data saves to Supabase (both phases)
@@ -126,8 +127,57 @@ Phase B adds a data skills diagnostic after the existing Phase A foundation asse
 
 ---
 
-## Phase 2: Sprint System — Not Started
-Depends on Phase 1 being complete. See `docs/REALISTIC_3DAY_ROADMAP.md` for the build plan.
+## Phase 2: Sprint System — In Progress
+
+Phase 2 builds the Sprint 1 vertical slice: assessment results → sprint dashboard → workspace → submission → AI feedback. This proves the full product loop.
+
+### [x] 2A. Supabase Schema — `sprints` + `submissions` tables
+- **Action:** Run SQL in Supabase dashboard
+- **Tables:** `sprints` (id, title, description, business_scenario, dataset_url, deliverables JSONB, rubric_id), `submissions` (id UUID, session_id, sprint_id, submission_text, submission_urls JSONB, score, feedback JSONB, status, submitted_at, evaluated_at)
+- **RLS:** sprints read-only, submissions insert+read+update
+- **Status:** Pending — SQL must be run in Supabase dashboard
+
+### [x] 2B. Generate Sprint 1 Dataset
+- **Files added:** `scripts/generate-sprint-1-data.js`, `data/sprint-1-deliveries.csv`
+- **How it works:** Generates 5,000 rows with embedded patterns:
+  - QuickMove carrier: ~35% late rate (PRIMARY finding)
+  - Phoenix warehouse: ~28% late rate (SECONDARY finding)
+  - Snow: correlates with delays but NOT root cause
+  - Economy routes: NOT slower than Express
+- **Verified:** Console output confirms all 4 patterns within expected ranges
+
+### [x] 2C. Database Helper Functions
+- **Files modified:** `api/lib/db-supabase.js`
+- **Functions added:** `getSprintById()`, `insertSubmission()`, `getSubmissionById()`, `updateSubmission()`
+- **How it works:** Same `supabaseRequest()` pattern as existing functions
+
+### [x] 2D. Sprint 1 Rubric
+- **Files added:** `api/lib/rubrics.js` (CommonJS)
+- **How it works:** Sprint 1 rubric with 5 weighted categories (Business Framing 20%, Data Correctness 25%, Technical Execution 25%, Insight Quality 20%, Communication Clarity 10%). `validateScores()` recalculates weighted overall, overrides AI if >5 points off, sets passed = score >= 75.
+
+### [x] 2E. API Endpoints
+- **Files added:** `api/submit.js` (ESM), `api/evaluate.js` (ESM)
+- **Files modified:** `api/lib/llm.js` (added temperature support)
+- **submit.js:** CORS, rate limiting, input validation (200-5000 chars), saves to submissions table, returns submission_id
+- **evaluate.js:** Loads submission, builds evaluation prompt with ground truth + rubric, calls LLM (temperature 0.3), parses JSON response (markdown fences + brace-counting fallback), validates scores server-side, saves feedback to DB
+
+### [x] 2F. Frontend — View System + Sprint Dashboard + Workspace
+- **Files modified:** `index.html`
+- **View system:** `currentView` state drives 5 views: assessment, results, dashboard, sprint, feedback
+- **Session ID:** Generated via `crypto.randomUUID()` on assessment completion, stored in localStorage
+- **Sprint Dashboard:** 6 cards in a grid, Sprint 1 active/clickable, Sprints 2-6 locked with "Coming Soon"
+- **Sprint Workspace:** Business scenario, deliverables checklist, CSV download button, submission form with character counter
+
+### [x] 2G. Frontend — Submission Form + Feedback Display
+- **Submission form:** Google Sheets URL (optional, validated), Executive Memo textarea (200-5000 chars, character counter), Submit button → POST /api/submit → POST /api/evaluate → spinner
+- **Feedback display:** Overall score (large, color-coded: green >=75, yellow 60-74, red <60), 5 category score cards with feedback text, strengths + areas for improvement lists, pass/fail, "Try Again" button (score < 75)
+
+### [ ] 2H. End-to-End Test
+- **Status:** Pending — need to:
+  1. Run Supabase SQL to create `sprints` and `submissions` tables
+  2. Deploy to Vercel
+  3. Complete full flow: assessment → dashboard → workspace → download CSV → submit memo → see feedback
+  4. Verify submission row in Supabase
 
 ---
 
@@ -136,9 +186,12 @@ Depends on Phase 1 being complete. See `docs/REALISTIC_3DAY_ROADMAP.md` for the 
 | File | Purpose |
 |------|---------|
 | `api/chat.js` | Main assessment API (ESM) — uses LLM adapter, saves to Supabase |
+| `api/submit.js` | Sprint submission API (ESM) — saves student work to submissions table |
+| `api/evaluate.js` | Sprint evaluation API (ESM) — AI scores submissions against rubric |
 | `api/export-csv.js` | CSV download endpoint (CommonJS) — reads from Supabase |
 | `api/lib/llm.js` | LLM adapter — wraps Anthropic API (swap providers here) |
 | `api/lib/db-supabase.js` | Supabase database helper (CommonJS) — persistent storage |
+| `api/lib/rubrics.js` | Sprint rubrics + score validation (CommonJS) |
 | `api/lib/db.js` | Old SQLite helper (kept for reference, no longer used) |
 | `api/lib/cors.js` | CORS helper — whitelists production + localhost origins |
 | `api/lib/rateLimiter.js` | Rate limiting (CommonJS) — 60 req/hr per IP |
@@ -146,7 +199,9 @@ Depends on Phase 1 being complete. See `docs/REALISTIC_3DAY_ROADMAP.md` for the 
 | `privacy.html` | Privacy policy page |
 | `.clauderules` | Rules Claude Code follows — read this first every session |
 | `scripts/seed-data.js` | Generates 100 demo assessment records |
+| `scripts/generate-sprint-1-data.js` | Generates Sprint 1 delivery dataset (5,000 rows) |
 | `scripts/verify-patterns.js` | Analyzes database for demo patterns |
+| `data/sprint-1-deliveries.csv` | Sprint 1 dataset (generated, 5,000 rows) |
 
 ## Environment Variables (set in Vercel dashboard)
 

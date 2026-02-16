@@ -164,11 +164,129 @@ async function getAssessmentCount() {
   }
 }
 
-// Export the same interface as the old db.js
+// =========================================================
+// SPRINT SYSTEM — Phase 2 Functions
+// =========================================================
+
+/**
+ * Get a sprint by its ID
+ *
+ * @param {number} sprintId - The sprint ID (1-6)
+ * @returns {Object|null} - Sprint data or null if not found
+ */
+async function getSprintById(sprintId) {
+  try {
+    const { data, error } = await supabaseRequest(
+      `/rest/v1/sprints?id=eq.${sprintId}&select=*`
+    );
+
+    if (error) {
+      console.error('[DB] Sprint query error:', error);
+      return null;
+    }
+
+    return Array.isArray(data) && data.length > 0 ? data[0] : null;
+  } catch (error) {
+    console.error('[DB] Sprint query error:', error.message);
+    return null;
+  }
+}
+
+/**
+ * Insert a new submission
+ *
+ * @param {Object} submission - { session_id, sprint_id, submission_text, submission_urls }
+ * @returns {Object|null} - Created submission row (with id) or null on failure
+ */
+async function insertSubmission(submission) {
+  try {
+    const { data, error } = await supabaseRequest('/rest/v1/submissions', {
+      method: 'POST',
+      body: JSON.stringify({
+        session_id: submission.session_id,
+        sprint_id: submission.sprint_id,
+        submission_text: submission.submission_text,
+        submission_urls: submission.submission_urls || null,
+        status: 'pending'
+      })
+    });
+
+    if (error) {
+      console.error('[DB] Submission insert error:', error);
+      return null;
+    }
+
+    console.log('[DB] Submission inserted successfully');
+    return Array.isArray(data) && data.length > 0 ? data[0] : null;
+  } catch (error) {
+    console.error('[DB] Submission insert error:', error.message);
+    return null;
+  }
+}
+
+/**
+ * Get a submission by its UUID
+ *
+ * @param {string} submissionId - UUID of the submission
+ * @returns {Object|null} - Submission data or null
+ */
+async function getSubmissionById(submissionId) {
+  try {
+    const { data, error } = await supabaseRequest(
+      `/rest/v1/submissions?id=eq.${submissionId}&select=*`
+    );
+
+    if (error) {
+      console.error('[DB] Submission query error:', error);
+      return null;
+    }
+
+    return Array.isArray(data) && data.length > 0 ? data[0] : null;
+  } catch (error) {
+    console.error('[DB] Submission query error:', error.message);
+    return null;
+  }
+}
+
+/**
+ * Update a submission (e.g., after evaluation completes)
+ *
+ * @param {string} submissionId - UUID of the submission
+ * @param {Object} updates - Fields to update (score, feedback, status, evaluated_at)
+ * @returns {Object|null} - Updated submission row or null
+ */
+async function updateSubmission(submissionId, updates) {
+  try {
+    const { data, error } = await supabaseRequest(
+      `/rest/v1/submissions?id=eq.${submissionId}`,
+      {
+        method: 'PATCH',
+        body: JSON.stringify(updates)
+      }
+    );
+
+    if (error) {
+      console.error('[DB] Submission update error:', error);
+      return null;
+    }
+
+    console.log('[DB] Submission updated successfully');
+    return Array.isArray(data) && data.length > 0 ? data[0] : null;
+  } catch (error) {
+    console.error('[DB] Submission update error:', error.message);
+    return null;
+  }
+}
+
+// Export the same interface as the old db.js + new sprint functions
 // TEACHING MOMENT: By keeping the same function names and signatures,
 // we can swap databases without changing any code that uses them.
 module.exports = {
   insertAssessment,
   getAllAssessments,
-  getAssessmentCount
+  getAssessmentCount,
+  getSprintById,
+  insertSubmission,
+  getSubmissionById,
+  updateSubmission
 };
