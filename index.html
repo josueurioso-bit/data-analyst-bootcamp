@@ -227,6 +227,9 @@ Your job: Analyze the data in Excel/Google Sheets, identify the root causes, and
         return localStorage.getItem('bootcamp_session_id') || null;
       });
 
+      // Whether user skipped the assessment (arrived via URL param)
+      const [skippedAssessment, setSkippedAssessment] = useState(false);
+
       // Submission + Feedback state
       const [submissionFeedback, setSubmissionFeedback] = useState(null);
       const [memoText, setMemoText] = useState('');
@@ -243,6 +246,29 @@ Your job: Analyze the data in Excel/Google Sheets, identify the root causes, and
 
       useEffect(() => { scrollToBottom(); }, [messages]);
       useEffect(() => { inputRef.current?.focus(); }, []);
+
+      // URL param routing — allow skipping assessment via ?view=dashboard or ?view=sprint
+      useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const view = params.get('view');
+        if (view === 'dashboard' || view === 'sprint') {
+          // Generate session ID if none exists
+          if (!sessionId) {
+            const newId = crypto.randomUUID();
+            setSessionId(newId);
+            localStorage.setItem('bootcamp_session_id', newId);
+          }
+          setSkippedAssessment(true);
+          if (view === 'sprint') {
+            setCurrentSprint(SPRINTS[0]);
+            setCurrentView('sprint');
+          } else {
+            setCurrentView('dashboard');
+          }
+          // Clean up URL params without reload
+          window.history.replaceState({}, '', window.location.pathname);
+        }
+      }, []);
 
       // When assessment completes, generate session ID and switch to results
       useEffect(() => {
@@ -763,12 +789,21 @@ Your job: Analyze the data in Excel/Google Sheets, identify the root causes, and
             <main className="flex-1 overflow-y-auto px-4 py-6">
               <div className="max-w-4xl mx-auto">
                 {/* Back nav */}
-                <button
-                  onClick={() => setCurrentView('results')}
-                  className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6 text-sm font-medium transition-colors"
-                >
-                  <ArrowLeftIcon /> Back to Results
-                </button>
+                {skippedAssessment ? (
+                  <a
+                    href="landing.html"
+                    className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6 text-sm font-medium transition-colors"
+                  >
+                    <ArrowLeftIcon /> Back to Landing Page
+                  </a>
+                ) : (
+                  <button
+                    onClick={() => setCurrentView('results')}
+                    className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6 text-sm font-medium transition-colors"
+                  >
+                    <ArrowLeftIcon /> Back to Results
+                  </button>
+                )}
 
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {SPRINTS.map((sprint) => (
