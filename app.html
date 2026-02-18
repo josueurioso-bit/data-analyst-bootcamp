@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Data Analyst Bootcamp</title>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+        'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border-width: 0;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script type="text/babel">
+    const { useState, useEffect, useRef } = React;
+
+    // =========================================================
+    // Error Boundary
+    // =========================================================
+    class ErrorBoundary extends React.Component {
+      constructor(props) {
+        super(props);
+        this.state = { hasError: false, error: null };
+      }
+
+      static getDerivedStateFromError(error) {
+        return { hasError: true, error };
+      }
+
+      componentDidCatch(error, errorInfo) {
+        console.error(`[ErrorBoundary] ${this.props.name || 'Unknown'}:`, error, errorInfo);
+      }
+
+      render() {
+        if (this.state.hasError) {
+          return (
+            <div className="bg-red-50 border border-red-200 rounded-xl p-6 m-4 text-center">
+              <h3 className="text-red-800 font-semibold mb-2">
+                Something went wrong in {this.props.name || 'this section'}
+              </h3>
+              <p className="text-red-600 text-sm mb-4">
+                {this.state.error?.message || 'An unexpected error occurred.'}
+              </p>
+              <button
+                onClick={() => this.setState({ hasError: false, error: null })}
+                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+              >
+                Try Again
+              </button>
+            </div>
+          );
+        }
+        return this.props.children;
+      }
+    }
+
+    // =========================================================
+    // Constants
+    // =========================================================
+    const API_URL = 'https://data-analyst-bootcamp.vercel.app';
+
+    // Sprint metadata (hardcoded in frontend — Sprints 2-6 are locked placeholders)
+    const SPRINTS = [
+      {
+        id: 1,
+        title: 'Excel: Operational Bottleneck Analysis',
+        description: 'Analyze delivery data to find root causes of late shipments at FastTrack Logistics.',
+        locked: false,
+        business_scenario: `You've just been hired as a Junior Data Analyst at FastTrack Logistics. The VP of Operations is concerned: late deliveries cost the company $2.3M last year.
+
+She hands you a dataset of 5,000 delivery records and says: "Find out WHY our deliveries are late. I need answers by Friday."
+
+Your job: Analyze the data in Excel/Google Sheets, identify the root causes, and write a 1-page executive memo with your findings and recommendations.`,
+        deliverables: [
+          'Download and explore the delivery dataset (5,000 rows)',
+          'Create pivot tables to analyze late delivery patterns',
+          'Add calculated fields (days_late, on_time flag)',
+          'Identify the primary and secondary causes of delays',
+          'Distinguish correlation from causation in the data',
+          'Write a 1-page executive memo to the VP of Operations'
+        ],
+        dataset_url: '/data/sprint-1-deliveries.csv'
+      },
+      {
+        id: 2,
+        title: 'SQL: Customer Segmentation',
+        description: 'Query a database to segment customers and identify high-value groups.',
+        locked: true
+      },
+      {
+        id: 3,
+        title: 'SQL + Excel: Sales Pipeline Analysis',
+        description: 'Combine SQL queries with Excel dashboards to analyze sales funnel performance.',
+        locked: true
+      },
+      {
+        id: 4,
+        title: 'Python: Automated Reporting',
+        description: 'Build a Python script to automate weekly KPI reporting.',
+        locked: true
+      },
+      {
+        id: 5,
+        title: 'Python + Viz: Market Analysis Dashboard',
+        description: 'Create interactive visualizations to present market research findings.',
+        locked: true
+      },
+      {
+        id: 6,
+        title: 'Capstone: End-to-End Analysis',
+        description: 'Complete a full data analysis project from data collection to presentation.',
+        locked: true
+      }
+    ];
+
+    // =========================================================
+    // SVG Icons
+    // =========================================================
+    const SendIcon = () => (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+        <line x1="22" y1="2" x2="11" y2="13"></line>
+        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+      </svg>
+    );
+
+    const CheckCircleIcon = () => (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+      </svg>
+    );
+
+    const CircleIcon = () => (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <circle cx="12" cy="12" r="10"></circle>
+      </svg>
+    );
+
+    const LoaderIcon = () => (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="animate-spin">
+        <line x1="12" y1="2" x2="12" y2="6"></line>
+        <line x1="12" y1="18" x2="12" y2="22"></line>
+        <line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line>
+        <line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line>
+        <line x1="2" y1="12" x2="6" y2="12"></line>
+        <line x1="18" y1="12" x2="22" y2="12"></line>
+        <line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line>
+        <line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line>
+      </svg>
+    );
+
+    const LockIcon = () => (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+      </svg>
+    );
+
+    const DownloadIcon = () => (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+        <polyline points="7 10 12 15 17 10"></polyline>
+        <line x1="12" y1="15" x2="12" y2="3"></line>
+      </svg>
+    );
+
+    const ArrowLeftIcon = () => (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <line x1="19" y1="12" x2="5" y2="12"></line>
+        <polyline points="12 19 5 12 12 5"></polyline>
+      </svg>
+    );
+
+    // =========================================================
+    // Main App Component
+    // =========================================================
+    function App() {
+      // View state: 'assessment' | 'results' | 'dashboard' | 'sprint' | 'feedback'
+      const [currentView, setCurrentView] = useState('assessment');
+
+      // Assessment state
+      const [messages, setMessages] = useState([
+        {
+          role: 'assistant',
+          content: "Hi! I'm your AI tutor for the Data Analyst Bootcamp.\n\nI'm here to help you discover if you're ready to start learning data analysis, or if you need a bit of prep work first. This isn't a test you can fail - it's just a conversation to find your starting point.\n\nNo pressure, and I'll be supportive throughout. Ready to begin?"
+        }
+      ]);
+      const [input, setInput] = useState('');
+      const [isLoading, setIsLoading] = useState(false);
+      const [assessmentResults, setAssessmentResults] = useState(null);
+      const [error, setError] = useState(null);
+      const [consentGiven, setConsentGiven] = useState(true);
+      const messagesEndRef = useRef(null);
+      const inputRef = useRef(null);
+
+      // Sprint state
+      const [currentSprint, setCurrentSprint] = useState(null);
+      const [sessionId, setSessionId] = useState(() => {
+        return localStorage.getItem('bootcamp_session_id') || null;
+      });
+
+      // Whether user skipped the assessment (arrived via URL param)
+      const [skippedAssessment, setSkippedAssessment] = useState(false);
+
+      // Submission + Feedback state
+      const [submissionFeedback, setSubmissionFeedback] = useState(null);
+      const [memoText, setMemoText] = useState('');
+      const [sheetsUrl, setSheetsUrl] = useState('');
+      const [isSubmitting, setIsSubmitting] = useState(false);
+      const [submitError, setSubmitError] = useState(null);
+
+      // =========================================================
+      // Effects
+      // =========================================================
+      const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      };
+
+      useEffect(() => { scrollToBottom(); }, [messages]);
+      useEffect(() => { inputRef.current?.focus(); }, []);
+
+      // URL param routing — allow skipping assessment via ?view=dashboard or ?view=sprint
+      useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const view = params.get('view');
+        if (view === 'dashboard' || view === 'sprint') {
+          // Generate session ID if none exists
+          if (!sessionId) {
+            const newId = crypto.randomUUID();
+            setSessionId(newId);
+            localStorage.setItem('bootcamp_session_id', newId);
+          }
+          setSkippedAssessment(true);
+          if (view === 'sprint') {
+            setCurrentSprint(SPRINTS[0]);
+            setCurrentView('sprint');
+          } else {
+            setCurrentView('dashboard');
+          }
+          // Clean up URL params without reload
+          window.history.replaceState({}, '', window.location.pathname);
+        }
+      }, []);
+
+      // When assessment completes, generate session ID and switch to results
+      useEffect(() => {
+        if (assessmentResults && currentView === 'assessment') {
+          const newSessionId = crypto.randomUUID();
+          setSessionId(newSessionId);
+          localStorage.setItem('bootcamp_session_id', newSessionId);
+          setCurrentView('results');
+        }
+      }, [assessmentResults]);
+
+      // =========================================================
+      // Assessment Chat Logic (unchanged from Phase 1)
+      // =========================================================
+      const sendMessage = async () => {
+        if (!input.trim() || isLoading) return;
+
+        const userMessage = { role: 'user', content: input };
+        setMessages(prev => [...prev, userMessage]);
+        setInput('');
+        setIsLoading(true);
+        setError(null);
+
+        try {
+          const response = await fetch(`${API_URL}/api/chat`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              messages: [...messages.filter(m => m.role !== 'system'), userMessage].map(m => ({
+                role: m.role,
+                content: m.content
+              })),
+              consentGiven
+            })
+          });
+
+          if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.error || `Server error: ${response.status}`);
+          }
+
+          const data = await response.json();
+          const assistantMessage = data.content[0].text;
+
+          // Check if assessment is complete — extract JSON by brace-counting
+          try {
+            const marker = '"assessment_complete"';
+            const markerIdx = assistantMessage.indexOf(marker);
+            let extracted = null;
+            let jsonStr = null;
+            if (markerIdx !== -1) {
+              let start = -1;
+              for (let i = markerIdx - 1; i >= 0; i--) {
+                if (assistantMessage[i] === '{') { start = i; break; }
+              }
+              if (start !== -1) {
+                let depth = 0;
+                for (let i = start; i < assistantMessage.length; i++) {
+                  if (assistantMessage[i] === '{') depth++;
+                  else if (assistantMessage[i] === '}') depth--;
+                  if (depth === 0) {
+                    jsonStr = assistantMessage.substring(start, i + 1);
+                    const parsed = JSON.parse(jsonStr);
+                    if (parsed.assessment_complete === true) extracted = parsed;
+                    break;
+                  }
+                }
+              }
+            }
+            if (extracted) {
+              setAssessmentResults(extracted);
+              const messageWithoutJson = assistantMessage.replace(jsonStr, '').trim();
+              if (messageWithoutJson) {
+                setMessages(prev => [...prev, { role: 'assistant', content: messageWithoutJson }]);
+              }
+            } else {
+              setMessages(prev => [...prev, { role: 'assistant', content: assistantMessage }]);
+            }
+          } catch (e) {
+            setMessages(prev => [...prev, { role: 'assistant', content: assistantMessage }]);
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          setError(error.message);
+          setMessages(prev => [...prev, {
+            role: 'assistant',
+            content: `I encountered an error: ${error.message}. Please try again or contact support if the issue persists.`
+          }]);
+        } finally {
+          setIsLoading(false);
+          setTimeout(() => inputRef.current?.focus(), 0);
+        }
+      };
+
+      const handleKeyPress = (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          sendMessage();
+        }
+      };
+
+      const resetAssessment = () => {
+        setMessages([{
+          role: 'assistant',
+          content: "Hi! I'm your AI tutor for the Data Analyst Bootcamp.\n\nI'm here to help you discover if you're ready to start learning data analysis, or if you need a bit of prep work first. This isn't a test you can fail - it's just a conversation to find your starting point.\n\nNo pressure, and I'll be supportive throughout. Ready to begin?"
+        }]);
+        setAssessmentResults(null);
+        setError(null);
+        setCurrentView('assessment');
+      };
+
+      // =========================================================
+      // Submission Logic
+      // =========================================================
+      const handleSubmit = async () => {
+        setSubmitError(null);
+
+        if (memoText.length < 200) {
+          setSubmitError('Your memo must be at least 200 characters.');
+          return;
+        }
+        if (memoText.length > 5000) {
+          setSubmitError('Your memo must be under 5000 characters.');
+          return;
+        }
+        if (sheetsUrl) {
+          try { new URL(sheetsUrl); } catch {
+            setSubmitError('Please enter a valid URL for your Google Sheets link.');
+            return;
+          }
+        }
+
+        setIsSubmitting(true);
+
+        try {
+          // Step 1: Submit
+          const submitRes = await fetch(`${API_URL}/api/submit`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              session_id: sessionId,
+              sprint_id: currentSprint.id,
+              submission_text: memoText,
+              google_sheets_url: sheetsUrl || undefined
+            })
+          });
+
+          if (!submitRes.ok) {
+            const err = await submitRes.json().catch(() => ({}));
+            throw new Error(err.error || 'Submission failed');
+          }
+
+          const { submission_id } = await submitRes.json();
+
+          // Step 2: Evaluate
+          const evalRes = await fetch(`${API_URL}/api/evaluate`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ submission_id })
+          });
+
+          if (!evalRes.ok) {
+            const err = await evalRes.json().catch(() => ({}));
+            throw new Error(err.error || 'Evaluation failed');
+          }
+
+          const feedback = await evalRes.json();
+          setSubmissionFeedback(feedback);
+          setCurrentView('feedback');
+        } catch (error) {
+          console.error('[Submit] Error:', error);
+          setSubmitError(error.message);
+        } finally {
+          setIsSubmitting(false);
+        }
+      };
+
+      // =========================================================
+      // Helper Functions
+      // =========================================================
+      const getColorClass = (color) => {
+        switch(color) {
+          case 'green': return 'bg-emerald-100 text-emerald-800 border-emerald-300';
+          case 'yellow': return 'bg-yellow-100 text-yellow-800 border-yellow-300';
+          case 'orange': return 'bg-orange-100 text-orange-800 border-orange-300';
+          case 'red': return 'bg-red-100 text-red-800 border-red-300';
+          default: return 'bg-gray-100 text-gray-800 border-gray-300';
+        }
+      };
+
+      const getReadinessColor = (level) => {
+        if (level <= 2) return 'text-emerald-600';
+        if (level === 3) return 'text-yellow-600';
+        if (level === 4) return 'text-orange-600';
+        return 'text-red-600';
+      };
+
+      const getScoreColor = (score) => {
+        if (score >= 75) return 'text-emerald-600';
+        if (score >= 60) return 'text-yellow-600';
+        return 'text-red-600';
+      };
+
+      const getScoreBg = (score) => {
+        if (score >= 75) return 'bg-emerald-50 border-emerald-200';
+        if (score >= 60) return 'bg-yellow-50 border-yellow-200';
+        return 'bg-red-50 border-red-200';
+      };
+
+      // =========================================================
+      // Header (shared across all views)
+      // =========================================================
+      const headerTitle = {
+        assessment: 'Milestone 0 Assessment',
+        results: 'Assessment Results',
+        dashboard: 'Sprint Dashboard',
+        sprint: currentSprint ? `Sprint ${currentSprint.id}: ${currentSprint.title}` : 'Sprint',
+        feedback: 'Evaluation Results'
+      };
+
+      const headerSubtitle = {
+        assessment: 'Baseline Skills Check - Data Analyst Bootcamp',
+        results: 'Your personalized learning plan',
+        dashboard: 'Choose your sprint',
+        sprint: 'Complete the deliverables and submit your work',
+        feedback: 'AI-powered feedback on your submission'
+      };
+
+      // =========================================================
+      // RENDER
+      // =========================================================
+      return (
+        <div className="min-h-screen flex flex-col" style={{
+          background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)'
+        }}>
+          {/* Header */}
+          <header className="bg-white shadow-sm border-b border-gray-200">
+            <div className="max-w-4xl mx-auto px-4 py-4">
+              <h1 className="text-2xl font-bold text-gray-900" style={{ fontFamily: 'Georgia, serif' }}>
+                {headerTitle[currentView]}
+              </h1>
+              <p className="text-sm text-gray-700">{headerSubtitle[currentView]}</p>
+            </div>
+          </header>
+
+          {/* Consent Banner — only during assessment */}
+          {currentView === 'assessment' && (
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-blue-200 px-4 py-3">
+              <div className="max-w-4xl mx-auto">
+                <label htmlFor="consent-checkbox" className="flex items-start gap-3 cursor-pointer">
+                  <input
+                    id="consent-checkbox"
+                    type="checkbox"
+                    checked={consentGiven}
+                    onChange={(e) => setConsentGiven(e.target.checked)}
+                    aria-describedby="consent-description"
+                    className="mt-1 w-5 h-5 text-purple-600 border-gray-300 rounded focus:ring-purple-500 focus:ring-offset-2 cursor-pointer"
+                  />
+                  <span className="text-sm text-gray-800">
+                    <span className="font-medium">I consent to my anonymous assessment scores being used to improve the bootcamp curriculum.</span>
+                    {' '}
+                    <a href="privacy.html" target="_blank" rel="noopener noreferrer" className="text-purple-600 hover:text-purple-800 underline">Learn more</a>
+                  </span>
+                </label>
+                <p id="consent-description" className="text-xs text-gray-600 mt-1 ml-8">
+                  {consentGiven
+                    ? "Your scores will help us identify common skill gaps and improve our curriculum."
+                    : "You can still take the quiz - your results just won't be saved to our database."}
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Error Banner */}
+          {error && (
+            <div className="bg-red-50 border-b border-red-200 px-4 py-3">
+              <div className="max-w-4xl mx-auto flex items-center justify-between">
+                <p className="text-sm text-red-800">{error}</p>
+                <button onClick={() => setError(null)} className="text-red-600 hover:text-red-800 text-sm underline focus:ring-2 focus:ring-red-500 focus:ring-offset-2 rounded">Dismiss</button>
+              </div>
+            </div>
+          )}
+
+          {/* ======================================================= */}
+          {/* VIEW: Assessment Chat */}
+          {/* ======================================================= */}
+          {currentView === 'assessment' && (
+            <>
+              <main className="flex-1 overflow-y-auto px-4 py-6" aria-label="Chat conversation">
+                <ErrorBoundary name="Chat">
+                  <div className="max-w-4xl mx-auto space-y-4" role="log" aria-live="polite" aria-relevant="additions">
+                    {messages.map((message, idx) => (
+                      <div key={idx} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                        <div className={`max-w-[80%] rounded-2xl px-6 py-4 shadow-md ${
+                          message.role === 'user'
+                            ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white'
+                            : 'bg-white text-gray-800 border border-gray-200'
+                        }`} aria-label={message.role === 'user' ? 'Your message' : 'AI tutor message'}>
+                          <p className="whitespace-pre-wrap leading-relaxed" style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+                            {message.content}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+
+                    {isLoading && (
+                      <div className="flex justify-start">
+                        <div className="bg-white rounded-2xl px-6 py-4 shadow-md border border-gray-200 flex items-center space-x-2">
+                          <LoaderIcon />
+                          <span className="text-gray-600">Thinking...</span>
+                        </div>
+                      </div>
+                    )}
+
+                    <div ref={messagesEndRef} />
+                  </div>
+                </ErrorBoundary>
+              </main>
+
+              <footer className="bg-white border-t border-gray-200 px-4 py-4">
+                <div className="max-w-4xl mx-auto flex items-end space-x-3">
+                  <label htmlFor="chat-input" className="sr-only">Type your response</label>
+                  <textarea
+                    ref={inputRef}
+                    id="chat-input"
+                    autoFocus
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    onKeyPress={handleKeyPress}
+                    placeholder="Type your response..."
+                    aria-label="Type your response"
+                    disabled={isLoading}
+                    rows="2"
+                    className="flex-1 px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:border-transparent resize-none disabled:bg-gray-100 disabled:cursor-not-allowed transition-all"
+                    style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}
+                  />
+                  <button
+                    onClick={sendMessage}
+                    disabled={!input.trim() || isLoading}
+                    aria-label="Send message"
+                    className="px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl font-semibold hover:from-purple-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl flex items-center space-x-2 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+                  >
+                    <span>Send</span>
+                    <SendIcon />
+                  </button>
+                </div>
+              </footer>
+            </>
+          )}
+
+          {/* ======================================================= */}
+          {/* VIEW: Assessment Results */}
+          {/* ======================================================= */}
+          {currentView === 'results' && assessmentResults && (
+            <ErrorBoundary name="Results Dashboard">
+              <main className="flex-1 overflow-y-auto px-4 py-6">
+                <div className="max-w-4xl mx-auto">
+                  <div className="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-2xl p-8 shadow-xl border border-purple-200">
+                    <h2 className="text-3xl font-bold mb-2" style={{ fontFamily: 'Georgia, serif' }}>
+                      Assessment Complete!
+                    </h2>
+                    <p className={`text-xl font-semibold mb-6 ${getReadinessColor(assessmentResults.readiness_level)}`}>
+                      {assessmentResults.readiness_title}
+                    </p>
+
+                    {/* Overall Message */}
+                    <div className="bg-white rounded-xl p-6 mb-6 shadow-md">
+                      <p className="text-gray-700 leading-relaxed">{assessmentResults.overall_message}</p>
+                    </div>
+
+                    {/* Pillar Results */}
+                    <div className="grid md:grid-cols-2 gap-4 mb-6">
+                      {Object.entries(assessmentResults.pillars).map(([pillar, data]) => (
+                        <div key={pillar} className="bg-white rounded-xl p-4 shadow-md border-l-4" style={{
+                          borderColor: data.color === 'green' ? '#10b981' :
+                                       data.color === 'yellow' ? '#f59e0b' :
+                                       data.color === 'orange' ? '#f97316' : '#ef4444'
+                        }}>
+                          <div className="flex items-center justify-between mb-2">
+                            <h3 className="font-semibold text-gray-900 capitalize">{pillar}</h3>
+                            {data.color === 'green' ? <CheckCircleIcon /> : <CircleIcon />}
+                          </div>
+                          <div className={`inline-block px-3 py-1 rounded-full text-sm font-medium border ${getColorClass(data.color)}`}>
+                            {data.level}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Strengths */}
+                    {assessmentResults.strengths && assessmentResults.strengths.length > 0 && (
+                      <div className="bg-emerald-50 rounded-xl p-6 mb-4 border border-emerald-200">
+                        <h3 className="font-bold text-emerald-900 mb-3 flex items-center">
+                          <CheckCircleIcon />
+                          <span className="ml-2">Your Strengths</span>
+                        </h3>
+                        <ul className="space-y-2">
+                          {assessmentResults.strengths.map((strength, idx) => (
+                            <li key={idx} className="text-emerald-800 flex items-start">
+                              <span className="mr-2">+</span>
+                              <span>{strength}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {/* Areas to Develop */}
+                    {assessmentResults.areas_to_develop && assessmentResults.areas_to_develop.length > 0 && (
+                      <div className="bg-blue-50 rounded-xl p-6 mb-4 border border-blue-200">
+                        <h3 className="font-bold text-blue-900 mb-3">Areas to Develop</h3>
+                        <ul className="space-y-2">
+                          {assessmentResults.areas_to_develop.map((area, idx) => (
+                            <li key={idx} className="text-blue-800 flex items-start">
+                              <span className="mr-2">-</span>
+                              <span>{area}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {/* Phase B: Data Skills Breakdown */}
+                    {assessmentResults.phase_b && assessmentResults.phase_b.skills && (
+                      <div className="bg-indigo-50 rounded-xl p-6 mb-4 border border-indigo-200">
+                        <h3 className="font-bold text-indigo-900 mb-4">Data Skills Placement</h3>
+                        <div className="grid md:grid-cols-2 gap-3">
+                          {Object.entries(assessmentResults.phase_b.skills).map(([skill, info]) => {
+                            const levelColors = {
+                              'COMPETENT': 'bg-emerald-100 text-emerald-800 border-emerald-300',
+                              'DEVELOPING': 'bg-yellow-100 text-yellow-800 border-yellow-300',
+                              'BEGINNER': 'bg-orange-100 text-orange-800 border-orange-300',
+                              'NONE': 'bg-red-100 text-red-800 border-red-300'
+                            };
+                            const colorClass = levelColors[info.level] || levelColors['NONE'];
+                            const skillNames = {
+                              excel: 'Excel / Sheets',
+                              sql: 'SQL',
+                              python: 'Python',
+                              visualization: 'Data Visualization',
+                              business_thinking: 'Business Thinking'
+                            };
+                            return (
+                              <div key={skill} className="bg-white rounded-lg p-3 shadow-sm border border-indigo-100 flex items-center justify-between">
+                                <span className="font-medium text-gray-900">{skillNames[skill] || skill}</span>
+                                <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${colorClass}`}>{info.level}</span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Study Plan */}
+                    {assessmentResults.phase_b && (
+                      <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl p-6 mb-4 border border-indigo-200">
+                        <h3 className="font-bold text-indigo-900 mb-3">Your Personalized Study Plan</h3>
+                        <div className="grid md:grid-cols-3 gap-4 mb-4">
+                          <div className="bg-white rounded-lg p-4 text-center shadow-sm">
+                            <p className="text-3xl font-bold text-indigo-600">Sprint {assessmentResults.phase_b.recommended_start_sprint}</p>
+                            <p className="text-sm text-gray-600 mt-1">Starting Point</p>
+                          </div>
+                          <div className="bg-white rounded-lg p-4 text-center shadow-sm">
+                            <p className="text-3xl font-bold text-purple-600">{assessmentResults.phase_b.estimated_completion || '--'}</p>
+                            <p className="text-sm text-gray-600 mt-1">Est. Completion</p>
+                          </div>
+                          <div className="bg-white rounded-lg p-4 text-center shadow-sm">
+                            <p className="text-3xl font-bold text-emerald-600">{assessmentResults.phase_b.sprints_to_skip?.length || 0}</p>
+                            <p className="text-sm text-gray-600 mt-1">Sprints Skipped</p>
+                          </div>
+                        </div>
+                        {assessmentResults.phase_b.sprints_to_focus && assessmentResults.phase_b.sprints_to_focus.length > 0 && (
+                          <p className="text-indigo-800 text-sm">
+                            <span className="font-semibold">Focus sprints:</span>{' '}
+                            {assessmentResults.phase_b.sprints_to_focus.map(s => typeof s === 'number' ? `Sprint ${s}` : String(s)).join(', ')}
+                          </p>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Next Steps */}
+                    <div className="bg-purple-50 rounded-xl p-6 border border-purple-200">
+                      <h3 className="font-bold text-purple-900 mb-3">Next Steps</h3>
+                      <p className="text-purple-800 mb-4">{assessmentResults.next_steps}</p>
+                      <div className="flex items-center text-purple-700">
+                        <span className="font-semibold">Estimated prep time:</span>
+                        <span className="ml-2 bg-purple-100 px-3 py-1 rounded-full text-sm">
+                          {assessmentResults.estimated_prep_time}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-4">
+                      <button
+                        onClick={() => setCurrentView('dashboard')}
+                        className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-lg font-semibold hover:from-emerald-600 hover:to-teal-600 transition-all shadow-lg hover:shadow-xl focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+                      >
+                        Go to Sprint Dashboard
+                      </button>
+                      <button
+                        onClick={resetAssessment}
+                        className="px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg font-semibold hover:from-purple-700 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+                      >
+                        Take Assessment Again
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </main>
+            </ErrorBoundary>
+          )}
+
+          {/* ======================================================= */}
+          {/* VIEW: Sprint Dashboard */}
+          {/* ======================================================= */}
+          {currentView === 'dashboard' && (
+            <main className="flex-1 overflow-y-auto px-4 py-6">
+              <div className="max-w-4xl mx-auto">
+                {/* Back nav */}
+                {skippedAssessment ? (
+                  <a
+                    href="index.html"
+                    className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6 text-sm font-medium transition-colors"
+                  >
+                    <ArrowLeftIcon /> Back to Landing Page
+                  </a>
+                ) : (
+                  <button
+                    onClick={() => setCurrentView('results')}
+                    className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6 text-sm font-medium transition-colors"
+                  >
+                    <ArrowLeftIcon /> Back to Results
+                  </button>
+                )}
+
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {SPRINTS.map((sprint) => (
+                    <div
+                      key={sprint.id}
+                      className={`rounded-xl p-6 shadow-md border-2 transition-all ${
+                        sprint.locked
+                          ? 'bg-gray-50 border-gray-200 opacity-60'
+                          : 'bg-white border-purple-200 hover:border-purple-400 hover:shadow-lg cursor-pointer'
+                      }`}
+                      onClick={() => {
+                        if (!sprint.locked) {
+                          setCurrentSprint(sprint);
+                          setCurrentView('sprint');
+                        }
+                      }}
+                    >
+                      <div className="flex items-center justify-between mb-3">
+                        <span className={`text-xs font-bold px-2 py-1 rounded-full ${
+                          sprint.locked
+                            ? 'bg-gray-200 text-gray-500'
+                            : 'bg-purple-100 text-purple-700'
+                        }`}>
+                          Sprint {sprint.id}
+                        </span>
+                        {sprint.locked && <LockIcon />}
+                      </div>
+                      <h3 className={`font-bold mb-2 ${sprint.locked ? 'text-gray-400' : 'text-gray-900'}`}>
+                        {sprint.title}
+                      </h3>
+                      <p className={`text-sm ${sprint.locked ? 'text-gray-400' : 'text-gray-600'}`}>
+                        {sprint.description}
+                      </p>
+                      {sprint.locked && (
+                        <p className="mt-3 text-xs font-semibold text-gray-400">Coming Soon</p>
+                      )}
+                      {!sprint.locked && (
+                        <p className="mt-3 text-xs font-semibold text-purple-600">Click to start</p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </main>
+          )}
+
+          {/* ======================================================= */}
+          {/* VIEW: Sprint Workspace */}
+          {/* ======================================================= */}
+          {currentView === 'sprint' && currentSprint && (
+            <main className="flex-1 overflow-y-auto px-4 py-6">
+              <div className="max-w-4xl mx-auto">
+                {/* Back nav */}
+                <button
+                  onClick={() => setCurrentView('dashboard')}
+                  className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6 text-sm font-medium transition-colors"
+                >
+                  <ArrowLeftIcon /> Back to Dashboard
+                </button>
+
+                {/* Business Scenario */}
+                <div className="bg-white rounded-xl p-6 shadow-md border border-gray-200 mb-6">
+                  <h2 className="text-xl font-bold text-gray-900 mb-4" style={{ fontFamily: 'Georgia, serif' }}>
+                    Business Scenario
+                  </h2>
+                  <p className="text-gray-700 leading-relaxed whitespace-pre-line">
+                    {currentSprint.business_scenario}
+                  </p>
+                </div>
+
+                {/* Dataset Download */}
+                {currentSprint.dataset_url && (
+                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 shadow-md border border-blue-200 mb-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="font-bold text-blue-900 mb-1">Dataset</h3>
+                        <p className="text-sm text-blue-700">5,000 delivery records (CSV format)</p>
+                      </div>
+                      <a
+                        href={currentSprint.dataset_url}
+                        download
+                        className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors shadow-md focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                      >
+                        <DownloadIcon />
+                        Download CSV
+                      </a>
+                    </div>
+                  </div>
+                )}
+
+                {/* Deliverables Checklist */}
+                <div className="bg-white rounded-xl p-6 shadow-md border border-gray-200 mb-6">
+                  <h3 className="font-bold text-gray-900 mb-4">Deliverables Checklist</h3>
+                  <ul className="space-y-3">
+                    {currentSprint.deliverables.map((item, idx) => (
+                      <li key={idx} className="flex items-start gap-3">
+                        <span className="mt-0.5 w-5 h-5 rounded border-2 border-gray-300 flex-shrink-0 flex items-center justify-center text-xs text-gray-400">
+                          {idx + 1}
+                        </span>
+                        <span className="text-gray-700">{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* Submission Form */}
+                <div className="bg-white rounded-xl p-6 shadow-md border-2 border-purple-200">
+                  <h3 className="font-bold text-gray-900 mb-4" style={{ fontFamily: 'Georgia, serif' }}>
+                    Submit Your Work
+                  </h3>
+
+                  {/* Google Sheets URL */}
+                  <div className="mb-4">
+                    <label htmlFor="sheets-url" className="block text-sm font-medium text-gray-700 mb-1">
+                      Google Sheets Link (optional)
+                    </label>
+                    <input
+                      id="sheets-url"
+                      type="url"
+                      value={sheetsUrl}
+                      onChange={(e) => setSheetsUrl(e.target.value)}
+                      placeholder="https://docs.google.com/spreadsheets/d/..."
+                      className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">Saved for reference only — the AI evaluates your memo text below.</p>
+                  </div>
+
+                  {/* Executive Memo */}
+                  <div className="mb-4">
+                    <label htmlFor="memo-text" className="block text-sm font-medium text-gray-700 mb-1">
+                      Executive Memo
+                    </label>
+                    <textarea
+                      id="memo-text"
+                      value={memoText}
+                      onChange={(e) => setMemoText(e.target.value)}
+                      placeholder="Write your executive memo to the VP of Operations here. Describe your findings, the root causes you identified, and your recommendations..."
+                      rows="10"
+                      maxLength={5000}
+                      className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-y transition-all"
+                      style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}
+                    />
+                    <div className="flex justify-between items-center mt-1">
+                      <p className={`text-xs ${memoText.length < 200 ? 'text-red-500' : memoText.length > 4500 ? 'text-yellow-600' : 'text-gray-500'}`}>
+                        {memoText.length < 200 ? `${200 - memoText.length} more characters needed` : `${memoText.length}/5000 characters`}
+                      </p>
+                      <p className="text-xs text-gray-400">Min 200, Max 5000</p>
+                    </div>
+                  </div>
+
+                  {/* Submit Error */}
+                  {submitError && (
+                    <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
+                      <p className="text-sm text-red-800">{submitError}</p>
+                    </div>
+                  )}
+
+                  {/* Submit Button */}
+                  <button
+                    onClick={handleSubmit}
+                    disabled={isSubmitting || memoText.length < 200}
+                    className="w-full py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg font-semibold hover:from-purple-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <LoaderIcon />
+                        <span>Evaluating your submission...</span>
+                      </>
+                    ) : (
+                      <span>Submit for Evaluation</span>
+                    )}
+                  </button>
+                </div>
+              </div>
+            </main>
+          )}
+
+          {/* ======================================================= */}
+          {/* VIEW: Feedback Display */}
+          {/* ======================================================= */}
+          {currentView === 'feedback' && submissionFeedback && (
+            <ErrorBoundary name="Feedback">
+              <main className="flex-1 overflow-y-auto px-4 py-6">
+                <div className="max-w-4xl mx-auto">
+
+                  {/* Overall Score */}
+                  <div className={`rounded-2xl p-8 shadow-xl border-2 mb-6 text-center ${getScoreBg(submissionFeedback.overall_score)}`}>
+                    <p className={`text-6xl font-bold mb-2 ${getScoreColor(submissionFeedback.overall_score)}`}>
+                      {submissionFeedback.overall_score}
+                    </p>
+                    <p className="text-lg font-semibold text-gray-700 mb-2">Overall Score</p>
+                    <p className={`text-xl font-bold ${submissionFeedback.passed ? 'text-emerald-600' : 'text-red-600'}`}>
+                      {submissionFeedback.passed ? 'PASSED' : 'NOT YET — Keep Going!'}
+                    </p>
+                    {submissionFeedback.overall_feedback && (
+                      <p className="text-gray-700 mt-4 max-w-2xl mx-auto leading-relaxed">{submissionFeedback.overall_feedback}</p>
+                    )}
+                  </div>
+
+                  {/* Category Scores */}
+                  <div className="grid md:grid-cols-2 gap-4 mb-6">
+                    {submissionFeedback.category_scores && Object.entries(submissionFeedback.category_scores).map(([category, data]) => (
+                      <div key={category} className="bg-white rounded-xl p-5 shadow-md border border-gray-200">
+                        <div className="flex items-center justify-between mb-3">
+                          <h3 className="font-bold text-gray-900">{category}</h3>
+                          <span className={`text-2xl font-bold ${getScoreColor(data.score)}`}>{data.score}</span>
+                        </div>
+                        <p className="text-sm text-gray-600 leading-relaxed">{data.feedback}</p>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Strengths */}
+                  {submissionFeedback.strengths && submissionFeedback.strengths.length > 0 && (
+                    <div className="bg-emerald-50 rounded-xl p-6 mb-4 border border-emerald-200">
+                      <h3 className="font-bold text-emerald-900 mb-3 flex items-center">
+                        <CheckCircleIcon />
+                        <span className="ml-2">Strengths</span>
+                      </h3>
+                      <ul className="space-y-2">
+                        {submissionFeedback.strengths.map((s, idx) => (
+                          <li key={idx} className="text-emerald-800 flex items-start">
+                            <span className="mr-2">+</span>
+                            <span>{s}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {/* Areas for Improvement */}
+                  {submissionFeedback.areas_for_improvement && submissionFeedback.areas_for_improvement.length > 0 && (
+                    <div className="bg-blue-50 rounded-xl p-6 mb-4 border border-blue-200">
+                      <h3 className="font-bold text-blue-900 mb-3">Areas for Improvement</h3>
+                      <ul className="space-y-2">
+                        {submissionFeedback.areas_for_improvement.map((a, idx) => (
+                          <li key={idx} className="text-blue-800 flex items-start">
+                            <span className="mr-2">-</span>
+                            <span>{a}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {/* Next Steps */}
+                  {submissionFeedback.next_steps && (
+                    <div className="bg-purple-50 rounded-xl p-6 mb-6 border border-purple-200">
+                      <h3 className="font-bold text-purple-900 mb-3">Next Steps</h3>
+                      <p className="text-purple-800">{submissionFeedback.next_steps}</p>
+                    </div>
+                  )}
+
+                  {/* Action Buttons */}
+                  <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                    {!submissionFeedback.passed && (
+                      <button
+                        onClick={() => {
+                          setSubmissionFeedback(null);
+                          setSubmitError(null);
+                          setCurrentView('sprint');
+                        }}
+                        className="px-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-lg font-semibold hover:from-orange-600 hover:to-red-600 transition-all shadow-lg hover:shadow-xl focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
+                      >
+                        Try Again
+                      </button>
+                    )}
+                    <button
+                      onClick={() => setCurrentView('dashboard')}
+                      className="px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg font-semibold hover:from-purple-700 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+                    >
+                      Back to Dashboard
+                    </button>
+                  </div>
+                </div>
+              </main>
+            </ErrorBoundary>
+          )}
+        </div>
+      );
+    }
+
+    // Render the app
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
