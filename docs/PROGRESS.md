@@ -185,35 +185,31 @@ Phase 2 builds the Sprint 1 vertical slice: assessment results → sprint dashbo
 
 A public-facing landing page and a way for returning users to skip the assessment and go straight to Sprint 1.
 
-### [x] 3A. Create `landing.html`
+### [x] 3A. Create Landing Page
 - **Commit:** `7ff97f5` — Add landing page and skip-assessment flow
-- **Files added:** `landing.html`
+- **Files added:** `index.html` (was `landing.html`, renamed in `e8a5e5b`)
 - **How it works:** Static HTML + Tailwind CDN (no React, no build step). 5 sections:
   1. **Hero** — Headline, subhead, "Get Started" CTA scrolls to choice section
   2. **How It Works** — 3 step cards (Assess, Work Projects, Get Feedback) with SVG icons
-  3. **Sprint Curriculum** — 2x3 grid matching dashboard style; Sprint 1 links to `index.html?view=dashboard`, Sprints 2-6 locked
+  3. **Sprint Curriculum** — 2x3 grid matching dashboard style; Sprint 1 links to `app.html?view=dashboard`, Sprints 2-6 locked
   4. **Who It's For** — 4 audience cards (career switchers, self-taught, tutorial fatigue, apprenticeship prep)
-  5. **Final CTA** — "Take the Assessment" (primary) → `index.html`, "Skip to Sprint 1" (secondary) → `index.html?view=dashboard`
+  5. **Final CTA** — "Take the Assessment" (primary) → `app.html`, "Skip to Sprint 1" (secondary) → `app.html?view=dashboard`
 - **Design:** Matches existing palette (purple-600/indigo-600 gradients, emerald accents, Georgia headings, system font body, mobile-first responsive)
 
-### [x] 3B. Update `index.html` — URL Param Routing
+### [x] 3B. Update App — URL Param Routing
 - **Commit:** `7ff97f5` (same commit)
-- **Files modified:** `index.html`
+- **Files modified:** `app.html` (was `index.html`, renamed in `e8a5e5b`)
 - **Changes:**
   - Added `skippedAssessment` state
   - `useEffect` on mount reads `?view=dashboard` or `?view=sprint` URL params
   - Generates session ID via `crypto.randomUUID()` if none exists (skip doesn't require assessment)
   - Cleans URL params with `history.replaceState` after routing
-  - Dashboard "Back" nav shows "Back to Landing Page" → `landing.html` when assessment was skipped, or "Back to Results" when it wasn't
+  - Dashboard "Back" nav shows "Back to Landing Page" → `index.html` when assessment was skipped, or "Back to Results" when it wasn't
 
-### [ ] 3C. Verification
-- **Status:** Pending — need to manually verify:
-  1. `landing.html` renders all 5 sections, responsive on mobile
-  2. "Get Started" scrolls to choice section
-  3. "Skip to Sprint 1" → `index.html?view=dashboard` shows dashboard without assessment
-  4. "Take the Assessment" → `index.html` shows normal assessment flow
-  5. From skipped dashboard, click Sprint 1 → workspace loads, can submit
-  6. Existing assessment flow still works unchanged when no URL params
+### [x] 3C. Make Landing Page the Root URL
+- **Commit:** `e8a5e5b` — Swap filenames so landing page is served at `/`
+- **What changed:** Renamed `index.html` → `app.html` (React app) and `landing.html` → `index.html` (landing page). Updated all cross-links. Added `vercel.json`.
+- **Verified:** Landing page loads at root URL on production
 
 ---
 
@@ -231,8 +227,9 @@ A public-facing landing page and a way for returning users to skip the assessmen
 | `api/lib/db.js` | Old SQLite helper (kept for reference, no longer used) |
 | `api/lib/cors.js` | CORS helper — whitelists production + localhost origins |
 | `api/lib/rateLimiter.js` | Rate limiting (CommonJS) — 60 req/hr per IP |
-| `index.html` | Entire frontend (React + Tailwind via CDN, no build step) |
-| `landing.html` | Public landing page (static HTML + Tailwind CDN, no React) |
+| `app.html` | Entire frontend (React + Tailwind via CDN, no build step) |
+| `index.html` | Public landing page (static HTML + Tailwind CDN, no React) — served at root `/` |
+| `vercel.json` | Vercel configuration |
 | `privacy.html` | Privacy policy page |
 | `.clauderules` | Rules Claude Code follows — read this first every session |
 | `scripts/seed-data.js` | Generates 100 demo assessment records |
