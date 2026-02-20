@@ -7,6 +7,8 @@
   <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Supabase JS SDK — used for client-side auth only (anon key is safe to expose) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     body {
       margin: 0;
@@ -94,6 +96,21 @@
     // Constants
     // =========================================================
     const API_URL = 'https://data-analyst-bootcamp.vercel.app';
+
+    // =========================================================
+    // TEACHING MOMENT: Supabase client (browser-side auth)
+    // The anon key is safe to expose — it only allows what RLS policies permit.
+    // Service role key NEVER goes in frontend. It lives in Vercel env vars only.
+    // Replace the placeholder values below with your real project URL + anon key
+    // from: Supabase Dashboard → Project Settings → API
+    // =========================================================
+    const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+    const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+
+    // Only initialize the client if real credentials are present
+    const supabase = (SUPABASE_URL !== 'YOUR_SUPABASE_URL' && SUPABASE_ANON_KEY !== 'YOUR_SUPABASE_ANON_KEY')
+      ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+      : null;
 
     // Sprint metadata (hardcoded in frontend — Sprints 2-6 are locked placeholders)
     const SPRINTS = [
@@ -252,6 +269,8 @@ Your job: Analyze the data in Excel/Google Sheets, identify the root causes, and
       const [showAuthModal, setShowAuthModal] = useState(false);
       const [authEmail, setAuthEmail] = useState('');
       const [authPassword, setAuthPassword] = useState('');
+      const [authError, setAuthError] = useState(null);
+      const [authLoading, setAuthLoading] = useState(false);
 
       // =========================================================
       // Effects
@@ -263,11 +282,44 @@ Your job: Analyze the data in Excel/Google Sheets, identify the root causes, and
       useEffect(() => { scrollToBottom(); }, [messages]);
       useEffect(() => { inputRef.current?.focus(); }, []);
 
-      // Show auth modal on first load if user hasn't signed in or skipped before
+      // =========================================================
+      // TEACHING MOMENT: Auth session lifecycle
+      // On mount: check for an existing session (e.g. user refreshed the page).
+      // onAuthStateChange: fires whenever sign-in / sign-out / token refresh happens.
+      // If supabase client is null (placeholder keys), fall back to the simple
+      // "show modal unless skipped" behavior so the app still works during dev.
+      // =========================================================
       useEffect(() => {
-        if (!localStorage.getItem('compadre_skipped')) {
-          setShowAuthModal(true);
+        if (!supabase) {
+          // Supabase not configured yet — show modal unless previously skipped
+          if (!localStorage.getItem('compadre_skipped')) {
+            setShowAuthModal(true);
+          }
+          return;
         }
+
+        // Check for an existing session immediately
+        supabase.auth.getSession().then(({ data: { session } }) => {
+          if (session?.user) {
+            setUser(session.user);
+            setShowAuthModal(false);
+          } else if (!localStorage.getItem('compadre_skipped')) {
+            setShowAuthModal(true);
+          }
+        });
+
+        // Subscribe to future auth changes (sign in, sign out, token refresh)
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+          if (session?.user) {
+            setUser(session.user);
+            setShowAuthModal(false);
+          } else {
+            setUser(null);
+          }
+        });
+
+        // Clean up the listener when the component unmounts
+        return () => subscription.unsubscribe();
       }, []);
 
       // Move focus into modal when it opens; return focus to chat input when it closes
@@ -407,6 +459,66 @@ Your job: Analyze the data in Excel/Google Sheets, identify the root causes, and
         setIsAnonymous(true);
         setShowAuthModal(false);
         // focus returns to chat input via the showAuthModal useEffect above
+      };
+
+      // =========================================================
+      // Auth Handlers
+      // =========================================================
+      const handleEmailSignIn = async () => {
+        if (!supabase) return;
+        setAuthError(null);
+        setAuthLoading(true);
+        const { error } = await supabase.auth.signInWithPassword({
+          email: authEmail.trim(),
+          password: authPassword
+        });
+        setAuthLoading(false);
+        if (error) {
+          setAuthError(error.message);
+        }
+        // On success, onAuthStateChange fires → sets user → closes modal automatically
+      };
+
+      const handleEmailSignUp = async () => {
+        if (!supabase) return;
+        setAuthError(null);
+        setAuthLoading(true);
+        const { error } = await supabase.auth.signUp({
+          email: authEmail.trim(),
+          password: authPassword
+        });
+        setAuthLoading(false);
+        if (error) {
+          setAuthError(error.message);
+        } else {
+          // Supabase sends a confirmation email by default.
+          // Show a friendly message in place of an error.
+          setAuthError('Check your email for a confirmation link, then sign in.');
+        }
+      };
+
+      const handleGoogleSignIn = async () => {
+        if (!supabase) return;
+        setAuthError(null);
+        setAuthLoading(true);
+        const { error } = await supabase.auth.signInWithOAuth({
+          provider: 'google',
+          options: { redirectTo: window.location.href }
+        });
+        // signInWithOAuth redirects the browser — loading stays true until redirect
+        if (error) {
+          setAuthLoading(false);
+          setAuthError(error.message);
+        }
+      };
+
+      const handleSignOut = async () => {
+        if (!supabase) return;
+        await supabase.auth.signOut();
+        setUser(null);
+        setIsAnonymous(false);
+        localStorage.removeItem('compadre_skipped');
+        setShowAuthModal(true);
       };
 
       const resetAssessment = () => {
@@ -566,10 +678,20 @@ Your job: Analyze the data in Excel/Google Sheets, identify the root causes, and
                   </p>
                 </div>
 
-                {/* Google button — wired in Task 1.8 */}
+                {/* Auth error / info message */}
+                {authError && (
+                  <div role="alert" aria-live="assertive" aria-atomic="true"
+                    className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 mb-4 text-sm text-red-800">
+                    {authError}
+                  </div>
+                )}
+
+                {/* Google button */}
                 <button
-                  onClick={() => {}}
-                  className="w-full flex items-center justify-center gap-3 px-4 py-3 border-2 border-gray-300 rounded-xl hover:border-gray-400 hover:bg-gray-50 transition-all font-medium text-gray-700 mb-4"
+                  onClick={handleGoogleSignIn}
+                  disabled={authLoading}
+                  aria-busy={authLoading}
+                  className="w-full flex items-center justify-center gap-3 px-4 py-3 border-2 border-gray-300 rounded-xl hover:border-gray-400 hover:bg-gray-50 transition-all font-medium text-gray-700 mb-4 disabled:opacity-50 disabled:cursor-not-allowed focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
                 >
                   <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true">
                     <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
@@ -598,9 +720,10 @@ Your job: Analyze the data in Excel/Google Sheets, identify the root causes, and
                       id="auth-email"
                       type="email"
                       value={authEmail}
-                      onChange={(e) => setAuthEmail(e.target.value)}
+                      onChange={(e) => { setAuthEmail(e.target.value); setAuthError(null); }}
                       placeholder="you@example.com"
                       autoComplete="email"
+                      aria-required="true"
                       className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
                     />
                   </div>
@@ -612,27 +735,33 @@ Your job: Analyze the data in Excel/Google Sheets, identify the root causes, and
                       id="auth-password"
                       type="password"
                       value={authPassword}
-                      onChange={(e) => setAuthPassword(e.target.value)}
+                      onChange={(e) => { setAuthPassword(e.target.value); setAuthError(null); }}
+                      onKeyDown={(e) => { if (e.key === 'Enter') handleEmailSignIn(); }}
                       placeholder="••••••••"
                       autoComplete="current-password"
+                      aria-required="true"
                       className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
                     />
                   </div>
                 </div>
 
-                {/* Sign In / Create Account — wired in Task 1.8 */}
+                {/* Sign In / Create Account */}
                 <div className="flex gap-3 mb-6">
                   <button
-                    onClick={() => {}}
-                    className="flex-1 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl font-semibold hover:from-purple-700 hover:to-indigo-700 transition-all shadow-md"
+                    onClick={handleEmailSignIn}
+                    disabled={authLoading || !authEmail || !authPassword}
+                    aria-busy={authLoading}
+                    className="flex-1 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl font-semibold hover:from-purple-700 hover:to-indigo-700 transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
                   >
-                    Sign In
+                    {authLoading ? 'Signing in…' : 'Sign In'}
                   </button>
                   <button
-                    onClick={() => {}}
-                    className="flex-1 py-3 border-2 border-purple-300 text-purple-700 rounded-xl font-semibold hover:border-purple-500 hover:bg-purple-50 transition-all"
+                    onClick={handleEmailSignUp}
+                    disabled={authLoading || !authEmail || !authPassword}
+                    aria-busy={authLoading}
+                    className="flex-1 py-3 border-2 border-purple-300 text-purple-700 rounded-xl font-semibold hover:border-purple-500 hover:bg-purple-50 transition-all disabled:opacity-50 disabled:cursor-not-allowed focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
                   >
-                    Create Account
+                    {authLoading ? 'Creating…' : 'Create Account'}
                   </button>
                 </div>
 
@@ -655,12 +784,34 @@ Your job: Analyze the data in Excel/Google Sheets, identify the root causes, and
           <header className="bg-white shadow-sm border-b border-gray-200">
             <div className="max-w-4xl mx-auto px-4 py-4 flex items-center gap-3">
               <img src="compadre_axolotl.png" alt="Compadre" className="w-9 h-9 mix-blend-multiply flex-shrink-0" />
-              <div>
+              <div className="flex-1">
                 <h1 className="text-2xl font-bold text-gray-900" style={{ fontFamily: 'Georgia, serif' }}>
                   {headerTitle[currentView]}
                 </h1>
                 <p className="text-sm text-gray-700" aria-live="polite" aria-atomic="true">{headerSubtitle[currentView]}</p>
               </div>
+
+              {/* Auth indicator */}
+              {user ? (
+                <div className="flex items-center gap-3 flex-shrink-0">
+                  <span className="text-sm text-gray-600 hidden sm:block" aria-label={`Signed in as ${user.email}`}>
+                    {user.email}
+                  </span>
+                  <button
+                    onClick={handleSignOut}
+                    className="text-sm text-gray-500 hover:text-gray-800 underline underline-offset-2 transition-colors focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 rounded"
+                  >
+                    Sign out
+                  </button>
+                </div>
+              ) : isAnonymous ? (
+                <button
+                  onClick={() => { setAuthError(null); setShowAuthModal(true); }}
+                  className="text-sm text-purple-600 hover:text-purple-800 underline underline-offset-2 transition-colors focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 rounded flex-shrink-0"
+                >
+                  Save progress
+                </button>
+              ) : null}
             </div>
           </header>
 
