@@ -108,3 +108,48 @@ Do NOT implement features from future phases. Stay in sequence.
 - This is a **solo project** — prioritize simplicity over scalability
 
 When in doubt, ask Josue. Don't make assumptions.
+
+## Accessibility Requirements (Section 508 / WCAG 2.0 AA)
+
+All web content must conform to the Revised Section 508 Standards (WCAG 2.0 Level AA).
+Apply these rules to every component, page, and interaction built.
+
+### 1. Perceivable
+- Every non-text element (images, icons, charts) must have descriptive `alt` text. Decorative images use `alt=""`.
+- Color contrast ratio: **4.5:1 minimum** for normal text, **3:1 for large text**.
+- Never use color alone to convey meaning — always pair with text, icons, or patterns.
+- Text must be resizable up to 200% without loss of content or functionality.
+
+### 2. Operable
+- Every interactive element (buttons, links, inputs, modals) must be fully keyboard navigable — no mouse required.
+- **Visible focus indicators required** on all focusable elements. Never remove the default outline without a clearly visible replacement.
+- No content should flash more than 3 times per second.
+- Page titles must be descriptive and unique per page/view.
+
+### 3. Understandable
+- Use plain language appropriate for a general audience.
+- All form inputs must have visible, associated `<label>` elements — never placeholder-only labels.
+- Error messages must identify the field and explain how to fix it. Use `aria-describedby` to connect errors to inputs.
+- Consistent navigation and layout across all pages/screens.
+
+### 4. Robust (Assistive Technology Compatible)
+- Use semantic HTML: `<nav>`, `<main>`, `<header>`, `<footer>`, `<section>`, `<h1>`–`<h6>` in logical order.
+- Only one `<h1>` per page. Heading levels must not skip (e.g., h1 → h3 is not allowed).
+- All interactive components use proper WAI-ARIA roles, states, and properties where native HTML is insufficient.
+- Dynamic content updates (AI feedback loading, errors) must use `aria-live` regions.
+
+### 5. React / JavaScript Specific
+- Manage focus explicitly when modals open/close or views change.
+- Use `role="alert"` or `aria-live="polite"` for dynamic status messages.
+- Avoid `onClick` on non-interactive elements — use `<button>` or `<a>` instead.
+
+### 6. Forms & Assessments (Critical for this project)
+- Every input in the assessment must have a visible label.
+- Required fields must be marked with `aria-required="true"` AND a visible indicator.
+- Inline validation errors must be announced via `aria-live`.
+
+### Quick Contrast Reference (Tailwind on white background)
+- `text-gray-400` (#9ca3af) → **2.6:1 — FAILS** (never use for text)
+- `text-gray-500` (#6b7280) → **4.6:1 — passes AA**
+- `text-gray-600` (#4b5563) → **7.0:1 — passes AA and AAA**
+- Use `text-gray-600` as the minimum for any body/label text on white.
