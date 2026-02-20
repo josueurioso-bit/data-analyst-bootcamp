@@ -1,10 +1,11 @@
 # Project Progress Tracker
-## Data School Readiness Engine — Build Log
+## Compadre — Build Log
 
 **Repo:** https://github.com/josueurioso-bit/data-analyst-bootcamp
 **Live:** https://data-analyst-bootcamp.vercel.app
-**Builder:** Josue
-**Last Updated:** February 17, 2026
+**Platform:** Compadre
+**Builder:** Sway
+**Last Updated:** February 20, 2026
 
 ---
 
@@ -38,7 +39,24 @@ I'm picking up where I left off. Check PROGRESS.md for what's done and what's ne
 ```
 
 ### 5. Tell Claude what to work on
-Phases 0 and 1 are done. Phase 2 is nearly done (2H E2E test pending). Phase 3 (landing page) is done. Pick the next unchecked item below.
+Phases 0-3 are complete (original build). Platform is now being transformed into **Compadre**. The 3-day Compadre sprint plan is in `docs/REALISTIC_3DAY_ROADMAP.md`. Pick up at **Phase 4, Day 1, Task 1.1** — the git fix.
+
+### Session ended: February 20, 2026
+**Where we left off:** Ideation + planning complete. No code written yet for the Compadre transformation. Ready to start Day 1 tasks.
+
+**What was decided this session:**
+- Platform name: **Compadre** (platform and guide are one)
+- Curriculum: Storytelling with Data (SWD) — 6 principles, 6 sprints
+- Tools: Excel (analysis) + Tableau Public (visualization)
+- Auth: Optional — email/password + Google OAuth, anonymous sessions link on sign-up
+- Tutorial: Skippable 5-step onboarding on first visit
+- Deliverable: Tableau Public viz (real portfolio piece)
+- Sprint 1 dataset: **NYC Restaurant Inspections (DOHMH)**
+  - Download: https://data.cityofnewyork.us/api/views/43nn-pn8j/rows.csv?accessType=DOWNLOAD
+  - ~400K rows, 26 columns, filter to 2022-present for Sprint 1
+- All planning docs updated: `REALISTIC_3DAY_ROADMAP.md` and `PROGRESS.md`
+
+**First task tomorrow:** Phase 4, Task 1.1 — fix git status (5 min)
 
 ---
 
@@ -244,3 +262,91 @@ A public-facing landing page and a way for returning users to skip the assessmen
 | `ANTHROPIC_API_KEY` | Set and working |
 | `SUPABASE_URL` | Set and working |
 | `SUPABASE_KEY` | Set and working |
+
+---
+
+## Platform Pivot: Compadre Transformation
+
+**Decision date:** February 20, 2026
+**Reason:** Platform evolving from demo-focused assessment tool into a full interactive learning platform.
+
+### What Changed
+- **Platform name:** Data Analyst Bootcamp → **Compadre**
+- **Guide/mascot:** Compadre IS the platform. Platform and guide are one.
+- **Curriculum backbone:** Storytelling with Data (SWD) by Cole Nussbaumer Knaflic — 6 principles mapped to 6 sprints
+- **Datasets:** All fake/generated data replaced with real public datasets
+- **Sprint structure:** LEARN → CHOOSE → BUILD → PUBLISH (replaces direct-to-workspace)
+- **Deliverable:** Tableau Public visualization (real portfolio piece, shareable URL)
+- **Auth:** Optional Supabase Auth (email + Google OAuth). Anonymous sessions preserved and linked on sign-up.
+- **Tutorial:** Skippable onboarding (5 steps) on first visit
+
+### Sprint → SWD Principle Mapping
+| Sprint | SWD Principle | Tool |
+|---|---|---|
+| 1 | Understand the context | Excel + Tableau |
+| 2 | Choose the right visual | Tableau |
+| 3 | Eliminate clutter | Tableau |
+| 4 | Focus attention | Tableau + Color |
+| 5 | Think like a designer | Tableau |
+| 6 | Tell a story (Capstone) | All tools |
+
+### Sprint 1 Dataset Decision
+**Selected:** NYC Restaurant Inspections (DOHMH)
+**Source:** [NYC Open Data](https://data.cityofnewyork.us/Health/DOHMH-New-York-City-Restaurant-Inspection-Results/43nn-pn8j)
+**Why selected:**
+
+| Criterion | Assessment |
+|---|---|
+| Size | ~400K rows, 26 columns. Filter to 2022-present = ~150K. Perfect for Excel. |
+| Grade system | A/B/C immediately understandable. No domain expertise needed. |
+| Pivot potential | Borough × cuisine × grade × year = rich multi-dimensional analysis |
+| Tableau fit | Maps by borough, bar charts by cuisine, time series of grade trends |
+| SWD Principle 1 fit | Audience = NYC Health Commissioner. Decision = where to allocate inspection resources. |
+| Relatability | Every NYC resident has eaten at a restaurant. Personal connection. |
+
+**Rejected alternatives:**
+- NYC 311: 40M+ rows, 3.7 GB for 2 years, 41 columns — too large for Sprint 1
+- MTA Hourly Ridership: 105M rows — completely unusable raw
+- MTA Daily Ridership: ~1,800 rows — too small, limited pivot depth
+
+**Data caveat to teach:** Multiple rows per restaurant (one per inspection). Students learn to handle longitudinal data — a real skill.
+
+**Download URL:** https://data.cityofnewyork.us/api/views/43nn-pn8j/rows.csv?accessType=DOWNLOAD
+
+---
+
+## Phase 4: Compadre Transformation — In Progress
+
+Full 3-day sprint plan: `docs/REALISTIC_3DAY_ROADMAP.md`
+
+### Day 1: Brand + Auth
+- [ ] 1.1 Fix git status (commit landing.html deletion)
+- [ ] 1.2 Rebrand index.html to Compadre
+- [ ] 1.3 Rebrand app.html to Compadre voice
+- [ ] 1.4 Enable Supabase email auth
+- [ ] 1.5 Enable Google OAuth
+- [ ] 1.6 Create profiles + portfolio_projects tables in Supabase
+- [ ] 1.7 Auth modal UI (email / Google / skip)
+- [ ] 1.8 Auth logic (Supabase JS SDK)
+- [ ] 1.9 Link anonymous session ID to user on sign-in
+- [ ] 1.10 Day 1 test
+
+### Day 2: Tutorial + Curriculum
+- [ ] 2.1 Build tutorial view (5 steps, skippable)
+- [ ] 2.2 Save tutorial completion state
+- [ ] 2.3 Add sprint phase flow (LEARN → CHOOSE → BUILD)
+- [ ] 2.4 Write LEARN phase content (SWD Principle 1: Understand the Context)
+- [ ] 2.5 Download NYC Restaurant Inspections dataset → save to data/
+- [ ] 2.6 Build CHOOSE phase UI (dataset picker + audience definition)
+- [ ] 2.7 Update Sprint 1 business scenario for real dataset
+- [ ] 2.8 Rewrite assessment voice to Compadre
+- [ ] 2.9 Day 2 test
+
+### Day 3: Tableau + Portfolio + Deploy
+- [ ] 3.1 Write Tableau guided instructions for Sprint 1
+- [ ] 3.2 Add PUBLISH phase (Tableau Public URL input)
+- [ ] 3.3 Build portfolio view
+- [ ] 3.4 Add portfolio to navigation
+- [ ] 3.5 Update rubric for real dataset + SWD evaluation criteria
+- [ ] 3.6 Full E2E test
+- [ ] 3.7 Deploy + smoke test on production
