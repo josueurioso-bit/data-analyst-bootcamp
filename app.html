@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Data Analyst Bootcamp</title>
+  <title>Compadre</title>
   <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
@@ -91,8 +91,8 @@
     const SPRINTS = [
       {
         id: 1,
-        title: 'Excel: Operational Bottleneck Analysis',
-        description: 'Analyze delivery data to find root causes of late shipments at FastTrack Logistics.',
+        title: 'Understand the Context',
+        description: 'Analyze NYC restaurant inspection data and build a Tableau visualization for the NYC Health Commissioner.',
         locked: false,
         business_scenario: `You've just been hired as a Junior Data Analyst at FastTrack Logistics. The VP of Operations is concerned: late deliveries cost the company $2.3M last year.
 
@@ -111,32 +111,32 @@ Your job: Analyze the data in Excel/Google Sheets, identify the root causes, and
       },
       {
         id: 2,
-        title: 'SQL: Customer Segmentation',
-        description: 'Query a database to segment customers and identify high-value groups.',
+        title: 'Choose the Right Visual',
+        description: 'Match your data to the right chart type so your audience actually understands what you\'re showing.',
         locked: true
       },
       {
         id: 3,
-        title: 'SQL + Excel: Sales Pipeline Analysis',
-        description: 'Combine SQL queries with Excel dashboards to analyze sales funnel performance.',
+        title: 'Eliminate Clutter',
+        description: 'Strip away everything that doesn\'t serve the story. Less is more — and harder than it sounds.',
         locked: true
       },
       {
         id: 4,
-        title: 'Python: Automated Reporting',
-        description: 'Build a Python script to automate weekly KPI reporting.',
+        title: 'Focus Attention',
+        description: 'Use color, size, and positioning to guide your audience\'s eye to what matters most.',
         locked: true
       },
       {
         id: 5,
-        title: 'Python + Viz: Market Analysis Dashboard',
-        description: 'Create interactive visualizations to present market research findings.',
+        title: 'Think Like a Designer',
+        description: 'Apply design principles to make your visualizations clear, trustworthy, and professional.',
         locked: true
       },
       {
         id: 6,
-        title: 'Capstone: End-to-End Analysis',
-        description: 'Complete a full data analysis project from data collection to presentation.',
+        title: 'Tell a Story — Capstone',
+        description: 'Bring it all together. One dataset, one audience, one complete narrative. Your portfolio centerpiece.',
         locked: true
       }
     ];
@@ -210,7 +210,7 @@ Your job: Analyze the data in Excel/Google Sheets, identify the root causes, and
       const [messages, setMessages] = useState([
         {
           role: 'assistant',
-          content: "Hi! I'm your AI tutor for the Data Analyst Bootcamp.\n\nI'm here to help you discover if you're ready to start learning data analysis, or if you need a bit of prep work first. This isn't a test you can fail - it's just a conversation to find your starting point.\n\nNo pressure, and I'll be supportive throughout. Ready to begin?"
+          content: "Hey — I'm Compadre. I'll be with you every step of the way.\n\nBefore we jump into your first sprint, I want to figure out your best starting point. This isn't a test you can fail — it's just a conversation to understand where you are right now.\n\nReady to begin?"
         }
       ]);
       const [input, setInput] = useState('');
@@ -224,7 +224,7 @@ Your job: Analyze the data in Excel/Google Sheets, identify the root causes, and
       // Sprint state
       const [currentSprint, setCurrentSprint] = useState(null);
       const [sessionId, setSessionId] = useState(() => {
-        return localStorage.getItem('bootcamp_session_id') || null;
+        return localStorage.getItem('compadre_session_id') || null;
       });
 
       // Whether user skipped the assessment (arrived via URL param)
@@ -256,7 +256,7 @@ Your job: Analyze the data in Excel/Google Sheets, identify the root causes, and
           if (!sessionId) {
             const newId = crypto.randomUUID();
             setSessionId(newId);
-            localStorage.setItem('bootcamp_session_id', newId);
+            localStorage.setItem('compadre_session_id', newId);
           }
           setSkippedAssessment(true);
           if (view === 'sprint') {
@@ -275,7 +275,7 @@ Your job: Analyze the data in Excel/Google Sheets, identify the root causes, and
         if (assessmentResults && currentView === 'assessment') {
           const newSessionId = crypto.randomUUID();
           setSessionId(newSessionId);
-          localStorage.setItem('bootcamp_session_id', newSessionId);
+          localStorage.setItem('compadre_session_id', newSessionId);
           setCurrentView('results');
         }
       }, [assessmentResults]);
@@ -355,7 +355,7 @@ Your job: Analyze the data in Excel/Google Sheets, identify the root causes, and
           setError(error.message);
           setMessages(prev => [...prev, {
             role: 'assistant',
-            content: `I encountered an error: ${error.message}. Please try again or contact support if the issue persists.`
+            content: `Something went wrong on my end: ${error.message}. Try sending your message again — I'm still here.`
           }]);
         } finally {
           setIsLoading(false);
@@ -373,7 +373,7 @@ Your job: Analyze the data in Excel/Google Sheets, identify the root causes, and
       const resetAssessment = () => {
         setMessages([{
           role: 'assistant',
-          content: "Hi! I'm your AI tutor for the Data Analyst Bootcamp.\n\nI'm here to help you discover if you're ready to start learning data analysis, or if you need a bit of prep work first. This isn't a test you can fail - it's just a conversation to find your starting point.\n\nNo pressure, and I'll be supportive throughout. Ready to begin?"
+          content: "Hey — I'm Compadre. I'll be with you every step of the way.\n\nBefore we jump into your first sprint, I want to figure out your best starting point. This isn't a test you can fail — it's just a conversation to understand where you are right now.\n\nReady to begin?"
         }]);
         setAssessmentResults(null);
         setError(null);
@@ -482,19 +482,19 @@ Your job: Analyze the data in Excel/Google Sheets, identify the root causes, and
       // Header (shared across all views)
       // =========================================================
       const headerTitle = {
-        assessment: 'Milestone 0 Assessment',
-        results: 'Assessment Results',
+        assessment: 'Skills Check',
+        results: 'Your Results',
         dashboard: 'Sprint Dashboard',
         sprint: currentSprint ? `Sprint ${currentSprint.id}: ${currentSprint.title}` : 'Sprint',
-        feedback: 'Evaluation Results'
+        feedback: 'Feedback'
       };
 
       const headerSubtitle = {
-        assessment: 'Baseline Skills Check - Data Analyst Bootcamp',
-        results: 'Your personalized learning plan',
+        assessment: 'Find your starting sprint — about 10 minutes',
+        results: 'Your personalized sprint plan',
         dashboard: 'Choose your sprint',
         sprint: 'Complete the deliverables and submit your work',
-        feedback: 'AI-powered feedback on your submission'
+        feedback: 'Here\'s what Compadre thinks of your work'
       };
 
       // =========================================================
@@ -506,11 +506,14 @@ Your job: Analyze the data in Excel/Google Sheets, identify the root causes, and
         }}>
           {/* Header */}
           <header className="bg-white shadow-sm border-b border-gray-200">
-            <div className="max-w-4xl mx-auto px-4 py-4">
-              <h1 className="text-2xl font-bold text-gray-900" style={{ fontFamily: 'Georgia, serif' }}>
-                {headerTitle[currentView]}
-              </h1>
-              <p className="text-sm text-gray-700">{headerSubtitle[currentView]}</p>
+            <div className="max-w-4xl mx-auto px-4 py-4 flex items-center gap-3">
+              <img src="compadre_axolotl.png" alt="Compadre" className="w-9 h-9 mix-blend-multiply flex-shrink-0" />
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900" style={{ fontFamily: 'Georgia, serif' }}>
+                  {headerTitle[currentView]}
+                </h1>
+                <p className="text-sm text-gray-700">{headerSubtitle[currentView]}</p>
+              </div>
             </div>
           </header>
 
@@ -528,7 +531,7 @@ Your job: Analyze the data in Excel/Google Sheets, identify the root causes, and
                     className="mt-1 w-5 h-5 text-purple-600 border-gray-300 rounded focus:ring-purple-500 focus:ring-offset-2 cursor-pointer"
                   />
                   <span className="text-sm text-gray-800">
-                    <span className="font-medium">I consent to my anonymous assessment scores being used to improve the bootcamp curriculum.</span>
+                    <span className="font-medium">I consent to my anonymous assessment scores being used to improve Compadre.</span>
                     {' '}
                     <a href="privacy.html" target="_blank" rel="noopener noreferrer" className="text-purple-600 hover:text-purple-800 underline">Learn more</a>
                   </span>
@@ -970,7 +973,7 @@ Your job: Analyze the data in Excel/Google Sheets, identify the root causes, and
                     {isSubmitting ? (
                       <>
                         <LoaderIcon />
-                        <span>Evaluating your submission...</span>
+                        <span>Compadre is reviewing your work...</span>
                       </>
                     ) : (
                       <span>Submit for Evaluation</span>
