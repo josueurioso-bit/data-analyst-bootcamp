@@ -19,3 +19,50 @@ INSERT INTO sprints (id, title, description) VALUES (3, 'SQL + Excel: Sales Pipe
 INSERT INTO sprints (id, title, description) VALUES (4, 'Python: Automated Reporting', 'Build a Python script to automate weekly KPI reporting.');
 INSERT INTO sprints (id, title, description) VALUES (5, 'Python + Viz: Market Analysis Dashboard', 'Create interactive visualizations to present market research findings.');
 INSERT INTO sprints (id, title, description) VALUES (6, 'Capstone: End-to-End Analysis', 'Complete a full data analysis project from data collection to presentation.');
+
+-- =============================================
+-- PHASE 4: Compadre Transformation
+-- Run this block after Phase 2 SQL above.
+-- Requires Supabase Auth to be enabled first.
+-- =============================================
+
+-- User profiles (linked to auth.users)
+-- Separate from auth.users — Supabase best practice
+CREATE TABLE profiles (
+  id                  UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  username            TEXT UNIQUE,
+  display_name        TEXT,
+  created_at          TIMESTAMPTZ DEFAULT NOW(),
+  tutorial_completed  BOOLEAN DEFAULT FALSE,
+  current_sprint      INTEGER DEFAULT 1,
+  lessons_completed   TEXT[] DEFAULT '{}',
+  badges_earned       TEXT[] DEFAULT '{}'
+);
+
+-- Portfolio projects (student's published Tableau work)
+CREATE TABLE portfolio_projects (
+  id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id           UUID REFERENCES profiles(id) ON DELETE CASCADE,
+  sprint_id         INTEGER,
+  project_title     TEXT NOT NULL,
+  dataset_name      TEXT,
+  tableau_url       TEXT,
+  business_question TEXT,
+  published_at      TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- RLS: users can only see and edit their own data
+ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE portfolio_projects ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users manage own profile"
+  ON profiles FOR ALL
+  USING (auth.uid() = id);
+
+CREATE POLICY "Users manage own portfolio"
+  ON portfolio_projects FOR ALL
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Portfolio is public read"
+  ON portfolio_projects FOR SELECT
+  USING (true);
