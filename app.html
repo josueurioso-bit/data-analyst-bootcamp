@@ -36,6 +36,14 @@
   </style>
 </head>
 <body>
+  <!-- Skip to main content — keyboard/screen reader navigation -->
+  <a
+    href="#main-content"
+    class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-purple-600 focus:text-white focus:rounded-lg focus:font-semibold focus:shadow-lg"
+  >
+    Skip to main content
+  </a>
+
   <div id="root"></div>
 
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -145,27 +153,27 @@ Your job: Analyze the data in Excel/Google Sheets, identify the root causes, and
     // SVG Icons
     // =========================================================
     const SendIcon = () => (
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true" focusable="false">
         <line x1="22" y1="2" x2="11" y2="13"></line>
         <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
       </svg>
     );
 
     const CheckCircleIcon = () => (
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true" focusable="false">
         <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
         <polyline points="22 4 12 14.01 9 11.01"></polyline>
       </svg>
     );
 
     const CircleIcon = () => (
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true" focusable="false">
         <circle cx="12" cy="12" r="10"></circle>
       </svg>
     );
 
     const LoaderIcon = () => (
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="animate-spin">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="animate-spin" aria-hidden="true" focusable="false">
         <line x1="12" y1="2" x2="12" y2="6"></line>
         <line x1="12" y1="18" x2="12" y2="22"></line>
         <line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line>
@@ -178,14 +186,14 @@ Your job: Analyze the data in Excel/Google Sheets, identify the root causes, and
     );
 
     const LockIcon = () => (
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true" focusable="false">
         <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
         <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
       </svg>
     );
 
     const DownloadIcon = () => (
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true" focusable="false">
         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
         <polyline points="7 10 12 15 17 10"></polyline>
         <line x1="12" y1="15" x2="12" y2="3"></line>
@@ -193,7 +201,7 @@ Your job: Analyze the data in Excel/Google Sheets, identify the root causes, and
     );
 
     const ArrowLeftIcon = () => (
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true" focusable="false">
         <line x1="19" y1="12" x2="5" y2="12"></line>
         <polyline points="12 19 5 12 12 5"></polyline>
       </svg>
@@ -220,6 +228,7 @@ Your job: Analyze the data in Excel/Google Sheets, identify the root causes, and
       const [consentGiven, setConsentGiven] = useState(true);
       const messagesEndRef = useRef(null);
       const inputRef = useRef(null);
+      const modalEmailRef = useRef(null);
 
       // Sprint state
       const [currentSprint, setCurrentSprint] = useState(null);
@@ -260,6 +269,15 @@ Your job: Analyze the data in Excel/Google Sheets, identify the root causes, and
           setShowAuthModal(true);
         }
       }, []);
+
+      // Move focus into modal when it opens; return focus to chat input when it closes
+      useEffect(() => {
+        if (showAuthModal) {
+          setTimeout(() => modalEmailRef.current?.focus(), 50);
+        } else {
+          setTimeout(() => inputRef.current?.focus(), 50);
+        }
+      }, [showAuthModal]);
 
       // URL param routing — allow skipping assessment via ?view=dashboard or ?view=sprint
       useEffect(() => {
@@ -388,6 +406,7 @@ Your job: Analyze the data in Excel/Google Sheets, identify the root causes, and
         localStorage.setItem('compadre_skipped', 'true');
         setIsAnonymous(true);
         setShowAuthModal(false);
+        // focus returns to chat input via the showAuthModal useEffect above
       };
 
       const resetAssessment = () => {
@@ -528,13 +547,18 @@ Your job: Analyze the data in Excel/Google Sheets, identify the root causes, and
           {/* AUTH MODAL                                             */}
           {/* ======================================================= */}
           {showAuthModal && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4">
-              <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8">
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4" role="presentation">
+              <div
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="auth-modal-title"
+                className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8"
+              >
 
                 {/* Header */}
                 <div className="text-center mb-6">
                   <img src="compadre_axolotl.png" alt="Compadre" className="w-16 h-16 mx-auto mb-3 mix-blend-multiply" />
-                  <h2 className="text-2xl font-bold text-gray-900" style={{ fontFamily: 'Georgia, serif' }}>
+                  <h2 id="auth-modal-title" className="text-2xl font-bold text-gray-900" style={{ fontFamily: 'Georgia, serif' }}>
                     Welcome to Compadre
                   </h2>
                   <p className="text-gray-500 mt-2 text-sm leading-relaxed">
@@ -559,26 +583,41 @@ Your job: Analyze the data in Excel/Google Sheets, identify the root causes, and
                 {/* Divider */}
                 <div className="flex items-center gap-3 mb-4">
                   <div className="flex-1 h-px bg-gray-200" />
-                  <span className="text-xs text-gray-400 font-medium">or</span>
+                  <span className="text-xs text-gray-500 font-medium">or</span>
                   <div className="flex-1 h-px bg-gray-200" />
                 </div>
 
                 {/* Email + Password */}
                 <div className="space-y-3 mb-4">
-                  <input
-                    type="email"
-                    value={authEmail}
-                    onChange={(e) => setAuthEmail(e.target.value)}
-                    placeholder="Email"
-                    className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-                  />
-                  <input
-                    type="password"
-                    value={authPassword}
-                    onChange={(e) => setAuthPassword(e.target.value)}
-                    placeholder="Password"
-                    className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-                  />
+                  <div>
+                    <label htmlFor="auth-email" className="block text-sm font-medium text-gray-700 mb-1">
+                      Email
+                    </label>
+                    <input
+                      ref={modalEmailRef}
+                      id="auth-email"
+                      type="email"
+                      value={authEmail}
+                      onChange={(e) => setAuthEmail(e.target.value)}
+                      placeholder="you@example.com"
+                      autoComplete="email"
+                      className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="auth-password" className="block text-sm font-medium text-gray-700 mb-1">
+                      Password
+                    </label>
+                    <input
+                      id="auth-password"
+                      type="password"
+                      value={authPassword}
+                      onChange={(e) => setAuthPassword(e.target.value)}
+                      placeholder="••••••••"
+                      autoComplete="current-password"
+                      className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                    />
+                  </div>
                 </div>
 
                 {/* Sign In / Create Account — wired in Task 1.8 */}
@@ -620,7 +659,7 @@ Your job: Analyze the data in Excel/Google Sheets, identify the root causes, and
                 <h1 className="text-2xl font-bold text-gray-900" style={{ fontFamily: 'Georgia, serif' }}>
                   {headerTitle[currentView]}
                 </h1>
-                <p className="text-sm text-gray-700">{headerSubtitle[currentView]}</p>
+                <p className="text-sm text-gray-700" aria-live="polite" aria-atomic="true">{headerSubtitle[currentView]}</p>
               </div>
             </div>
           </header>
@@ -644,7 +683,7 @@ Your job: Analyze the data in Excel/Google Sheets, identify the root causes, and
                     <a href="privacy.html" target="_blank" rel="noopener noreferrer" className="text-purple-600 hover:text-purple-800 underline">Learn more</a>
                   </span>
                 </label>
-                <p id="consent-description" className="text-xs text-gray-600 mt-1 ml-8">
+                <p id="consent-description" className="text-xs text-gray-600 mt-1 ml-8" aria-live="polite">
                   {consentGiven
                     ? "Your scores will help us identify common skill gaps and improve our curriculum."
                     : "You can still take the quiz - your results just won't be saved to our database."}
@@ -655,7 +694,7 @@ Your job: Analyze the data in Excel/Google Sheets, identify the root causes, and
 
           {/* Error Banner */}
           {error && (
-            <div className="bg-red-50 border-b border-red-200 px-4 py-3">
+            <div role="alert" aria-live="assertive" aria-atomic="true" className="bg-red-50 border-b border-red-200 px-4 py-3">
               <div className="max-w-4xl mx-auto flex items-center justify-between">
                 <p className="text-sm text-red-800">{error}</p>
                 <button onClick={() => setError(null)} className="text-red-600 hover:text-red-800 text-sm underline focus:ring-2 focus:ring-red-500 focus:ring-offset-2 rounded">Dismiss</button>
@@ -668,7 +707,7 @@ Your job: Analyze the data in Excel/Google Sheets, identify the root causes, and
           {/* ======================================================= */}
           {currentView === 'assessment' && (
             <>
-              <main className="flex-1 overflow-y-auto px-4 py-6" aria-label="Chat conversation">
+              <main id="main-content" className="flex-1 overflow-y-auto px-4 py-6" aria-label="Chat conversation">
                 <ErrorBoundary name="Chat">
                   <div className="max-w-4xl mx-auto space-y-4" role="log" aria-live="polite" aria-relevant="additions">
                     {messages.map((message, idx) => (
@@ -735,7 +774,7 @@ Your job: Analyze the data in Excel/Google Sheets, identify the root causes, and
           {/* ======================================================= */}
           {currentView === 'results' && assessmentResults && (
             <ErrorBoundary name="Results Dashboard">
-              <main className="flex-1 overflow-y-auto px-4 py-6">
+              <main id="main-content" className="flex-1 overflow-y-auto px-4 py-6">
                 <div className="max-w-4xl mx-auto">
                   <div className="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-2xl p-8 shadow-xl border border-purple-200">
                     <h2 className="text-3xl font-bold mb-2" style={{ fontFamily: 'Georgia, serif' }}>
@@ -897,7 +936,7 @@ Your job: Analyze the data in Excel/Google Sheets, identify the root causes, and
           {/* VIEW: Sprint Dashboard */}
           {/* ======================================================= */}
           {currentView === 'dashboard' && (
-            <main className="flex-1 overflow-y-auto px-4 py-6">
+            <main id="main-content" className="flex-1 overflow-y-auto px-4 py-6">
               <div className="max-w-4xl mx-auto">
                 {/* Back nav */}
                 {skippedAssessment ? (
@@ -917,45 +956,53 @@ Your job: Analyze the data in Excel/Google Sheets, identify the root causes, and
                 )}
 
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {SPRINTS.map((sprint) => (
-                    <div
-                      key={sprint.id}
-                      className={`rounded-xl p-6 shadow-md border-2 transition-all ${
-                        sprint.locked
-                          ? 'bg-gray-50 border-gray-200 opacity-60'
-                          : 'bg-white border-purple-200 hover:border-purple-400 hover:shadow-lg cursor-pointer'
-                      }`}
-                      onClick={() => {
-                        if (!sprint.locked) {
-                          setCurrentSprint(sprint);
-                          setCurrentView('sprint');
-                        }
-                      }}
-                    >
-                      <div className="flex items-center justify-between mb-3">
-                        <span className={`text-xs font-bold px-2 py-1 rounded-full ${
-                          sprint.locked
-                            ? 'bg-gray-200 text-gray-500'
-                            : 'bg-purple-100 text-purple-700'
-                        }`}>
-                          Sprint {sprint.id}
-                        </span>
-                        {sprint.locked && <LockIcon />}
+                  {SPRINTS.map((sprint) => {
+                    const inner = (
+                      <>
+                        <div className="flex items-center justify-between mb-3">
+                          <span className={`text-xs font-bold px-2 py-1 rounded-full ${
+                            sprint.locked
+                              ? 'bg-gray-200 text-gray-700'
+                              : 'bg-purple-100 text-purple-700'
+                          }`}>
+                            Sprint {sprint.id}
+                          </span>
+                          {sprint.locked && <LockIcon />}
+                        </div>
+                        <h3 className={`font-bold mb-2 text-left ${sprint.locked ? 'text-gray-600' : 'text-gray-900'}`}>
+                          {sprint.title}
+                        </h3>
+                        <p className={`text-sm text-left ${sprint.locked ? 'text-gray-600' : 'text-gray-600'}`}>
+                          {sprint.description}
+                        </p>
+                        {sprint.locked && (
+                          <p className="mt-3 text-xs font-semibold text-gray-600">Coming Soon</p>
+                        )}
+                        {!sprint.locked && (
+                          <p className="mt-3 text-xs font-semibold text-purple-600">Click to start →</p>
+                        )}
+                      </>
+                    );
+
+                    return sprint.locked ? (
+                      <div
+                        key={sprint.id}
+                        className="rounded-xl p-6 shadow-md border-2 bg-gray-50 border-gray-200"
+                        aria-label={`Sprint ${sprint.id}: ${sprint.title} — Coming Soon`}
+                      >
+                        {inner}
                       </div>
-                      <h3 className={`font-bold mb-2 ${sprint.locked ? 'text-gray-400' : 'text-gray-900'}`}>
-                        {sprint.title}
-                      </h3>
-                      <p className={`text-sm ${sprint.locked ? 'text-gray-400' : 'text-gray-600'}`}>
-                        {sprint.description}
-                      </p>
-                      {sprint.locked && (
-                        <p className="mt-3 text-xs font-semibold text-gray-400">Coming Soon</p>
-                      )}
-                      {!sprint.locked && (
-                        <p className="mt-3 text-xs font-semibold text-purple-600">Click to start</p>
-                      )}
-                    </div>
-                  ))}
+                    ) : (
+                      <button
+                        key={sprint.id}
+                        className="rounded-xl p-6 shadow-md border-2 bg-white border-purple-200 hover:border-purple-400 hover:shadow-lg transition-all text-left w-full focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+                        onClick={() => { setCurrentSprint(sprint); setCurrentView('sprint'); }}
+                        aria-label={`Start Sprint ${sprint.id}: ${sprint.title}`}
+                      >
+                        {inner}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             </main>
@@ -965,7 +1012,7 @@ Your job: Analyze the data in Excel/Google Sheets, identify the root causes, and
           {/* VIEW: Sprint Workspace */}
           {/* ======================================================= */}
           {currentView === 'sprint' && currentSprint && (
-            <main className="flex-1 overflow-y-auto px-4 py-6">
+            <main id="main-content" className="flex-1 overflow-y-auto px-4 py-6">
               <div className="max-w-4xl mx-auto">
                 {/* Back nav */}
                 <button
@@ -1011,7 +1058,7 @@ Your job: Analyze the data in Excel/Google Sheets, identify the root causes, and
                   <ul className="space-y-3">
                     {currentSprint.deliverables.map((item, idx) => (
                       <li key={idx} className="flex items-start gap-3">
-                        <span className="mt-0.5 w-5 h-5 rounded border-2 border-gray-300 flex-shrink-0 flex items-center justify-center text-xs text-gray-400">
+                        <span className="mt-0.5 w-5 h-5 rounded border-2 border-gray-300 flex-shrink-0 flex items-center justify-center text-xs text-gray-600">
                           {idx + 1}
                         </span>
                         <span className="text-gray-700">{item}</span>
@@ -1061,13 +1108,13 @@ Your job: Analyze the data in Excel/Google Sheets, identify the root causes, and
                       <p className={`text-xs ${memoText.length < 200 ? 'text-red-500' : memoText.length > 4500 ? 'text-yellow-600' : 'text-gray-500'}`}>
                         {memoText.length < 200 ? `${200 - memoText.length} more characters needed` : `${memoText.length}/5000 characters`}
                       </p>
-                      <p className="text-xs text-gray-400">Min 200, Max 5000</p>
+                      <p className="text-xs text-gray-600">Min 200, Max 5000</p>
                     </div>
                   </div>
 
                   {/* Submit Error */}
                   {submitError && (
-                    <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
+                    <div role="alert" aria-live="assertive" aria-atomic="true" className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
                       <p className="text-sm text-red-800">{submitError}</p>
                     </div>
                   )}
@@ -1076,6 +1123,7 @@ Your job: Analyze the data in Excel/Google Sheets, identify the root causes, and
                   <button
                     onClick={handleSubmit}
                     disabled={isSubmitting || memoText.length < 200}
+                    aria-busy={isSubmitting}
                     className="w-full py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg font-semibold hover:from-purple-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
                   >
                     {isSubmitting ? (
@@ -1097,7 +1145,7 @@ Your job: Analyze the data in Excel/Google Sheets, identify the root causes, and
           {/* ======================================================= */}
           {currentView === 'feedback' && submissionFeedback && (
             <ErrorBoundary name="Feedback">
-              <main className="flex-1 overflow-y-auto px-4 py-6">
+              <main id="main-content" className="flex-1 overflow-y-auto px-4 py-6">
                 <div className="max-w-4xl mx-auto">
 
                   {/* Overall Score */}
