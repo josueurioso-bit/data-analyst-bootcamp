@@ -42,7 +42,9 @@ I'm picking up where I left off. Check PROGRESS.md for what's done and what's ne
 Phases 0-3 are complete (original build). Platform is now being transformed into **Compadre**. The 3-day Compadre sprint plan is in `docs/REALISTIC_3DAY_ROADMAP.md`. Pick up at **Phase 4, Day 1, Task 1.1** — the git fix.
 
 ### Session ended: February 20, 2026 (updated)
-**Where we left off:** Day 1 complete. Email auth working, session linking verified, security fixes applied. Ready to start Day 2.
+**Where we left off:** Day 1 complete. Day 2 planned and ready to start. Stopped before writing any Day 2 code.
+
+**First task next session:** Answer the tutorial placement question (Option A: before assessment, or Option B: after assessment/before dashboard), then start Task 2.1 (tutorial view).
 
 **What was decided this session:**
 - Platform name: **Compadre** (platform and guide are one)
