@@ -104,8 +104,8 @@
     // Replace the placeholder values below with your real project URL + anon key
     // from: Supabase Dashboard → Project Settings → API
     // =========================================================
-    const SUPABASE_URL = 'YOUR_SUPABASE_URL';
-    const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+    const SUPABASE_URL = 'https://qsevipetqmldzgwzeacr.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFzZXZpcGV0cW1sZHpnd3plYWNyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk4NzIyMTMsImV4cCI6MjA4NTQ0ODIxM30.5r2yk2B0fLU5bwnVI9RT8dDJNcKD_r38_ElOT0G4G38';
 
     // Only initialize the client if real credentials are present
     const supabase = (SUPABASE_URL !== 'YOUR_SUPABASE_URL' && SUPABASE_ANON_KEY !== 'YOUR_SUPABASE_ANON_KEY')
@@ -309,10 +309,34 @@ Your job: Analyze the data in Excel/Google Sheets, identify the root causes, and
         });
 
         // Subscribe to future auth changes (sign in, sign out, token refresh)
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
           if (session?.user) {
             setUser(session.user);
             setShowAuthModal(false);
+            // =========================================================
+            // TEACHING MOMENT: Anonymous session linking
+            // We only run this on SIGNED_IN — not on TOKEN_REFRESHED or
+            // the initial page-load check — so we don't burn extra DB
+            // calls on every mount.
+            //
+            // upsert = INSERT if this user has no profile yet, UPDATE if
+            // they do. It's idempotent, so signing in twice is harmless.
+            //
+            // We only include anonymous_session_id when one exists in
+            // localStorage. If the user signed in from a new device where
+            // there's no session, we still create the profile row — we
+            // just don't overwrite the session_id they linked previously.
+            // =========================================================
+            if (event === 'SIGNED_IN') {
+              const storedSessionId = localStorage.getItem('compadre_session_id');
+              const profileData = { id: session.user.id };
+              if (storedSessionId) profileData.anonymous_session_id = storedSessionId;
+              supabase.from('profiles')
+                .upsert(profileData, { onConflict: 'id' })
+                .then(({ error }) => {
+                  if (error) console.warn('[Auth] Profile upsert failed:', error.message);
+                });
+            }
           } else {
             setUser(null);
           }
