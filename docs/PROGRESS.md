@@ -41,8 +41,8 @@ I'm picking up where I left off. Check PROGRESS.md for what's done and what's ne
 ### 5. Tell Claude what to work on
 Phases 0-3 are complete (original build). Platform is now being transformed into **Compadre**. The 3-day Compadre sprint plan is in `docs/REALISTIC_3DAY_ROADMAP.md`. Pick up at **Phase 4, Day 1, Task 1.1** — the git fix.
 
-### Session ended: February 20, 2026
-**Where we left off:** Ideation + planning complete. No code written yet for the Compadre transformation. Ready to start Day 1 tasks.
+### Session ended: February 20, 2026 (updated)
+**Where we left off:** Day 1 complete. Email auth working, session linking verified, security fixes applied. Ready to start Day 2.
 
 **What was decided this session:**
 - Platform name: **Compadre** (platform and guide are one)
@@ -319,17 +319,23 @@ A public-facing landing page and a way for returning users to skip the assessmen
 
 Full 3-day sprint plan: `docs/REALISTIC_3DAY_ROADMAP.md`
 
-### Day 1: Brand + Auth
-- [ ] 1.1 Fix git status (commit landing.html deletion)
-- [ ] 1.2 Rebrand index.html to Compadre
-- [ ] 1.3 Rebrand app.html to Compadre voice
-- [ ] 1.4 Enable Supabase email auth
-- [ ] 1.5 Enable Google OAuth
-- [ ] 1.6 Create profiles + portfolio_projects tables in Supabase
-- [ ] 1.7 Auth modal UI (email / Google / skip)
-- [ ] 1.8 Auth logic (Supabase JS SDK)
-- [ ] 1.9 Link anonymous session ID to user on sign-in
-- [ ] 1.10 Day 1 test
+### Day 1: Brand + Auth ✅ COMPLETE
+- [x] 1.1 Fix git status (commit landing.html deletion)
+- [x] 1.2 Rebrand index.html to Compadre
+- [x] 1.3 Rebrand app.html to Compadre voice
+- [x] 1.4 Enable Supabase email auth — done in Supabase dashboard (Auth → Providers → Email ON, Confirm email OFF)
+- [~] 1.5 Enable Google OAuth — blocked: Google provider UI not found in Supabase dashboard. Deferred to after Day 2.
+- [x] 1.6 Create profiles + portfolio_projects tables in Supabase — SQL in supabase-phase2.sql
+- [x] 1.7 Auth modal UI (email / Google / skip)
+- [x] 1.8 Auth logic (Supabase JS SDK) — real credentials wired in app.html
+- [x] 1.9 Link anonymous session ID to user on sign-in — upserts profiles row with anonymous_session_id on SIGNED_IN event
+- [x] 1.10 Day 1 test — passed. Email auth, skip flow, session linking all verified on live site.
+
+**Security fixes completed on Feb 20:**
+- Switched SUPABASE_KEY in Vercel from anon key → service role key
+- Dropped 3 overly permissive RLS policies (assessments INSERT, submissions INSERT, submissions UPDATE)
+- Set Supabase Site URL to https://data-analyst-bootcamp.vercel.app
+- Added anonymous_session_id column to profiles table
 
 ### Day 2: Tutorial + Curriculum
 - [ ] 2.1 Build tutorial view (5 steps, skippable)
