@@ -5,7 +5,7 @@
 **Live:** https://data-analyst-bootcamp.vercel.app
 **Platform:** Compadre
 **Builder:** Sway
-**Last Updated:** February 20, 2026
+**Last Updated:** February 22, 2026
 
 ---
 
@@ -39,26 +39,33 @@ I'm picking up where I left off. Check PROGRESS.md for what's done and what's ne
 ```
 
 ### 5. Tell Claude what to work on
-Phases 0-3 are complete (original build). Platform is now being transformed into **Compadre**. The 3-day Compadre sprint plan is in `docs/REALISTIC_3DAY_ROADMAP.md`. Pick up at **Phase 4, Day 1, Task 1.1** — the git fix.
+Phases 0-3 are complete (original build). Platform is now being transformed into **Compadre**. The 3-day Compadre sprint plan is in `docs/REALISTIC_3DAY_ROADMAP.md`. Pick up at **Day 2, debugging the tutorial view** — see session notes below.
 
-### Session ended: February 20, 2026 (updated)
-**Where we left off:** Day 1 complete. Day 2 planned and ready to start. Stopped before writing any Day 2 code.
+### Session ended: February 22, 2026
+**Where we left off:** Tasks 2.1, 2.2, and 2.3 are coded but NOT committed. The tutorial is not rendering and the root cause is unconfirmed. Stop here — debug tutorial first before moving to 2.4.
 
-**First task next session:** Answer the tutorial placement question (Option A: before assessment, or Option B: after assessment/before dashboard), then start Task 2.1 (tutorial view).
+**First task next session:** Debug tutorial not rendering.
+1. Open browser DevTools (F12) → Console tab
+2. Run: `localStorage.getItem('compadre_tutorial_done')`
+3. Look for red JS errors in Console
+4. Paste results and start from there
 
 **What was decided this session:**
-- Platform name: **Compadre** (platform and guide are one)
-- Curriculum: Storytelling with Data (SWD) — 6 principles, 6 sprints
-- Tools: Excel (analysis) + Tableau Public (visualization)
-- Auth: Optional — email/password + Google OAuth, anonymous sessions link on sign-up
-- Tutorial: Skippable 5-step onboarding on first visit
-- Deliverable: Tableau Public viz (real portfolio piece)
-- Sprint 1 dataset: **NYC Restaurant Inspections (DOHMH)**
-  - Download: https://data.cityofnewyork.us/api/views/43nn-pn8j/rows.csv?accessType=DOWNLOAD
-  - ~400K rows, 26 columns, filter to 2022-present for Sprint 1
-- All planning docs updated: `REALISTIC_3DAY_ROADMAP.md` and `PROGRESS.md`
+- Tutorial placement: **Option A** — tutorial appears BEFORE assessment (right after auth modal)
+- Tutorial triggers via `currentView` initial state: `localStorage.getItem('compadre_tutorial_done') ? 'assessment' : 'tutorial'`
+- Auth modal is a fixed overlay — renders on top of whatever view is active
 
-**First task tomorrow:** Phase 4, Task 1.1 — fix git status (5 min)
+**Tasks completed this session (code written, not committed):**
+- [x] 2.1 Tutorial view — 5 steps, skip link, progress dots, "Start Sprint 1 →" button
+- [x] 2.2 Tutorial state — localStorage + Supabase `profiles.tutorial_completed` sync
+- [x] 2.3 Sprint phase flow — LEARN → CHOOSE → BUILD → PUBLISH structure + progress bar
+
+**Known open issue:**
+- Tutorial view not rendering on local server (`127.0.0.1:3000`). Root cause unknown — likely a JS error in-browser or localStorage state issue. Need console output to confirm.
+
+**What was decided this session:**
+- Tutorial placement changed from Option B (after assessment) to **Option A (before assessment)** mid-session
+- `completeTutorial()` and `skipTutorial()` both route to `'assessment'` (not `'dashboard'`)
 
 ---
 
@@ -340,9 +347,9 @@ Full 3-day sprint plan: `docs/REALISTIC_3DAY_ROADMAP.md`
 - Added anonymous_session_id column to profiles table
 
 ### Day 2: Tutorial + Curriculum
-- [ ] 2.1 Build tutorial view (5 steps, skippable)
-- [ ] 2.2 Save tutorial completion state
-- [ ] 2.3 Add sprint phase flow (LEARN → CHOOSE → BUILD)
+- [~] 2.1 Build tutorial view (5 steps, skippable) — coded, not committed, not rendering (debug needed)
+- [~] 2.2 Save tutorial completion state — coded, not committed
+- [~] 2.3 Add sprint phase flow (LEARN → CHOOSE → BUILD) — coded, not committed
 - [ ] 2.4 Write LEARN phase content (SWD Principle 1: Understand the Context)
 - [ ] 2.5 Download NYC Restaurant Inspections dataset → save to data/
 - [ ] 2.6 Build CHOOSE phase UI (dataset picker + audience definition)
