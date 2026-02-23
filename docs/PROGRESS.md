@@ -41,31 +41,44 @@ I'm picking up where I left off. Check PROGRESS.md for what's done and what's ne
 ### 5. Tell Claude what to work on
 Phases 0-3 are complete (original build). Platform is now being transformed into **Compadre**. The 3-day Compadre sprint plan is in `docs/REALISTIC_3DAY_ROADMAP.md`. Pick up at **Day 2, debugging the tutorial view** — see session notes below.
 
-### Session ended: February 22, 2026
-**Where we left off:** Tasks 2.1, 2.2, and 2.3 are coded but NOT committed. The tutorial is not rendering and the root cause is unconfirmed. Stop here — debug tutorial first before moving to 2.4.
+### Session ended: February 22, 2026 (Evening)
+**Where we left off:** Task 2.4 (LEARN phase content) is up next. Paused at the design decision for visual structure — no code written yet for 2.4.
 
-**First task next session:** Debug tutorial not rendering.
-1. Open browser DevTools (F12) → Console tab
-2. Run: `localStorage.getItem('compadre_tutorial_done')`
-3. Look for red JS errors in Console
-4. Paste results and start from there
+**First task next session:** Design + build Task 2.4 — LEARN phase content for SWD Principle 1.
 
-**What was decided this session:**
-- Tutorial placement: **Option A** — tutorial appears BEFORE assessment (right after auth modal)
-- Tutorial triggers via `currentView` initial state: `localStorage.getItem('compadre_tutorial_done') ? 'assessment' : 'tutorial'`
-- Auth modal is a fixed overlay — renders on top of whatever view is active
+**Start here:**
+```
+Read these files before we start:
+- .clauderules
+- docs/PROGRESS.md
 
-**Tasks completed this session (code written, not committed):**
-- [x] 2.1 Tutorial view — 5 steps, skip link, progress dots, "Start Sprint 1 →" button
-- [x] 2.2 Tutorial state — localStorage + Supabase `profiles.tutorial_completed` sync
-- [x] 2.3 Sprint phase flow — LEARN → CHOOSE → BUILD → PUBLISH structure + progress bar
+I'm picking up where I left off.
+```
 
-**Known open issue:**
-- Tutorial view not rendering on local server (`127.0.0.1:3000`). Root cause unknown — likely a JS error in-browser or localStorage state issue. Need console output to confirm.
+**What was resolved this session:**
+- 'Tutorial not rendering' was a false alarm — tutorial IS working. Root cause: VS Code Live Server served a cached version of app.html. Fix: Ctrl+Shift+P → Revert File in VS Code forces re-read of files edited by external tools like Claude Code.
+- The LEARN/CHOOSE/BUILD/PUBLISH step cards ARE the tutorial. Working correctly after a clean-state test.
 
-**What was decided this session:**
-- Tutorial placement changed from Option B (after assessment) to **Option A (before assessment)** mid-session
-- `completeTutorial()` and `skipTutorial()` both route to `'assessment'` (not `'dashboard'`)
+**Tasks completed and committed this session:**
+- [x] 2.1 Tutorial view — committed c7c15f2
+- [x] 2.2 Tutorial state — committed c7c15f2
+- [x] 2.3 Sprint phase flow — committed c7c15f2
+- [x] Avatar swap — compadre_axolotl.png → compadre_pixel_centered.png in app.html + index.html, deployed to Vercel (74fa640)
+- [x] Created docs/COMPADRE_PROJECT_BRIEF.md — shareable project summary for new AI chats
+
+**Design decision pending for Task 2.4 (decide before coding):**
+LEARN phase must be visually stimulating for ADHD/neurodivergent users — no walls of text.
+Proposed structure (not yet approved):
+- Section 1: The Big Idea (hero card, gradient bg, SWD pull quote)
+- Section 2: The 3 Questions (3 icon cards — Who / What / What changes minds)
+- Section 3: Real Talk (colored callout, 2 sentences max)
+- Section 4: See It In Action (NYC Health Commissioner scenario card)
+- Section 5: Quick Check (3-item checklist before continuing)
+
+Open questions to answer at start of next session:
+- Emoji icons vs SVG icons?
+- 3 sections vs 5 sections?
+- Is Quick Check clickable or just visual?
 
 ---
 
