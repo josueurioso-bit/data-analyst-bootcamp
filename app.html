@@ -228,8 +228,11 @@ Your job: Analyze the data in Excel/Google Sheets, identify the root causes, and
     // Main App Component
     // =========================================================
     function App() {
-      // View state: 'assessment' | 'results' | 'dashboard' | 'sprint' | 'feedback'
-      const [currentView, setCurrentView] = useState('assessment');
+      // View state: 'assessment' | 'results' | 'tutorial' | 'dashboard' | 'sprint' | 'feedback'
+      // Start in tutorial if it hasn't been completed yet — auth modal overlays on top
+      const [currentView, setCurrentView] = useState(
+        localStorage.getItem('compadre_tutorial_done') ? 'assessment' : 'tutorial'
+      );
 
       // Assessment state
       const [messages, setMessages] = useState([
@@ -271,6 +274,9 @@ Your job: Analyze the data in Excel/Google Sheets, identify the root causes, and
       const [authPassword, setAuthPassword] = useState('');
       const [authError, setAuthError] = useState(null);
       const [authLoading, setAuthLoading] = useState(false);
+      const [tutorialStep, setTutorialStep] = useState(0);
+      // Sprint phase: 'learn' | 'choose' | 'build' | 'publish'
+      const [sprintPhase, setSprintPhase] = useState('learn');
 
       // =========================================================
       // Effects
@@ -303,6 +309,25 @@ Your job: Analyze the data in Excel/Google Sheets, identify the root causes, and
           if (session?.user) {
             setUser(session.user);
             setShowAuthModal(false);
+            // =========================================================
+            // TEACHING MOMENT: Cross-device tutorial state sync
+            // localStorage only works on the same device/browser. If a
+            // user completed the tutorial on their phone and signs in on
+            // their laptop, localStorage has no record of it. We fix that
+            // by reading tutorial_completed from their Supabase profile
+            // on every page load and mirroring it to localStorage.
+            // =========================================================
+            supabase.from('profiles')
+              .select('tutorial_completed')
+              .eq('id', session.user.id)
+              .single()
+              .then(({ data }) => {
+                if (data?.tutorial_completed) {
+                  localStorage.setItem('compadre_tutorial_done', 'true');
+                  setCurrentView('assessment'); // returning user on new device — skip tutorial
+                }
+                // If not tutorial_completed, stay in tutorial (already set by initial state)
+              });
           } else if (!localStorage.getItem('compadre_skipped')) {
             setShowAuthModal(true);
           }
@@ -336,6 +361,7 @@ Your job: Analyze the data in Excel/Google Sheets, identify the root causes, and
                 .then(({ error }) => {
                   if (error) console.warn('[Auth] Profile upsert failed:', error.message);
                 });
+              // tutorial view is already showing underneath the modal — no trigger needed
             }
           } else {
             setUser(null);
@@ -369,6 +395,7 @@ Your job: Analyze the data in Excel/Google Sheets, identify the root causes, and
           setSkippedAssessment(true);
           if (view === 'sprint') {
             setCurrentSprint(SPRINTS[0]);
+            setSprintPhase('learn');
             setCurrentView('sprint');
           } else {
             setCurrentView('dashboard');
@@ -482,7 +509,7 @@ Your job: Analyze the data in Excel/Google Sheets, identify the root causes, and
         localStorage.setItem('compadre_skipped', 'true');
         setIsAnonymous(true);
         setShowAuthModal(false);
-        // focus returns to chat input via the showAuthModal useEffect above
+        // tutorial view is already showing underneath the modal — no trigger needed
       };
 
       // =========================================================
@@ -543,6 +570,34 @@ Your job: Analyze the data in Excel/Google Sheets, identify the root causes, and
         setIsAnonymous(false);
         localStorage.removeItem('compadre_skipped');
         setShowAuthModal(true);
+      };
+
+      const completeTutorial = () => {
+        localStorage.setItem('compadre_tutorial_done', 'true');
+        // Save to Supabase so signed-in users don't see the tutorial again on any device
+        if (supabase && user) {
+          supabase.from('profiles')
+            .update({ tutorial_completed: true })
+            .eq('id', user.id)
+            .then(({ error }) => {
+              if (error) console.warn('[Tutorial] Failed to save completion:', error.message);
+            });
+        }
+        setCurrentView('assessment');
+      };
+
+      const skipTutorial = () => {
+        localStorage.setItem('compadre_tutorial_done', 'true');
+        // Same as completeTutorial — skipping counts as done
+        if (supabase && user) {
+          supabase.from('profiles')
+            .update({ tutorial_completed: true })
+            .eq('id', user.id)
+            .then(({ error }) => {
+              if (error) console.warn('[Tutorial] Failed to save skip:', error.message);
+            });
+        }
+        setCurrentView('assessment');
       };
 
       const resetAssessment = () => {
@@ -659,6 +714,7 @@ Your job: Analyze the data in Excel/Google Sheets, identify the root causes, and
       const headerTitle = {
         assessment: 'Skills Check',
         results: 'Your Results',
+        tutorial: 'Welcome to Compadre',
         dashboard: 'Sprint Dashboard',
         sprint: currentSprint ? `Sprint ${currentSprint.id}: ${currentSprint.title}` : 'Sprint',
         feedback: 'Feedback'
@@ -667,8 +723,14 @@ Your job: Analyze the data in Excel/Google Sheets, identify the root causes, and
       const headerSubtitle = {
         assessment: 'Find your starting sprint — about 10 minutes',
         results: 'Your personalized sprint plan',
+        tutorial: 'A quick look at what\'s ahead — 2 minutes',
         dashboard: 'Choose your sprint',
-        sprint: 'Complete the deliverables and submit your work',
+        sprint: {
+          learn:   'Learn the principle before you touch the data',
+          choose:  'Pick your dataset and define your audience',
+          build:   'Analyze in Excel, visualize in Tableau',
+          publish: 'Share your work and add it to your portfolio',
+        }[sprintPhase] || 'Complete the deliverables and submit your work',
         feedback: 'Here\'s what Compadre thinks of your work'
       };
 
@@ -693,7 +755,7 @@ Your job: Analyze the data in Excel/Google Sheets, identify the root causes, and
 
                 {/* Header */}
                 <div className="text-center mb-6">
-                  <img src="compadre_axolotl.png" alt="Compadre" className="w-16 h-16 mx-auto mb-3 mix-blend-multiply" />
+                  <img src="compadre_pixel_centered.png" alt="Compadre" className="w-16 h-16 mx-auto mb-3 mix-blend-multiply" />
                   <h2 id="auth-modal-title" className="text-2xl font-bold text-gray-900" style={{ fontFamily: 'Georgia, serif' }}>
                     Welcome to Compadre
                   </h2>
@@ -807,7 +869,7 @@ Your job: Analyze the data in Excel/Google Sheets, identify the root causes, and
           {/* Header */}
           <header className="bg-white shadow-sm border-b border-gray-200">
             <div className="max-w-4xl mx-auto px-4 py-4 flex items-center gap-3">
-              <img src="compadre_axolotl.png" alt="Compadre" className="w-9 h-9 mix-blend-multiply flex-shrink-0" />
+              <img src="compadre_pixel_centered.png" alt="Compadre" className="w-9 h-9 mix-blend-multiply flex-shrink-0" />
               <div className="flex-1">
                 <h1 className="text-2xl font-bold text-gray-900" style={{ fontFamily: 'Georgia, serif' }}>
                   {headerTitle[currentView]}
@@ -1108,6 +1170,199 @@ Your job: Analyze the data in Excel/Google Sheets, identify the root causes, and
           )}
 
           {/* ======================================================= */}
+          {/* VIEW: Tutorial (5 steps, skippable)                    */}
+          {/* Shown once after assessment results, before dashboard.  */}
+          {/* localStorage key: compadre_tutorial_done               */}
+          {/* ======================================================= */}
+          {currentView === 'tutorial' && (
+            <main id="main-content" className="flex-1 overflow-y-auto px-4 py-8">
+              <div className="max-w-2xl mx-auto">
+
+                {/* Skip link */}
+                <div className="flex justify-end mb-6">
+                  <button
+                    onClick={skipTutorial}
+                    className="text-sm text-gray-500 hover:text-gray-700 underline underline-offset-2 transition-colors focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 rounded"
+                  >
+                    Skip tutorial
+                  </button>
+                </div>
+
+                {/* Step content card */}
+                <div className="bg-white rounded-2xl p-8 shadow-xl border border-gray-200">
+
+                  {/* Step 1: How Compadre works */}
+                  {tutorialStep === 0 && (
+                    <div>
+                      <h2 className="text-2xl font-bold text-gray-900 mb-2" style={{ fontFamily: 'Georgia, serif' }}>
+                        Here's how Compadre works.
+                      </h2>
+                      <p className="text-gray-600 mb-8">Four phases per sprint. One real portfolio piece at the end.</p>
+                      <div className="space-y-3">
+                        {[
+                          { phase: 'LEARN', color: 'from-purple-600 to-indigo-600', desc: 'Master one data storytelling principle' },
+                          { phase: 'CHOOSE', color: 'from-indigo-600 to-blue-600', desc: 'Pick a real dataset and define your audience' },
+                          { phase: 'BUILD', color: 'from-blue-600 to-cyan-600', desc: 'Analyze in Excel, visualize in Tableau' },
+                          { phase: 'PUBLISH', color: 'from-emerald-500 to-teal-500', desc: 'Share your viz — it goes on your portfolio' },
+                        ].map(item => (
+                          <div key={item.phase} className="flex items-center gap-4">
+                            <div className={`bg-gradient-to-r ${item.color} text-white rounded-xl py-2 px-4 font-bold text-sm w-24 text-center flex-shrink-0`}>
+                              {item.phase}
+                            </div>
+                            <p className="text-sm text-gray-600">{item.desc}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Step 2: Six sprints, six skills */}
+                  {tutorialStep === 1 && (
+                    <div>
+                      <h2 className="text-2xl font-bold text-gray-900 mb-2" style={{ fontFamily: 'Georgia, serif' }}>
+                        You'll learn one skill per sprint.
+                      </h2>
+                      <p className="text-gray-600 mb-6">
+                        Six sprints. Six principles from <em>Storytelling with Data</em> by Cole Nussbaumer Knaflic.
+                      </p>
+                      <div className="space-y-2">
+                        {[
+                          { n: 1, title: 'Understand the Context', current: true },
+                          { n: 2, title: 'Choose the Right Visual', current: false },
+                          { n: 3, title: 'Eliminate Clutter', current: false },
+                          { n: 4, title: 'Focus Attention', current: false },
+                          { n: 5, title: 'Think Like a Designer', current: false },
+                          { n: 6, title: 'Tell a Story — Capstone', current: false },
+                        ].map(s => (
+                          <div key={s.n} className={`flex items-center gap-3 p-3 rounded-xl ${s.current ? 'bg-purple-50 border border-purple-200' : 'bg-gray-50 border border-gray-200'}`}>
+                            <span className={`text-xs font-bold px-2 py-1 rounded-full flex-shrink-0 ${s.current ? 'bg-purple-600 text-white' : 'bg-gray-300 text-gray-600'}`}>
+                              {s.n}
+                            </span>
+                            <span className={`text-sm font-medium ${s.current ? 'text-purple-900' : 'text-gray-600'}`}>
+                              {s.title}
+                            </span>
+                            {s.current && <span className="ml-auto text-xs text-purple-600 font-semibold flex-shrink-0">Starting here →</span>}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Step 3: Real datasets */}
+                  {tutorialStep === 2 && (
+                    <div>
+                      <h2 className="text-2xl font-bold text-gray-900 mb-2" style={{ fontFamily: 'Georgia, serif' }}>
+                        You pick the data that matters to you.
+                      </h2>
+                      <p className="text-gray-600 mb-6">
+                        We give you a starter dataset — or you can bring your own. Either way, it's real data.
+                      </p>
+                      <div className="space-y-3">
+                        {[
+                          { name: 'NYC Restaurant Inspections', desc: '~200K rows · Health grades by borough & cuisine', tag: 'Starter dataset', highlight: true },
+                          { name: 'MTA Subway Ridership', desc: 'Post-COVID recovery trends by line', tag: 'Bring your own', highlight: false },
+                          { name: 'Spotify Top Songs', desc: 'Audio features + streaming counts', tag: 'Bring your own', highlight: false },
+                          { name: 'Your choice', desc: 'Any CSV from NYC Open Data, Kaggle, or data.gov', tag: 'Bring your own', highlight: false },
+                        ].map((d, i) => (
+                          <div key={i} className={`flex items-start gap-3 p-4 rounded-xl border ${d.highlight ? 'bg-emerald-50 border-emerald-200' : 'bg-gray-50 border-gray-200'}`}>
+                            <div className="flex-1">
+                              <p className={`font-semibold text-sm ${d.highlight ? 'text-emerald-900' : 'text-gray-900'}`}>{d.name}</p>
+                              <p className="text-xs text-gray-600 mt-0.5">{d.desc}</p>
+                            </div>
+                            <span className={`text-xs px-2 py-1 rounded-full font-medium whitespace-nowrap ${d.highlight ? 'bg-emerald-200 text-emerald-800' : 'bg-gray-200 text-gray-600'}`}>
+                              {d.tag}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Step 4: Real portfolio output */}
+                  {tutorialStep === 3 && (
+                    <div>
+                      <h2 className="text-2xl font-bold text-gray-900 mb-2" style={{ fontFamily: 'Georgia, serif' }}>
+                        Your final project is real. And it's yours.
+                      </h2>
+                      <p className="text-gray-600 mb-6">
+                        Every sprint ends with a published Tableau visualization — a portfolio piece you can share with employers.
+                      </p>
+                      <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl p-6 border border-indigo-200 mb-5">
+                        <div className="flex items-center gap-3 mb-4">
+                          <div className="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold text-sm flex-shrink-0" aria-hidden="true">T</div>
+                          <div>
+                            <p className="font-semibold text-gray-900 text-sm">Tableau Public</p>
+                            <p className="text-xs text-gray-600">Free · Shareable link · No download required to view</p>
+                          </div>
+                        </div>
+                        <p className="text-sm text-gray-700 italic mb-3">
+                          Example: "Manhattan Has 3× More Grade A Restaurants Than the Bronx"
+                        </p>
+                        <p className="text-xs text-gray-600">
+                          You'll paste your Tableau URL into Compadre when you're done. It lands on your portfolio — visible to anyone, shareable anywhere.
+                        </p>
+                      </div>
+                      <p className="text-sm text-gray-600">
+                        No screenshots. No PDFs. A live, interactive visualization with your name on it.
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Step 5: Compadre closing message */}
+                  {tutorialStep === 4 && (
+                    <div className="text-center py-4">
+                      <img src="compadre_pixel_centered.png" alt="Compadre" className="w-20 h-20 mx-auto mb-6 mix-blend-multiply" />
+                      <h2 className="text-2xl font-bold text-gray-900 mb-4" style={{ fontFamily: 'Georgia, serif' }}>
+                        I'll be with you the whole way.
+                      </h2>
+                      <p className="text-gray-600 mb-4 leading-relaxed">
+                        Every lesson, every sprint, every question — I'm here. You don't need a CS degree. You don't need to know SQL. You just need to show up.
+                      </p>
+                      <p className="text-gray-600 leading-relaxed">
+                        By the end of Sprint 1, you'll have built something real. Let's go.
+                      </p>
+                    </div>
+                  )}
+
+                </div>
+
+                {/* Progress dots + navigation */}
+                <div className="flex items-center justify-between mt-6">
+
+                  {/* Progress dots */}
+                  <div className="flex gap-2" role="group" aria-label="Tutorial progress">
+                    {[0, 1, 2, 3, 4].map(i => (
+                      <div
+                        key={i}
+                        aria-label={`Step ${i + 1} of 5${i === tutorialStep ? ' (current)' : ''}`}
+                        className={`w-2.5 h-2.5 rounded-full transition-colors ${i === tutorialStep ? 'bg-purple-600' : 'bg-gray-300'}`}
+                      />
+                    ))}
+                  </div>
+
+                  {/* Next / Start Sprint 1 button */}
+                  {tutorialStep < 4 ? (
+                    <button
+                      onClick={() => setTutorialStep(t => t + 1)}
+                      className="px-6 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl font-semibold hover:from-purple-700 hover:to-indigo-700 transition-all shadow-md focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+                    >
+                      Next →
+                    </button>
+                  ) : (
+                    <button
+                      onClick={completeTutorial}
+                      className="px-6 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-xl font-semibold hover:from-emerald-600 hover:to-teal-600 transition-all shadow-md focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+                    >
+                      Start Sprint 1 →
+                    </button>
+                  )}
+
+                </div>
+              </div>
+            </main>
+          )}
+
+          {/* ======================================================= */}
           {/* VIEW: Sprint Dashboard */}
           {/* ======================================================= */}
           {currentView === 'dashboard' && (
@@ -1171,7 +1426,7 @@ Your job: Analyze the data in Excel/Google Sheets, identify the root causes, and
                       <button
                         key={sprint.id}
                         className="rounded-xl p-6 shadow-md border-2 bg-white border-purple-200 hover:border-purple-400 hover:shadow-lg transition-all text-left w-full focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
-                        onClick={() => { setCurrentSprint(sprint); setCurrentView('sprint'); }}
+                        onClick={() => { setCurrentSprint(sprint); setSprintPhase('learn'); setCurrentView('sprint'); }}
                         aria-label={`Start Sprint ${sprint.id}: ${sprint.title}`}
                       >
                         {inner}
@@ -1184,133 +1439,265 @@ Your job: Analyze the data in Excel/Google Sheets, identify the root causes, and
           )}
 
           {/* ======================================================= */}
-          {/* VIEW: Sprint Workspace */}
+          {/* VIEW: Sprint Workspace — phase-based                   */}
+          {/* sprintPhase: 'learn' | 'choose' | 'build' | 'publish' */}
           {/* ======================================================= */}
           {currentView === 'sprint' && currentSprint && (
             <main id="main-content" className="flex-1 overflow-y-auto px-4 py-6">
               <div className="max-w-4xl mx-auto">
-                {/* Back nav */}
+
+                {/* Back nav — goes to dashboard on LEARN, previous phase otherwise */}
                 <button
-                  onClick={() => setCurrentView('dashboard')}
-                  className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6 text-sm font-medium transition-colors"
+                  onClick={() => {
+                    if (sprintPhase === 'learn')   setCurrentView('dashboard');
+                    if (sprintPhase === 'choose')  setSprintPhase('learn');
+                    if (sprintPhase === 'build')   setSprintPhase('choose');
+                    if (sprintPhase === 'publish') setSprintPhase('build');
+                  }}
+                  className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6 text-sm font-medium transition-colors focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 rounded"
                 >
-                  <ArrowLeftIcon /> Back to Dashboard
+                  <ArrowLeftIcon />
+                  {sprintPhase === 'learn' ? 'Back to Dashboard' : 'Back'}
                 </button>
 
-                {/* Business Scenario */}
-                <div className="bg-white rounded-xl p-6 shadow-md border border-gray-200 mb-6">
-                  <h2 className="text-xl font-bold text-gray-900 mb-4" style={{ fontFamily: 'Georgia, serif' }}>
-                    Business Scenario
-                  </h2>
-                  <p className="text-gray-700 leading-relaxed whitespace-pre-line">
-                    {currentSprint.business_scenario}
-                  </p>
-                </div>
+                {/* =========================================================
+                    Phase Progress Bar
+                    Shows which of the 4 phases the student is in.
+                    Completed phases show a checkmark, current is purple,
+                    upcoming are gray.
+                    ========================================================= */}
+                {(() => {
+                  const phases = ['learn', 'choose', 'build', 'publish'];
+                  const currentIdx = phases.indexOf(sprintPhase);
+                  return (
+                    <div className="flex items-center mb-8" role="group" aria-label="Sprint phases">
+                      {phases.map((phase, i) => (
+                        <React.Fragment key={phase}>
+                          <div className="flex flex-col items-center">
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${
+                              i < currentIdx  ? 'bg-emerald-500 text-white' :
+                              i === currentIdx ? 'bg-purple-600 text-white' :
+                              'bg-gray-200 text-gray-500'
+                            }`} aria-hidden="true">
+                              {i < currentIdx ? '✓' : i + 1}
+                            </div>
+                            <span className={`text-xs font-bold mt-1 uppercase tracking-wide ${
+                              i === currentIdx ? 'text-purple-700' :
+                              i < currentIdx  ? 'text-emerald-600' :
+                              'text-gray-400'
+                            }`}>
+                              {phase}
+                            </span>
+                          </div>
+                          {i < phases.length - 1 && (
+                            <div className={`flex-1 h-0.5 mx-2 mb-4 ${i < currentIdx ? 'bg-emerald-400' : 'bg-gray-200'}`} />
+                          )}
+                        </React.Fragment>
+                      ))}
+                    </div>
+                  );
+                })()}
 
-                {/* Dataset Download */}
-                {currentSprint.dataset_url && (
-                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 shadow-md border border-blue-200 mb-6">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="font-bold text-blue-900 mb-1">Dataset</h3>
-                        <p className="text-sm text-blue-700">5,000 delivery records (CSV format)</p>
+                {/* =========================================================
+                    PHASE: LEARN
+                    Placeholder — full lesson content added in Task 2.4
+                    ========================================================= */}
+                {sprintPhase === 'learn' && (
+                  <div>
+                    <div className="bg-white rounded-xl p-8 shadow-md border border-gray-200 mb-6">
+                      <div className="flex items-center gap-2 mb-4">
+                        <span className="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide">Learn</span>
+                        <span className="text-sm text-gray-500">Sprint {currentSprint.id} · SWD Principle {currentSprint.id}</span>
                       </div>
-                      <a
-                        href={currentSprint.dataset_url}
-                        download
-                        className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors shadow-md focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                      <h2 className="text-2xl font-bold text-gray-900 mb-2" style={{ fontFamily: 'Georgia, serif' }}>
+                        {currentSprint.title}
+                      </h2>
+                      <p className="text-gray-600 leading-relaxed">
+                        Lesson content loads here in Task 2.4. This is the phase where you learn the SWD principle before touching any data.
+                      </p>
+                    </div>
+                    <div className="flex justify-end">
+                      <button
+                        onClick={() => setSprintPhase('choose')}
+                        className="px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl font-semibold hover:from-purple-700 hover:to-indigo-700 transition-all shadow-md focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
                       >
-                        <DownloadIcon />
-                        Download CSV
-                      </a>
+                        Continue to Choose →
+                      </button>
                     </div>
                   </div>
                 )}
 
-                {/* Deliverables Checklist */}
-                <div className="bg-white rounded-xl p-6 shadow-md border border-gray-200 mb-6">
-                  <h3 className="font-bold text-gray-900 mb-4">Deliverables Checklist</h3>
-                  <ul className="space-y-3">
-                    {currentSprint.deliverables.map((item, idx) => (
-                      <li key={idx} className="flex items-start gap-3">
-                        <span className="mt-0.5 w-5 h-5 rounded border-2 border-gray-300 flex-shrink-0 flex items-center justify-center text-xs text-gray-600">
-                          {idx + 1}
-                        </span>
-                        <span className="text-gray-700">{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                {/* Submission Form */}
-                <div className="bg-white rounded-xl p-6 shadow-md border-2 border-purple-200">
-                  <h3 className="font-bold text-gray-900 mb-4" style={{ fontFamily: 'Georgia, serif' }}>
-                    Submit Your Work
-                  </h3>
-
-                  {/* Google Sheets URL */}
-                  <div className="mb-4">
-                    <label htmlFor="sheets-url" className="block text-sm font-medium text-gray-700 mb-1">
-                      Google Sheets Link (optional)
-                    </label>
-                    <input
-                      id="sheets-url"
-                      type="url"
-                      value={sheetsUrl}
-                      onChange={(e) => setSheetsUrl(e.target.value)}
-                      placeholder="https://docs.google.com/spreadsheets/d/..."
-                      className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-                    />
-                    <p className="text-xs text-gray-500 mt-1">Saved for reference only — the AI evaluates your memo text below.</p>
-                  </div>
-
-                  {/* Executive Memo */}
-                  <div className="mb-4">
-                    <label htmlFor="memo-text" className="block text-sm font-medium text-gray-700 mb-1">
-                      Executive Memo
-                    </label>
-                    <textarea
-                      id="memo-text"
-                      value={memoText}
-                      onChange={(e) => setMemoText(e.target.value)}
-                      placeholder="Write your executive memo to the VP of Operations here. Describe your findings, the root causes you identified, and your recommendations..."
-                      rows="10"
-                      maxLength={5000}
-                      className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-y transition-all"
-                      style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}
-                    />
-                    <div className="flex justify-between items-center mt-1">
-                      <p className={`text-xs ${memoText.length < 200 ? 'text-red-500' : memoText.length > 4500 ? 'text-yellow-600' : 'text-gray-500'}`}>
-                        {memoText.length < 200 ? `${200 - memoText.length} more characters needed` : `${memoText.length}/5000 characters`}
+                {/* =========================================================
+                    PHASE: CHOOSE
+                    Placeholder — dataset picker UI added in Task 2.6
+                    ========================================================= */}
+                {sprintPhase === 'choose' && (
+                  <div>
+                    <div className="bg-white rounded-xl p-8 shadow-md border border-gray-200 mb-6">
+                      <div className="flex items-center gap-2 mb-4">
+                        <span className="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide">Choose</span>
+                        <span className="text-sm text-gray-500">Pick your dataset and define your audience</span>
+                      </div>
+                      <h2 className="text-2xl font-bold text-gray-900 mb-2" style={{ fontFamily: 'Georgia, serif' }}>
+                        Choose Your Data
+                      </h2>
+                      <p className="text-gray-600 leading-relaxed">
+                        Dataset picker and audience definition fields load here in Task 2.6.
                       </p>
-                      <p className="text-xs text-gray-600">Min 200, Max 5000</p>
+                    </div>
+                    <div className="flex justify-end">
+                      <button
+                        onClick={() => setSprintPhase('build')}
+                        className="px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl font-semibold hover:from-purple-700 hover:to-indigo-700 transition-all shadow-md focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+                      >
+                        Start Building →
+                      </button>
                     </div>
                   </div>
+                )}
 
-                  {/* Submit Error */}
-                  {submitError && (
-                    <div role="alert" aria-live="assertive" aria-atomic="true" className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
-                      <p className="text-sm text-red-800">{submitError}</p>
+                {/* =========================================================
+                    PHASE: BUILD
+                    Existing workspace — unchanged from Phase 2 build.
+                    ========================================================= */}
+                {sprintPhase === 'build' && (
+                  <div>
+                    {/* Business Scenario */}
+                    <div className="bg-white rounded-xl p-6 shadow-md border border-gray-200 mb-6">
+                      <h2 className="text-xl font-bold text-gray-900 mb-4" style={{ fontFamily: 'Georgia, serif' }}>
+                        Business Scenario
+                      </h2>
+                      <p className="text-gray-700 leading-relaxed whitespace-pre-line">
+                        {currentSprint.business_scenario}
+                      </p>
                     </div>
-                  )}
 
-                  {/* Submit Button */}
-                  <button
-                    onClick={handleSubmit}
-                    disabled={isSubmitting || memoText.length < 200}
-                    aria-busy={isSubmitting}
-                    className="w-full py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg font-semibold hover:from-purple-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
-                  >
-                    {isSubmitting ? (
-                      <>
-                        <LoaderIcon />
-                        <span>Compadre is reviewing your work...</span>
-                      </>
-                    ) : (
-                      <span>Submit for Evaluation</span>
+                    {/* Dataset Download */}
+                    {currentSprint.dataset_url && (
+                      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 shadow-md border border-blue-200 mb-6">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <h3 className="font-bold text-blue-900 mb-1">Dataset</h3>
+                            <p className="text-sm text-blue-700">5,000 delivery records (CSV format)</p>
+                          </div>
+                          <a
+                            href={currentSprint.dataset_url}
+                            download
+                            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors shadow-md focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                          >
+                            <DownloadIcon />
+                            Download CSV
+                          </a>
+                        </div>
+                      </div>
                     )}
-                  </button>
-                </div>
+
+                    {/* Deliverables Checklist */}
+                    <div className="bg-white rounded-xl p-6 shadow-md border border-gray-200 mb-6">
+                      <h3 className="font-bold text-gray-900 mb-4">Deliverables Checklist</h3>
+                      <ul className="space-y-3">
+                        {currentSprint.deliverables.map((item, idx) => (
+                          <li key={idx} className="flex items-start gap-3">
+                            <span className="mt-0.5 w-5 h-5 rounded border-2 border-gray-300 flex-shrink-0 flex items-center justify-center text-xs text-gray-600">
+                              {idx + 1}
+                            </span>
+                            <span className="text-gray-700">{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    {/* Submission Form */}
+                    <div className="bg-white rounded-xl p-6 shadow-md border-2 border-purple-200">
+                      <h3 className="font-bold text-gray-900 mb-4" style={{ fontFamily: 'Georgia, serif' }}>
+                        Submit Your Work
+                      </h3>
+
+                      {/* Google Sheets URL */}
+                      <div className="mb-4">
+                        <label htmlFor="sheets-url" className="block text-sm font-medium text-gray-700 mb-1">
+                          Google Sheets Link (optional)
+                        </label>
+                        <input
+                          id="sheets-url"
+                          type="url"
+                          value={sheetsUrl}
+                          onChange={(e) => setSheetsUrl(e.target.value)}
+                          placeholder="https://docs.google.com/spreadsheets/d/..."
+                          className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                        />
+                        <p className="text-xs text-gray-500 mt-1">Saved for reference only — the AI evaluates your memo text below.</p>
+                      </div>
+
+                      {/* Executive Memo */}
+                      <div className="mb-4">
+                        <label htmlFor="memo-text" className="block text-sm font-medium text-gray-700 mb-1">
+                          Executive Memo
+                        </label>
+                        <textarea
+                          id="memo-text"
+                          value={memoText}
+                          onChange={(e) => setMemoText(e.target.value)}
+                          placeholder="Write your executive memo to the VP of Operations here. Describe your findings, the root causes you identified, and your recommendations..."
+                          rows="10"
+                          maxLength={5000}
+                          className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-y transition-all"
+                          style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}
+                        />
+                        <div className="flex justify-between items-center mt-1">
+                          <p className={`text-xs ${memoText.length < 200 ? 'text-red-500' : memoText.length > 4500 ? 'text-yellow-600' : 'text-gray-500'}`}>
+                            {memoText.length < 200 ? `${200 - memoText.length} more characters needed` : `${memoText.length}/5000 characters`}
+                          </p>
+                          <p className="text-xs text-gray-600">Min 200, Max 5000</p>
+                        </div>
+                      </div>
+
+                      {/* Submit Error */}
+                      {submitError && (
+                        <div role="alert" aria-live="assertive" aria-atomic="true" className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
+                          <p className="text-sm text-red-800">{submitError}</p>
+                        </div>
+                      )}
+
+                      {/* Submit Button */}
+                      <button
+                        onClick={handleSubmit}
+                        disabled={isSubmitting || memoText.length < 200}
+                        aria-busy={isSubmitting}
+                        className="w-full py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg font-semibold hover:from-purple-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+                      >
+                        {isSubmitting ? (
+                          <>
+                            <LoaderIcon />
+                            <span>Compadre is reviewing your work...</span>
+                          </>
+                        ) : (
+                          <span>Submit for Evaluation</span>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* =========================================================
+                    PHASE: PUBLISH
+                    Placeholder — Tableau URL submission added in Task 3.2
+                    ========================================================= */}
+                {sprintPhase === 'publish' && (
+                  <div className="bg-white rounded-xl p-8 shadow-md border border-gray-200">
+                    <div className="flex items-center gap-2 mb-4">
+                      <span className="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide">Publish</span>
+                      <span className="text-sm text-gray-500">Share your work</span>
+                    </div>
+                    <h2 className="text-2xl font-bold text-gray-900 mb-2" style={{ fontFamily: 'Georgia, serif' }}>
+                      Publish Your Work
+                    </h2>
+                    <p className="text-gray-600 leading-relaxed">
+                      Tableau Public URL submission and portfolio save coming in Task 3.2.
+                    </p>
+                  </div>
+                )}
+
               </div>
             </main>
           )}
