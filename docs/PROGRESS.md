@@ -379,7 +379,7 @@ Full 3-day sprint plan: `docs/REALISTIC_3DAY_ROADMAP.md`
 - [x] 2.4 Write LEARN phase content (SWD Principle 1: Understand the Context)
 - [x] 2.5 Download NYC Restaurant Inspections dataset → save to data/
 - [x] 2.6 Build CHOOSE phase UI (dataset picker + audience definition)
-- [ ] 2.7 Update Sprint 1 business scenario for real dataset
+- [x] 2.7 Update Sprint 1 business scenario for real dataset
 - [ ] 2.8 Rewrite assessment voice to Compadre
 - [ ] 2.9 Day 2 test
 
