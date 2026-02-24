@@ -167,6 +167,47 @@ Your job: Analyze the data in Excel/Google Sheets, identify the root causes, and
     ];
 
     // =========================================================
+    // CHOOSE phase dataset options (Sprints 1–5 only)
+    // Sprint 6 uses open choice — student picks their own dataset.
+    // Rule 5: 3 options max, one clearly marked as default.
+    // =========================================================
+    const CHOOSE_DATASETS = [
+      {
+        id:              'restaurants',
+        emoji:           '🍽️',
+        title:           'NYC Restaurant Inspections',
+        stats:           '150K rows · A/B/C grades · All 5 boroughs',
+        description:     'Find the highest-risk dining areas for the Health Commissioner. Clear patterns. Great first project.',
+        recommended:     true,
+        defaultAudience: 'NYC Health Commissioner',
+        defaultDecision: 'Where to allocate inspection resources next year',
+        downloadUrl:     'https://data.cityofnewyork.us/api/views/43nn-pn8j/rows.csv?accessType=DOWNLOAD',
+      },
+      {
+        id:              'mta',
+        emoji:           '🚇',
+        title:           'MTA Daily Ridership',
+        stats:           '~1,800 rows · System-wide · 2020–present',
+        description:     'Track post-COVID subway recovery. Small, clean dataset — ideal for time-series trend analysis.',
+        recommended:     false,
+        defaultAudience: 'MTA Executive Leadership',
+        defaultDecision: 'Which lines need the most attention to restore pre-pandemic ridership',
+        downloadUrl:     'https://data.cityofnewyork.us/api/views/vxuj-8kew/rows.csv?accessType=DOWNLOAD',
+      },
+      {
+        id:              '311',
+        emoji:           '📞',
+        title:           'NYC 311 Service Requests',
+        stats:           '~40M rows total — filter to ~50K by year',
+        description:     'Find which neighborhoods wait longest for city services. Larger dataset — more challenging.',
+        recommended:     false,
+        defaultAudience: "NYC Mayor's Office of Operations",
+        defaultDecision: 'Which neighborhoods and complaint types need faster response',
+        downloadUrl:     'https://data.cityofnewyork.us/api/views/erm2-nwe9/rows.csv?accessType=DOWNLOAD',
+      },
+    ];
+
+    // =========================================================
     // SVG Icons
     // =========================================================
     const SendIcon = () => (
@@ -293,6 +334,16 @@ Your job: Analyze the data in Excel/Google Sheets, identify the root causes, and
       const [learnPick2,     setLearnPick2]     = useState(null);
       const [learnPick3,     setLearnPick3]     = useState(null);
       const [learnQC,        setLearnQC]        = useState([null, null]);
+      // =========================================================
+      // CHOOSE phase state
+      // chosenDataset: id string of selected dataset, or null
+      // audienceText:  who the student is presenting to (pre-filled)
+      // decisionText:  what that audience needs to decide (pre-filled)
+      // "Start Building →" enables only when both text fields have content.
+      // =========================================================
+      const [chosenDataset, setChosenDataset] = useState(null);
+      const [audienceText,  setAudienceText]  = useState('');
+      const [decisionText,  setDecisionText]  = useState('');
 
       // =========================================================
       // Effects
@@ -1968,31 +2019,157 @@ Your job: Analyze the data in Excel/Google Sheets, identify the root causes, and
                 )}
 
                 {/* =========================================================
-                    PHASE: CHOOSE
-                    Placeholder — dataset picker UI added in Task 2.6
+                    PHASE: CHOOSE — Task 2.6
+                    Two steps: (1) pick dataset, (2) define audience.
+                    Rule 5: 3 constrained options, one recommended default.
+                    Step 2 only appears after Step 1 is complete.
+                    "Start Building →" requires both audience fields filled.
                     ========================================================= */}
                 {sprintPhase === 'choose' && (
                   <div>
-                    <div className="bg-white rounded-xl p-8 shadow-md border border-gray-200 mb-6">
-                      <div className="flex items-center gap-2 mb-4">
-                        <span className="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide">Choose</span>
-                        <span className="text-sm text-gray-500">Pick your dataset and define your audience</span>
+
+                    {/* ── Step 1: Dataset picker ── */}
+                    <div className="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-4">
+                      <div className="px-8 py-6">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="bg-indigo-100 text-indigo-700 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">
+                            Choose
+                          </span>
+                          <span className="text-xs text-gray-500">About 5 minutes</span>
+                        </div>
+                        <h2 className="text-xl font-bold text-gray-900 mt-4 mb-1" style={{ fontFamily: 'Georgia, serif' }}>
+                          Pick your dataset.
+                        </h2>
+                        <p className="text-gray-600 text-sm mb-6">
+                          Which one sounds most interesting to you?
+                        </p>
+
+                        <div className="space-y-3" role="group" aria-label="Dataset options">
+                          {CHOOSE_DATASETS.map(ds => {
+                            const isSelected = chosenDataset === ds.id;
+                            return (
+                              <button
+                                key={ds.id}
+                                onClick={() => {
+                                  setChosenDataset(ds.id);
+                                  setAudienceText(ds.defaultAudience);
+                                  setDecisionText(ds.defaultDecision);
+                                }}
+                                aria-pressed={isSelected}
+                                className={`w-full flex items-start gap-4 px-5 py-4 rounded-xl border-2 transition-all text-left focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 ${
+                                  isSelected
+                                    ? 'border-purple-500 bg-purple-50 shadow-md'
+                                    : 'border-gray-200 hover:border-indigo-300 hover:bg-indigo-50'
+                                }`}
+                              >
+                                <span className="text-2xl flex-shrink-0 mt-0.5" aria-hidden="true">{ds.emoji}</span>
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center gap-2 flex-wrap mb-1">
+                                    <span className="font-semibold text-gray-900">{ds.title}</span>
+                                    {ds.recommended && (
+                                      <span className="bg-emerald-100 text-emerald-700 text-xs font-bold px-2 py-0.5 rounded-full">
+                                        Recommended
+                                      </span>
+                                    )}
+                                    {isSelected && (
+                                      <span className="bg-purple-100 text-purple-700 text-xs font-bold px-2 py-0.5 rounded-full">
+                                        Selected ✓
+                                      </span>
+                                    )}
+                                  </div>
+                                  <p className="text-xs text-gray-500 mb-1">{ds.stats}</p>
+                                  <p className="text-sm text-gray-700">{ds.description}</p>
+                                </div>
+                              </button>
+                            );
+                          })}
+                        </div>
+
+                        {/* Deprioritized own-dataset link — text only, not a card */}
+                        <p className="text-xs text-gray-500 mt-4 text-center">
+                          Working on something else?{' '}
+                          <a
+                            href="https://opendata.cityofnewyork.us/data/"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-indigo-600 hover:text-indigo-800 underline underline-offset-2 focus:ring-2 focus:ring-purple-500 focus:ring-offset-1 rounded"
+                          >
+                            Browse NYC Open Data
+                          </a>
+                          {' '}and paste your own download URL in the Build phase.
+                        </p>
                       </div>
-                      <h2 className="text-2xl font-bold text-gray-900 mb-2" style={{ fontFamily: 'Georgia, serif' }}>
-                        Choose Your Data
-                      </h2>
-                      <p className="text-gray-600 leading-relaxed">
-                        Dataset picker and audience definition fields load here in Task 2.6.
-                      </p>
                     </div>
-                    <div className="flex justify-end">
-                      <button
-                        onClick={() => setSprintPhase('build')}
-                        className="px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl font-semibold hover:from-purple-700 hover:to-indigo-700 transition-all shadow-md focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
-                      >
-                        Start Building →
-                      </button>
-                    </div>
+
+                    {/* ── Step 2: Audience definition (appears after dataset pick) ── */}
+                    {chosenDataset && (
+                      <div className="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-4">
+                        <div className="px-8 py-6">
+                          <p className="text-xs font-bold text-indigo-700 uppercase tracking-wide mb-1">Step 2 of 2</p>
+                          <h3 className="text-lg font-bold text-gray-900 mb-1" style={{ fontFamily: 'Georgia, serif' }}>
+                            Define your audience.
+                          </h3>
+                          <p className="text-sm text-gray-600 mb-5">
+                            Apply the 3 questions from your LEARN phase. We've pre-filled these based on your dataset — edit them if you want to go a different direction.
+                          </p>
+
+                          <div className="space-y-5">
+                            <div>
+                              <label
+                                htmlFor="audience-input"
+                                className="block text-sm font-semibold text-gray-800 mb-1"
+                              >
+                                👥 Who is your audience?
+                              </label>
+                              <input
+                                id="audience-input"
+                                type="text"
+                                value={audienceText}
+                                onChange={e => setAudienceText(e.target.value)}
+                                placeholder="e.g. NYC Health Commissioner"
+                                aria-required="true"
+                                className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:border-transparent transition-all text-gray-900"
+                                style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}
+                              />
+                            </div>
+                            <div>
+                              <label
+                                htmlFor="decision-input"
+                                className="block text-sm font-semibold text-gray-800 mb-1"
+                              >
+                                🎯 What do they need to decide?
+                              </label>
+                              <input
+                                id="decision-input"
+                                type="text"
+                                value={decisionText}
+                                onChange={e => setDecisionText(e.target.value)}
+                                placeholder="e.g. Where to allocate inspection resources next year"
+                                aria-required="true"
+                                className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:border-transparent transition-all text-gray-900"
+                                style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="px-8 py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-between">
+                          <p className="text-xs text-gray-500">
+                            {(!audienceText.trim() || !decisionText.trim())
+                              ? 'Fill in both fields to continue.'
+                              : 'Ready to start building.'}
+                          </p>
+                          <button
+                            onClick={() => setSprintPhase('build')}
+                            disabled={!audienceText.trim() || !decisionText.trim()}
+                            className="px-6 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl font-semibold hover:from-purple-700 hover:to-indigo-700 transition-all shadow-md focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none"
+                          >
+                            Start Building →
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
                   </div>
                 )}
 
@@ -2002,6 +2179,30 @@ Your job: Analyze the data in Excel/Google Sheets, identify the root causes, and
                     ========================================================= */}
                 {sprintPhase === 'build' && (
                   <div>
+
+                    {/* ── CHOOSE phase context banner ── */}
+                    {/* Shows what the student committed to in the CHOOSE phase.
+                        Keeps the audience/decision visible while they work. */}
+                    {chosenDataset && (
+                      <div className="bg-indigo-50 rounded-xl px-6 py-4 border border-indigo-200 mb-6 flex flex-wrap gap-4">
+                        <div>
+                          <p className="text-xs font-bold text-indigo-600 uppercase tracking-wide mb-0.5">Your Dataset</p>
+                          <p className="text-sm font-semibold text-gray-900">
+                            {CHOOSE_DATASETS.find(d => d.id === chosenDataset)?.emoji}{' '}
+                            {CHOOSE_DATASETS.find(d => d.id === chosenDataset)?.title}
+                          </p>
+                        </div>
+                        <div className="border-l border-indigo-200 pl-4">
+                          <p className="text-xs font-bold text-indigo-600 uppercase tracking-wide mb-0.5">Your Audience</p>
+                          <p className="text-sm font-semibold text-gray-900">{audienceText}</p>
+                        </div>
+                        <div className="border-l border-indigo-200 pl-4">
+                          <p className="text-xs font-bold text-indigo-600 uppercase tracking-wide mb-0.5">Their Decision</p>
+                          <p className="text-sm font-semibold text-gray-900">{decisionText}</p>
+                        </div>
+                      </div>
+                    )}
+
                     {/* Business Scenario */}
                     <div className="bg-white rounded-xl p-6 shadow-md border border-gray-200 mb-6">
                       <h2 className="text-xl font-bold text-gray-900 mb-4" style={{ fontFamily: 'Georgia, serif' }}>

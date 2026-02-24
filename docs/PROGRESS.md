@@ -5,7 +5,7 @@
 **Live:** https://data-analyst-bootcamp.vercel.app
 **Platform:** Compadre
 **Builder:** Sway
-**Last Updated:** February 22, 2026
+**Last Updated:** February 23, 2026
 
 ---
 
@@ -34,6 +34,9 @@ Paste this as your first message:
 Read these files before we start:
 - .clauderules
 - docs/PROGRESS.md
+- docs/ADHD_DESIGN_PRINCIPLES.md
+- docs/COMPETITOR_ANALYSIS.md
+- docs/CURRICULUM_OUTLINE.md
 
 I'm picking up where I left off. Check PROGRESS.md for what's done and what's next.
 ```
@@ -41,10 +44,20 @@ I'm picking up where I left off. Check PROGRESS.md for what's done and what's ne
 ### 5. Tell Claude what to work on
 Phases 0-3 are complete (original build). Platform is now being transformed into **Compadre**. The 3-day Compadre sprint plan is in `docs/REALISTIC_3DAY_ROADMAP.md`. Pick up at **Day 2, debugging the tutorial view** — see session notes below.
 
-### Session ended: February 22, 2026 (Evening)
-**Where we left off:** Task 2.4 (LEARN phase content) is up next. Paused at the design decision for visual structure — no code written yet for 2.4.
+### Session ended: February 23, 2026
+**Where we left off:** Curriculum research and documentation sprint. Three new docs written (see below). Task 2.4 (LEARN phase content) is still the next build task — now with ADHD design rules and competitor research fully documented to guide the implementation.
 
-**First task next session:** Design + build Task 2.4 — LEARN phase content for SWD Principle 1.
+**New docs added this session:**
+- `docs/ADHD_DESIGN_PRINCIPLES.md` — 7 non-negotiable design rules for all LEARN phase content and UI. **Read before designing any card or interaction.**
+- `docs/COMPETITOR_ANALYSIS.md` — Full competitor landscape (DataCamp, Dataquest, Codecademy, Brilliant, Khan Academy, Mimo, Duolingo + The Data School NYC requirements). Includes what to steal and what to avoid.
+- `docs/CURRICULUM_OUTLINE.md` — Refined 4-week curriculum with ADHD design applied throughout. Source of truth for LEARN phase content.
+
+**First task next session:** Build Task 2.4 — LEARN phase content for SWD Principle 1 ("Understand the Context"), applying the ADHD design rules from `docs/ADHD_DESIGN_PRINCIPLES.md`. Key rules for this task:
+- Open with the problem scenario (problem-first)
+- Each card = one idea, under 2 minutes
+- Show "Section X of Y" progress within the phase
+- Time estimate on the opening card ("~8 minutes")
+- No blocking failures on the mini-exercise
 
 **Start here:**
 ```
@@ -363,9 +376,9 @@ Full 3-day sprint plan: `docs/REALISTIC_3DAY_ROADMAP.md`
 - [~] 2.1 Build tutorial view (5 steps, skippable) — coded, not committed, not rendering (debug needed)
 - [~] 2.2 Save tutorial completion state — coded, not committed
 - [~] 2.3 Add sprint phase flow (LEARN → CHOOSE → BUILD) — coded, not committed
-- [ ] 2.4 Write LEARN phase content (SWD Principle 1: Understand the Context)
-- [ ] 2.5 Download NYC Restaurant Inspections dataset → save to data/
-- [ ] 2.6 Build CHOOSE phase UI (dataset picker + audience definition)
+- [x] 2.4 Write LEARN phase content (SWD Principle 1: Understand the Context)
+- [x] 2.5 Download NYC Restaurant Inspections dataset → save to data/
+- [x] 2.6 Build CHOOSE phase UI (dataset picker + audience definition)
 - [ ] 2.7 Update Sprint 1 business scenario for real dataset
 - [ ] 2.8 Rewrite assessment voice to Compadre
 - [ ] 2.9 Day 2 test
