@@ -275,6 +275,8 @@ Your job: Analyze the data in Excel/Google Sheets, identify the root causes, and
       const [authError, setAuthError] = useState(null);
       const [authLoading, setAuthLoading] = useState(false);
       const [tutorialStep, setTutorialStep] = useState(0);
+      // null = first-time flow; any view name = refresher (return here on close)
+      const [tutorialReturnView, setTutorialReturnView] = useState(null);
       // Sprint phase: 'learn' | 'choose' | 'build' | 'publish'
       const [sprintPhase, setSprintPhase] = useState('learn');
 
@@ -572,32 +574,57 @@ Your job: Analyze the data in Excel/Google Sheets, identify the root causes, and
         setShowAuthModal(true);
       };
 
+      // =========================================================
+      // TEACHING MOMENT: Tutorial open/close flow
+      // openTutorial() can be called from any view at any time.
+      // It saves where the user was (tutorialReturnView) so we can
+      // send them back there when they close the tutorial.
+      // First-time flow: tutorialReturnView is null → go to assessment
+      // and write the "done" flag. Refresher flow: tutorialReturnView
+      // is set → go back to wherever they came from, skip the flag write.
+      // =========================================================
+      const openTutorial = () => {
+        setTutorialReturnView(currentView);
+        setTutorialStep(0);
+        setCurrentView('tutorial');
+      };
+
       const completeTutorial = () => {
-        localStorage.setItem('compadre_tutorial_done', 'true');
-        // Save to Supabase so signed-in users don't see the tutorial again on any device
-        if (supabase && user) {
-          supabase.from('profiles')
-            .update({ tutorial_completed: true })
-            .eq('id', user.id)
-            .then(({ error }) => {
-              if (error) console.warn('[Tutorial] Failed to save completion:', error.message);
-            });
+        const returnTo = tutorialReturnView || 'assessment';
+        // Only mark as done on the first-time completion, not on refresher views
+        if (!tutorialReturnView) {
+          localStorage.setItem('compadre_tutorial_done', 'true');
+          if (supabase && user) {
+            supabase.from('profiles')
+              .update({ tutorial_completed: true })
+              .eq('id', user.id)
+              .then(({ error }) => {
+                if (error) console.warn('[Tutorial] Failed to save completion:', error.message);
+              });
+          }
         }
-        setCurrentView('assessment');
+        setTutorialReturnView(null);
+        setTutorialStep(0);
+        setCurrentView(returnTo);
       };
 
       const skipTutorial = () => {
-        localStorage.setItem('compadre_tutorial_done', 'true');
-        // Same as completeTutorial — skipping counts as done
-        if (supabase && user) {
-          supabase.from('profiles')
-            .update({ tutorial_completed: true })
-            .eq('id', user.id)
-            .then(({ error }) => {
-              if (error) console.warn('[Tutorial] Failed to save skip:', error.message);
-            });
+        const returnTo = tutorialReturnView || 'assessment';
+        // Only mark as done on the first-time skip, not on refresher views
+        if (!tutorialReturnView) {
+          localStorage.setItem('compadre_tutorial_done', 'true');
+          if (supabase && user) {
+            supabase.from('profiles')
+              .update({ tutorial_completed: true })
+              .eq('id', user.id)
+              .then(({ error }) => {
+                if (error) console.warn('[Tutorial] Failed to save skip:', error.message);
+              });
+          }
         }
-        setCurrentView('assessment');
+        setTutorialReturnView(null);
+        setTutorialStep(0);
+        setCurrentView(returnTo);
       };
 
       const resetAssessment = () => {
@@ -876,6 +903,17 @@ Your job: Analyze the data in Excel/Google Sheets, identify the root causes, and
                 </h1>
                 <p className="text-sm text-gray-700" aria-live="polite" aria-atomic="true">{headerSubtitle[currentView]}</p>
               </div>
+
+              {/* How it works — persistent tutorial link, hidden while tutorial is open */}
+              {currentView !== 'tutorial' && (
+                <button
+                  onClick={openTutorial}
+                  className="text-sm text-gray-500 hover:text-gray-700 underline underline-offset-2 transition-colors focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 rounded flex-shrink-0 hidden sm:block"
+                  aria-label="Open tutorial: how Compadre works"
+                >
+                  How it works
+                </button>
+              )}
 
               {/* Auth indicator */}
               {user ? (
@@ -1178,13 +1216,13 @@ Your job: Analyze the data in Excel/Google Sheets, identify the root causes, and
             <main id="main-content" className="flex-1 overflow-y-auto px-4 py-8">
               <div className="max-w-2xl mx-auto">
 
-                {/* Skip link */}
+                {/* Skip / Close link */}
                 <div className="flex justify-end mb-6">
                   <button
                     onClick={skipTutorial}
                     className="text-sm text-gray-500 hover:text-gray-700 underline underline-offset-2 transition-colors focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 rounded"
                   >
-                    Skip tutorial
+                    {tutorialReturnView ? 'Close' : 'Skip tutorial'}
                   </button>
                 </div>
 
@@ -1353,7 +1391,7 @@ Your job: Analyze the data in Excel/Google Sheets, identify the root causes, and
                       onClick={completeTutorial}
                       className="px-6 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-xl font-semibold hover:from-emerald-600 hover:to-teal-600 transition-all shadow-md focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
                     >
-                      Start Sprint 1 →
+                      {tutorialReturnView ? 'Got it →' : 'Start Sprint 1 →'}
                     </button>
                   )}
 
