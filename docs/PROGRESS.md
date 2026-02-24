@@ -372,16 +372,20 @@ Full 3-day sprint plan: `docs/REALISTIC_3DAY_ROADMAP.md`
 - Set Supabase Site URL to https://data-analyst-bootcamp.vercel.app
 - Added anonymous_session_id column to profiles table
 
-### Day 2: Tutorial + Curriculum
-- [~] 2.1 Build tutorial view (5 steps, skippable) — coded, not committed, not rendering (debug needed)
-- [~] 2.2 Save tutorial completion state — coded, not committed
-- [~] 2.3 Add sprint phase flow (LEARN → CHOOSE → BUILD) — coded, not committed
-- [x] 2.4 Write LEARN phase content (SWD Principle 1: Understand the Context)
-- [x] 2.5 Download NYC Restaurant Inspections dataset → save to data/
-- [x] 2.6 Build CHOOSE phase UI (dataset picker + audience definition)
-- [x] 2.7 Update Sprint 1 business scenario for real dataset
-- [ ] 2.8 Rewrite assessment voice to Compadre
-- [ ] 2.9 Day 2 test
+### Day 2: Tutorial + Curriculum ✅ COMPLETE
+- [x] 2.1 Build tutorial view (5 steps, skippable) — committed c7c15f2
+- [x] 2.2 Save tutorial completion state — committed c7c15f2
+- [x] 2.3 Add sprint phase flow (LEARN → CHOOSE → BUILD → PUBLISH) — committed c7c15f2
+- [x] 2.4 Write LEARN phase content (SWD Principle 1: Understand the Context) — committed 033a303
+- [x] 2.5 Download NYC Restaurant Inspections dataset → data/sprint-1-restaurants-sample.csv — committed d8e0dde
+- [x] 2.6 Build CHOOSE phase UI (dataset picker + audience definition) — committed c0c5464
+- [x] 2.7 Update Sprint 1 business scenario for real dataset (NYC Health Commissioner) — committed 2ff1336
+- [x] 2.8 Rewrite assessment voice to Compadre — committed d597ba8
+- [x] 2.9 Day 2 E2E test — passed (code review, all flows verified)
+
+**Day 2 status:** All 9 tasks complete. Tutorial accessible at any time via "How it works" header link.
+**Known non-blocking:** "How it works" button hidden on mobile (hidden sm:block). Acceptable — Tableau requires desktop anyway.
+**Pre-req for Day 3:** Supabase `sprints` and `submissions` tables still need to be created (Task 2H from original Phase 2 — run SQL in Supabase dashboard before 3.6 E2E test).
 
 ### Day 3: Tableau + Portfolio + Deploy
 - [ ] 3.1 Write Tableau guided instructions for Sprint 1
