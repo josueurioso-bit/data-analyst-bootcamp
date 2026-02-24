@@ -279,7 +279,7 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
       const [messages, setMessages] = useState([
         {
           role: 'assistant',
-          content: "Hey — I'm Compadre. I'll be with you every step of the way.\n\nBefore we jump into your first sprint, I want to figure out your best starting point. This isn't a test you can fail — it's just a conversation to understand where you are right now.\n\nReady to begin?"
+          content: "Hey — I'm Compadre. Before your first sprint, I want to get a read on where you're actually starting from.\n\nThis isn't a test you can fail. It's a conversation — about 22 questions across two parts. Takes roughly 10 minutes.\n\nReady?"
         }
       ]);
       const [input, setInput] = useState('');
@@ -695,7 +695,7 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
       const resetAssessment = () => {
         setMessages([{
           role: 'assistant',
-          content: "Hey — I'm Compadre. I'll be with you every step of the way.\n\nBefore we jump into your first sprint, I want to figure out your best starting point. This isn't a test you can fail — it's just a conversation to understand where you are right now.\n\nReady to begin?"
+          content: "Hey — I'm Compadre. Before your first sprint, I want to get a read on where you're actually starting from.\n\nThis isn't a test you can fail. It's a conversation — about 22 questions across two parts. Takes roughly 10 minutes.\n\nReady?"
         }]);
         setAssessmentResults(null);
         setError(null);
