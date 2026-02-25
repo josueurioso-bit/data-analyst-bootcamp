@@ -868,133 +868,117 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="auth-modal-title"
-                className="bg-cream rounded-xl border-2 border-stone w-full max-w-md sm:max-w-2xl overflow-hidden"
+                className="bg-cream rounded-xl border-2 border-stone w-full max-w-md overflow-y-auto max-h-[90vh] p-6"
               >
-                <div className="sm:flex">
 
-                  {/* Left brand panel — desktop only */}
-                  <div className="hidden sm:flex flex-col items-center justify-center w-2/5 bg-moss p-10">
-                    <img src="compadre_pixel_centered.png" alt="" aria-hidden="true" className="w-28 h-28 mb-5 mix-blend-multiply" />
-                    <p className="text-cream text-sm text-center leading-relaxed" style={{ opacity: 0.85 }}>
-                      Build a real data portfolio. Save your progress and come back anytime.
-                    </p>
+                {/* Header — no mascot (already in app header) */}
+                <div className="mb-5">
+                  <h2 id="auth-modal-title" className="text-xl font-bold text-ink">
+                    Sign in to Compadre
+                  </h2>
+                  <p className="text-bark mt-1 text-sm">
+                    Save your progress and build a portfolio — or just dive in.
+                  </p>
+                </div>
+
+                {/* Auth error */}
+                {authError && (
+                  <div role="alert" aria-live="assertive" aria-atomic="true"
+                    className="bg-red-50 border border-red-200 rounded-lg px-4 py-2.5 mb-4 text-sm text-red-800">
+                    {authError}
                   </div>
+                )}
 
-                  {/* Right form panel */}
-                  <div className="p-8 flex-1">
+                {/* Google button */}
+                <button
+                  onClick={handleGoogleSignIn}
+                  disabled={authLoading}
+                  aria-busy={authLoading}
+                  className="w-full flex items-center justify-center gap-3 px-4 py-2.5 border-2 border-stone rounded-xl hover:border-bark hover:bg-parchment transition-colors font-medium text-ink mb-3 disabled:opacity-50 disabled:cursor-not-allowed focus:ring-2 focus:ring-moss focus:ring-offset-2"
+                >
+                  <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true">
+                    <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                    <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                    <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                    <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.35-8.16 2.35-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+                  </svg>
+                  Continue with Google
+                </button>
 
-                    {/* Header */}
-                    <div className="mb-6">
-                      {/* Mascot — mobile only */}
-                      <img src="compadre_pixel_centered.png" alt="Compadre" className="w-14 h-14 mb-3 mix-blend-multiply sm:hidden" />
-                      <h2 id="auth-modal-title" className="text-2xl font-bold text-ink">
-                        Welcome to Compadre
-                      </h2>
-                      <p className="text-bark mt-1 text-sm leading-relaxed">
-                        Save your progress and build a portfolio — or just dive in.
-                      </p>
-                    </div>
+                {/* Divider */}
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="flex-1 h-px bg-stone" />
+                  <span className="text-xs text-bark font-medium">or</span>
+                  <div className="flex-1 h-px bg-stone" />
+                </div>
 
-                    {/* Auth error / info message */}
-                    {authError && (
-                      <div role="alert" aria-live="assertive" aria-atomic="true"
-                        className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 mb-4 text-sm text-red-800">
-                        {authError}
-                      </div>
-                    )}
+                {/* Email + Password */}
+                <div className="space-y-2.5 mb-4">
+                  <div>
+                    <label htmlFor="auth-email" className="block text-sm font-medium text-ink mb-1">
+                      Email
+                    </label>
+                    <input
+                      ref={modalEmailRef}
+                      id="auth-email"
+                      type="email"
+                      value={authEmail}
+                      onChange={(e) => { setAuthEmail(e.target.value); setAuthError(null); }}
+                      placeholder="you@example.com"
+                      autoComplete="email"
+                      aria-required="true"
+                      className="w-full px-4 py-2.5 border-2 border-stone rounded-xl focus:ring-4 focus:ring-moss focus:border-moss transition-colors"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="auth-password" className="block text-sm font-medium text-ink mb-1">
+                      Password
+                    </label>
+                    <input
+                      id="auth-password"
+                      type="password"
+                      value={authPassword}
+                      onChange={(e) => { setAuthPassword(e.target.value); setAuthError(null); }}
+                      onKeyDown={(e) => { if (e.key === 'Enter') handleEmailSignIn(); }}
+                      placeholder="••••••••"
+                      autoComplete="current-password"
+                      aria-required="true"
+                      className="w-full px-4 py-2.5 border-2 border-stone rounded-xl focus:ring-4 focus:ring-moss focus:border-moss transition-colors"
+                    />
+                  </div>
+                </div>
 
-                    {/* Google button */}
-                    <button
-                      onClick={handleGoogleSignIn}
-                      disabled={authLoading}
-                      aria-busy={authLoading}
-                      className="w-full flex items-center justify-center gap-3 px-4 py-3 border-2 border-stone rounded-xl hover:border-bark hover:bg-parchment transition-colors font-medium text-ink mb-4 disabled:opacity-50 disabled:cursor-not-allowed focus:ring-2 focus:ring-moss focus:ring-offset-2"
-                    >
-                      <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true">
-                        <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-                        <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
-                        <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
-                        <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.35-8.16 2.35-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
-                      </svg>
-                      Continue with Google
-                    </button>
+                {/* Sign In / Create Account */}
+                <div className="flex gap-3 mb-4">
+                  <button
+                    onClick={handleEmailSignIn}
+                    disabled={authLoading || !authEmail || !authPassword}
+                    aria-busy={authLoading}
+                    className="flex-1 py-2.5 bg-moss hover:bg-moss-dark text-cream rounded-xl font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus:ring-2 focus:ring-moss focus:ring-offset-2"
+                  >
+                    {authLoading ? 'Signing in…' : 'Sign In'}
+                  </button>
+                  <button
+                    onClick={handleEmailSignUp}
+                    disabled={authLoading || !authEmail || !authPassword}
+                    aria-busy={authLoading}
+                    className="flex-1 py-2.5 border-2 border-stone text-ink rounded-xl font-semibold hover:border-moss hover:bg-[#EAF0EC] transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus:ring-2 focus:ring-moss focus:ring-offset-2"
+                  >
+                    {authLoading ? 'Creating…' : 'Create Account'}
+                  </button>
+                </div>
 
-                    {/* Divider */}
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="flex-1 h-px bg-stone" />
-                      <span className="text-xs text-bark font-medium">or</span>
-                      <div className="flex-1 h-px bg-stone" />
-                    </div>
+                {/* Skip */}
+                <div className="text-center">
+                  <button
+                    onClick={handleSkip}
+                    className="text-bark hover:text-ink text-sm underline underline-offset-2 transition-colors focus:ring-2 focus:ring-moss focus:ring-offset-2 rounded"
+                  >
+                    Skip for now →
+                    <span className="block text-xs text-bark mt-0.5 no-underline">your progress won't be saved</span>
+                  </button>
+                </div>
 
-                    {/* Email + Password */}
-                    <div className="space-y-3 mb-4">
-                      <div>
-                        <label htmlFor="auth-email" className="block text-sm font-medium text-ink mb-1">
-                          Email
-                        </label>
-                        <input
-                          ref={modalEmailRef}
-                          id="auth-email"
-                          type="email"
-                          value={authEmail}
-                          onChange={(e) => { setAuthEmail(e.target.value); setAuthError(null); }}
-                          placeholder="you@example.com"
-                          autoComplete="email"
-                          aria-required="true"
-                          className="w-full px-4 py-3 border-2 border-stone rounded-xl focus:ring-4 focus:ring-moss focus:border-moss transition-colors"
-                        />
-                      </div>
-                      <div>
-                        <label htmlFor="auth-password" className="block text-sm font-medium text-ink mb-1">
-                          Password
-                        </label>
-                        <input
-                          id="auth-password"
-                          type="password"
-                          value={authPassword}
-                          onChange={(e) => { setAuthPassword(e.target.value); setAuthError(null); }}
-                          onKeyDown={(e) => { if (e.key === 'Enter') handleEmailSignIn(); }}
-                          placeholder="••••••••"
-                          autoComplete="current-password"
-                          aria-required="true"
-                          className="w-full px-4 py-3 border-2 border-stone rounded-xl focus:ring-4 focus:ring-moss focus:border-moss transition-colors"
-                        />
-                      </div>
-                    </div>
-
-                    {/* Sign In / Create Account */}
-                    <div className="flex gap-3 mb-6">
-                      <button
-                        onClick={handleEmailSignIn}
-                        disabled={authLoading || !authEmail || !authPassword}
-                        aria-busy={authLoading}
-                        className="flex-1 py-3 bg-moss hover:bg-moss-dark text-cream rounded-xl font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus:ring-2 focus:ring-moss focus:ring-offset-2"
-                      >
-                        {authLoading ? 'Signing in…' : 'Sign In'}
-                      </button>
-                      <button
-                        onClick={handleEmailSignUp}
-                        disabled={authLoading || !authEmail || !authPassword}
-                        aria-busy={authLoading}
-                        className="flex-1 py-3 border-2 border-stone text-ink rounded-xl font-semibold hover:border-moss hover:bg-[#EAF0EC] transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus:ring-2 focus:ring-moss focus:ring-offset-2"
-                      >
-                        {authLoading ? 'Creating…' : 'Create Account'}
-                      </button>
-                    </div>
-
-                    {/* Skip */}
-                    <div className="text-center">
-                      <button
-                        onClick={handleSkip}
-                        className="text-bark hover:text-ink text-sm underline underline-offset-2 transition-colors focus:ring-2 focus:ring-moss focus:ring-offset-2 rounded"
-                      >
-                        Skip for now →
-                        <span className="block text-xs text-bark mt-0.5 no-underline">your progress won't be saved</span>
-                      </button>
-                    </div>
-
-                  </div>{/* /form panel */}
-                </div>{/* /sm:flex */}
               </div>
             </div>
           )}
