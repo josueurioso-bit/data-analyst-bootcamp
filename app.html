@@ -395,6 +395,8 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
           // Supabase not configured yet — show modal unless previously skipped
           if (!localStorage.getItem('compadre_skipped')) {
             setShowAuthModal(true);
+          } else {
+            setIsAnonymous(true); // Restore anonymous state — shows "Save progress" in header
           }
           return;
         }
@@ -425,6 +427,8 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
               });
           } else if (!localStorage.getItem('compadre_skipped')) {
             setShowAuthModal(true);
+          } else {
+            setIsAnonymous(true); // Restore anonymous state — shows "Save progress" in header
           }
         });
 
