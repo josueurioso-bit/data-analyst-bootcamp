@@ -53,7 +53,7 @@ export default async function handler(req, res) {
 
     // Build evaluation prompt
     const rubric = sprint1Rubric;
-    const evaluationPrompt = buildEvaluationPrompt(submission.submission_text, rubric);
+    const evaluationPrompt = buildEvaluationPrompt(submission, rubric);
 
     // Call LLM with low temperature for consistent scoring
     const { text: aiText } = await sendMessage(
@@ -99,47 +99,59 @@ export default async function handler(req, res) {
 
 /**
  * Build the evaluation prompt with ground truth + rubric + student submission
+ *
+ * @param {Object} submission - Full submission row from DB (text + URLs)
+ * @param {Object} rubric - Sprint rubric object
  */
-function buildEvaluationPrompt(submissionText, rubric) {
-  return `You are an expert data analyst evaluator.
+function buildEvaluationPrompt(submission, rubric) {
+  const memoText = submission.submission_text;
+  const tableauUrl = submission.submission_urls?.google_sheets || null;
+
+  // Build ground truth list dynamically from rubric.expectedFindings
+  const findingLines = Object.entries(rubric.expectedFindings)
+    .map(([, value], i) => `${i + 1}. ${value}`)
+    .join('\n');
+
+  // Build category score keys for the required JSON output
+  const categoryScoreKeys = rubric.categories
+    .map(c => `    "${c.name}": { "score": 0, "feedback": "..." }`)
+    .join(',\n');
+
+  return `You are an expert data analyst evaluator scoring a student's sprint submission.
 
 SPRINT: ${rubric.name}
-BUSINESS CONTEXT: FastTrack Logistics, $2.3M annual loss from late deliveries
+BUSINESS CONTEXT: ${rubric.businessContext}
 
-GROUND TRUTH (Correct Findings):
-The dataset contains these patterns:
-1. ${rubric.expectedFindings.primaryIssue} (PRIMARY ISSUE)
-2. ${rubric.expectedFindings.secondaryIssue} (SECONDARY ISSUE)
-3. ${rubric.expectedFindings.falsePattern}
-4. ${rubric.expectedFindings.costOpportunity}
+WHAT A STRONG ANALYSIS SHOULD FIND:
+${findingLines}
+
+STUDENT'S TABLEAU VISUALIZATION:
+${tableauUrl ? `URL submitted: ${tableauUrl}` : 'No Tableau URL submitted — score Tableau Visualization category at 0.'}
 
 STUDENT'S EXECUTIVE MEMO:
 """
-${submissionText}
+${memoText}
 """
 
 RUBRIC CATEGORIES:
 ${rubric.categories.map(c => `- ${c.name} (${c.weight * 100}%): ${c.criteria.join('; ')}`).join('\n')}
 
 EVALUATION INSTRUCTIONS:
-Score each category 0-100, then calculate weighted overall.
-Be encouraging but accurate. Identify what they got right and what they missed.
+- Score each category 0-100, then calculate weighted overall score.
+- Be encouraging but accurate. Note what they got right and what they missed.
+- For Tableau Visualization: if no URL was submitted, score is 0. If a URL was submitted, trust that it works and score based on what the memo describes about the charts.
 
 REQUIRED OUTPUT FORMAT (JSON ONLY, no markdown fences):
 {
   "category_scores": {
-    "Business Framing": { "score": 0, "feedback": "..." },
-    "Data Correctness": { "score": 0, "feedback": "..." },
-    "Technical Execution": { "score": 0, "feedback": "..." },
-    "Insight Quality": { "score": 0, "feedback": "..." },
-    "Communication Clarity": { "score": 0, "feedback": "..." }
+${categoryScoreKeys}
   },
   "overall_score": 0,
   "overall_feedback": "2-3 sentences summarizing performance",
   "strengths": ["specific strength 1", "specific strength 2"],
   "areas_for_improvement": ["specific gap 1", "specific gap 2"],
   "passed": true,
-  "next_steps": "What to do next"
+  "next_steps": "One concrete thing to do next"
 }`;
 }
 

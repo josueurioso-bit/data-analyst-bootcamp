@@ -9,92 +9,95 @@
 const sprint1Rubric = {
   id: 'sprint-1-rubric',
   sprintId: 1,
-  name: 'Excel: Operational Bottleneck Analysis',
+  name: 'NYC Restaurant Inspections: Inspection Budget Analysis',
+  businessContext: 'NYC Health Commissioner allocating next year\'s restaurant inspection budget based on data-driven risk patterns from the DOHMH inspection database',
 
-  // Ground truth: What the correct answers are
+  // Ground truth: What a strong analysis should identify in the NYC data
+  // These are the patterns a student should surface when working with the dataset
   expectedFindings: {
-    primaryIssue: 'QuickMove carrier has ~35% late delivery rate',
-    secondaryIssue: 'Phoenix warehouse has ~28% late delivery rate',
-    falsePattern: 'Snow is correlated but NOT the root cause',
-    costOpportunity: 'Economy routes are NOT slower than Express'
+    boroughVariation:   'Grade distribution (A/B/C rates) varies meaningfully across the 5 boroughs — at least one borough stands out as higher risk',
+    cuisinePatterns:    'Certain cuisine categories show disproportionately high C-grade or violation rates compared to the citywide average',
+    timeTrend:          'Grade trends over 2022–present show whether inspection outcomes are improving, stable, or worsening',
+    dataStructureNote:  'The dataset has multiple rows per restaurant (one per inspection visit) — correct analysis aggregates to most-recent grade or counts unique restaurants'
   },
 
   // Rubric categories with weights (must sum to 1.0)
   categories: [
     {
-      name: 'Business Framing',
+      name: 'Audience & Context',
       weight: 0.20,
       criteria: [
-        "Addresses VP's actual question (root causes of $2.3M loss)",
-        'Frames findings in business/financial terms',
-        'Provides actionable recommendations'
+        'Addresses the Health Commissioner\'s actual question (where to allocate inspection budget)',
+        'Frames findings for a non-technical policy audience — numbers in plain language',
+        'Provides specific, actionable recommendations (which boroughs or cuisine types to prioritize)'
       ],
       scoringGuide: {
-        excellent: 'Clear business framing, quantified impact, specific actions',
-        good: 'Addresses business question with recommendations',
-        adequate: 'Some business context, vague recommendations',
-        poor: 'No business context, just technical findings'
+        excellent: 'Budget-focused framing, specific recommendations, executive-ready language',
+        good: 'Addresses the Commissioner\'s question with clear recommendations',
+        adequate: 'Some business context but recommendations are vague or generic',
+        poor: 'No audience consideration — just a raw data dump'
       }
     },
     {
-      name: 'Data Correctness',
+      name: 'Data Analysis',
       weight: 0.25,
       criteria: [
-        'Identifies QuickMove carrier as primary issue (~35% late rate)',
-        'Identifies Phoenix warehouse as secondary issue (~28% late rate)',
-        'Recognizes snow correlation is NOT causation',
-        'Identifies Economy route cost optimization opportunity'
+        'Correctly identifies grade distribution by borough (A/B/C breakdown)',
+        'Identifies cuisine categories with above-average C-grade or violation rates',
+        'Analyzes time trend — are inspection outcomes improving or worsening since 2022?',
+        'Handles the multi-row structure correctly (one restaurant can have multiple inspection rows)'
       ],
       scoringGuide: {
-        excellent: 'All 4 key patterns identified correctly',
+        excellent: 'All 4 patterns correctly identified and supported with numbers',
         good: '3 out of 4 patterns identified',
         adequate: '2 out of 4 patterns identified',
-        poor: '0-1 patterns identified'
+        poor: '0–1 patterns identified, or data is clearly misread'
       }
     },
     {
-      name: 'Technical Execution',
+      name: 'Tableau Visualization',
       weight: 0.25,
       criteria: [
-        'Mentions pivot tables or data aggregation',
-        'Describes calculated fields (days_late, on_time_flag)',
-        'Shows systematic analysis approach'
+        'Submitted a working Tableau Public URL',
+        'Dashboard includes at least 2 charts (e.g., bar chart by borough + breakdown by cuisine type)',
+        'Charts support the specific findings stated in the memo',
+        'Includes at least one reference line (mean or median) to anchor the audience\'s interpretation'
       ],
       scoringGuide: {
-        excellent: 'Clear pivot table use, multiple calculated fields',
-        good: 'Some aggregation mentioned, basic calculated fields',
-        adequate: 'Vague mention of Excel tools',
-        poor: 'No mention of technical approach'
+        excellent: 'Working URL, 2+ charts, charts match findings, reference line present',
+        good: 'Working URL, 2 charts, generally connected to findings',
+        adequate: 'URL present but charts are basic or loosely connected to memo',
+        poor: 'No URL submitted, or URL does not load a published visualization'
       }
     },
     {
-      name: 'Insight Quality',
+      name: 'SWD Principle: Context First',
       weight: 0.20,
       criteria: [
-        'Prioritizes issues by impact (carrier > warehouse > weather)',
-        'Distinguishes correlation from causation',
-        'Recommendations are specific and measurable'
+        'Opens with the decision or question (problem-first), not the data',
+        'Clearly identifies the audience and what they need to decide',
+        'One clear main takeaway — the single most important thing for the Commissioner to know'
       ],
       scoringGuide: {
-        excellent: 'Deep insights, clear prioritization, specific actions',
-        good: 'Valid insights with some prioritization',
-        adequate: 'Surface-level insights',
-        poor: 'No prioritization or vague insights'
+        excellent: 'Strong problem framing, explicit audience, unmistakable main takeaway',
+        good: 'Good context setup with a clear central finding',
+        adequate: 'Some framing present but buried under data details',
+        poor: 'Jumps straight into data without any framing or audience acknowledgment'
       }
     },
     {
       name: 'Communication Clarity',
       weight: 0.10,
       criteria: [
-        'Memo is concise (1-page equivalent ~500 words)',
-        'Professional business writing tone',
-        'Findings backed by specific data points'
+        'Memo length is appropriate — concise but complete (200–500 words)',
+        'Professional tone appropriate for a government executive audience',
+        'Key findings backed by specific data points (percentages, counts) from the analysis'
       ],
       scoringGuide: {
-        excellent: 'Concise, professional, data-backed',
-        good: 'Clear writing, mostly professional',
-        adequate: 'Understandable but verbose or informal',
-        poor: 'Unclear, unprofessional, no data support'
+        excellent: 'Concise, professional, specific numbers cited throughout',
+        good: 'Clear writing with some concrete data support',
+        adequate: 'Understandable but verbose, informal, or light on data',
+        poor: 'Unclear, no data support, or unprofessional tone'
       }
     }
   ]
