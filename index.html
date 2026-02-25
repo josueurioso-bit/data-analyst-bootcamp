@@ -41,6 +41,23 @@
     h1, h2, h3 {
       font-family: 'Lora', Georgia, serif;
     }
+    /* Brand color overrides — ensures colors apply even if Tailwind CDN config has a timing gap */
+    .bg-moss        { background-color: #3D5A47; }
+    .bg-moss-dark   { background-color: #2E4436; }
+    .bg-sage        { background-color: #5C8C6A; }
+    .bg-parchment   { background-color: #F7F3EC; }
+    .bg-cream       { background-color: #FDFAF4; }
+    .bg-stone       { background-color: #D4CEBD; }
+    .text-ink       { color: #1C2017; }
+    .text-bark      { color: #7A6E5F; }
+    .text-moss      { color: #3D5A47; }
+    .text-cream     { color: #FDFAF4; }
+    .text-sage      { color: #5C8C6A; }
+    .border-moss    { border-color: #3D5A47; }
+    .border-stone   { border-color: #D4CEBD; }
+    .hover\:bg-moss-dark:hover  { background-color: #2E4436; }
+    .hover\:border-moss:hover   { border-color: #3D5A47; }
+    .focus\:ring-moss:focus     { --tw-ring-color: #3D5A47; }
   </style>
 </head>
 <body class="bg-parchment text-ink">
