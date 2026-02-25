@@ -2302,6 +2302,234 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
                       );
                     })()}
 
+                    {/* ─── TABLEAU GUIDE — Sprint 1 only ─── */}
+                    {currentSprint.id === 1 && (
+                      <div className="bg-cream rounded-xl border border-stone mb-6 overflow-hidden">
+
+                        {/* Header */}
+                        <div className="bg-moss px-6 py-4">
+                          <div className="flex items-center justify-between gap-4">
+                            <h3 className="font-bold text-cream text-lg">How to Build Your Dashboard</h3>
+                            <span className="text-xs font-medium text-cream bg-moss-dark px-3 py-1 rounded-full flex-shrink-0">~3–4 hours</span>
+                          </div>
+                          <p className="text-sm text-cream mt-1" style={{opacity: 0.8}}>Step-by-step Tableau walkthrough — follow along while you build.</p>
+                        </div>
+
+                        {/* Concept callout */}
+                        <div className="px-6 py-4 bg-[#EAF0EC] border-b border-stone">
+                          <p className="text-sm text-ink leading-relaxed">
+                            <strong className="text-moss">Why mean vs. median?</strong>{' '}
+                            The median is less sensitive to outliers. If your dataset has extreme values —
+                            one restaurant with 200 violations while most have 5 — the mean gets pulled
+                            toward that outlier and gives a misleading picture of "typical."
+                            The median shows the true middle. Knowing when to use which one is a
+                            genuine analytical skill that comes up in every data interview.
+                          </p>
+                        </div>
+
+                        {/* Steps */}
+                        <div className="divide-y divide-stone">
+
+                          {/* Step 1 */}
+                          <div className="px-6 py-5">
+                            <div className="flex items-start gap-4">
+                              <span className="w-7 h-7 rounded-full bg-moss text-cream text-sm font-bold flex items-center justify-center flex-shrink-0 mt-0.5" aria-hidden="true">1</span>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-baseline justify-between gap-2 mb-2">
+                                  <h4 className="font-semibold text-ink">Connect your data</h4>
+                                  <span className="text-xs text-bark flex-shrink-0">15 min</span>
+                                </div>
+                                <p className="text-sm text-bark leading-relaxed mb-3">
+                                  Open{' '}
+                                  <a href="https://public.tableau.com/app/discover" target="_blank" rel="noopener noreferrer" className="text-amber-flask underline hover:text-moss transition-colors">
+                                    Tableau Public
+                                  </a>{' '}
+                                  (free). Select <strong className="text-ink">Connect &rarr; Text File</strong>.
+                                  Navigate to your downloaded CSV, drag the table onto the canvas, then click{' '}
+                                  <strong className="text-ink">Update Now</strong> to preview your data.
+                                </p>
+                                {chosenDataset === 'restaurants' && (
+                                  <div className="bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 text-xs text-ink leading-relaxed">
+                                    <strong>For NYC Restaurants:</strong> Key columns are{' '}
+                                    <code className="bg-amber-100 px-1 rounded font-mono">SCORE</code>{' '}
+                                    (inspection score — higher means more violations),{' '}
+                                    <code className="bg-amber-100 px-1 rounded font-mono">BORO</code>, and{' '}
+                                    <code className="bg-amber-100 px-1 rounded font-mono">INSPECTION DATE</code>.
+                                    In the Data Source tab, add a filter on{' '}
+                                    <code className="bg-amber-100 px-1 rounded font-mono">INSPECTION DATE</code>{' '}
+                                    to 2022–present to keep it manageable.
+                                  </div>
+                                )}
+                                {chosenDataset === 'mta' && (
+                                  <div className="bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 text-xs text-ink leading-relaxed">
+                                    <strong>For MTA Ridership:</strong> Your main measure is{' '}
+                                    <code className="bg-amber-100 px-1 rounded font-mono">Subways: Total Estimated Ridership</code>.
+                                    Each row is one day — you'll compare mean vs. median daily ridership.
+                                  </div>
+                                )}
+                                {chosenDataset === '311' && (
+                                  <div className="bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 text-xs text-ink leading-relaxed">
+                                    <strong>For 311 Complaints:</strong> Use{' '}
+                                    <code className="bg-amber-100 px-1 rounded font-mono">Complaint Type</code> or{' '}
+                                    <code className="bg-amber-100 px-1 rounded font-mono">Borough</code>{' '}
+                                    as your dimension. You'll compare mean vs. median complaint counts per group.
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Step 2 */}
+                          <div className="px-6 py-5">
+                            <div className="flex items-start gap-4">
+                              <span className="w-7 h-7 rounded-full bg-moss text-cream text-sm font-bold flex items-center justify-center flex-shrink-0 mt-0.5" aria-hidden="true">2</span>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-baseline justify-between gap-2 mb-2">
+                                  <h4 className="font-semibold text-ink">Build a bar chart</h4>
+                                  <span className="text-xs text-bark flex-shrink-0">30 min</span>
+                                </div>
+                                <p className="text-sm text-bark leading-relaxed">
+                                  Open <strong className="text-ink">Sheet 1</strong>.{' '}
+                                  {chosenDataset === 'restaurants' && (
+                                    'Drag BORO to Columns. Drag SCORE to Rows — it defaults to SUM. Right-click the SCORE pill → Measure → Average. Right-click the axis → Sort → Descending to rank boroughs highest to lowest.'
+                                  )}
+                                  {chosenDataset === 'mta' && (
+                                    'Drag Date (aggregated to Month) to Columns. Drag Subways ridership to Rows. Right-click the measure pill → Measure → Average.'
+                                  )}
+                                  {chosenDataset === '311' && (
+                                    'Drag Borough to Columns. Use a COUNT of rows as your measure in Rows. Right-click → Measure → Average to show average complaint count.'
+                                  )}
+                                  {!chosenDataset && (
+                                    'Drag your dimension (borough, category, etc.) to Columns. Drag your measure to Rows. Right-click the measure pill → Measure → Average.'
+                                  )}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Step 3 */}
+                          <div className="px-6 py-5">
+                            <div className="flex items-start gap-4">
+                              <span className="w-7 h-7 rounded-full bg-moss text-cream text-sm font-bold flex items-center justify-center flex-shrink-0 mt-0.5" aria-hidden="true">3</span>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-baseline justify-between gap-2 mb-2">
+                                  <h4 className="font-semibold text-ink">Add the Mean reference line</h4>
+                                  <span className="text-xs text-bark flex-shrink-0">15 min</span>
+                                </div>
+                                <p className="text-sm text-bark leading-relaxed">
+                                  Right-click the Y-axis &rarr; <strong className="text-ink">Add Reference Line</strong>.
+                                  Set Scope to <strong className="text-ink">Entire Table</strong>, Value to{' '}
+                                  <strong className="text-ink">Average</strong>.
+                                  In the Label field type <strong className="text-ink">Mean</strong>.
+                                  Set the line style to dashed.
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Step 4 */}
+                          <div className="px-6 py-5">
+                            <div className="flex items-start gap-4">
+                              <span className="w-7 h-7 rounded-full bg-moss text-cream text-sm font-bold flex items-center justify-center flex-shrink-0 mt-0.5" aria-hidden="true">4</span>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-baseline justify-between gap-2 mb-2">
+                                  <h4 className="font-semibold text-ink">Add the Median reference line</h4>
+                                  <span className="text-xs text-bark flex-shrink-0">15 min</span>
+                                </div>
+                                <p className="text-sm text-bark leading-relaxed">
+                                  Right-click the Y-axis again &rarr; <strong className="text-ink">Add Reference Line</strong>.
+                                  This time set Value to <strong className="text-ink">Median</strong>. Label it{' '}
+                                  <strong className="text-ink">Median</strong>. Use a solid line and a different
+                                  color so it's visually distinct from the mean line — amber (#C17F24) works well.
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Step 5 */}
+                          <div className="px-6 py-5">
+                            <div className="flex items-start gap-4">
+                              <span className="w-7 h-7 rounded-full bg-moss text-cream text-sm font-bold flex items-center justify-center flex-shrink-0 mt-0.5" aria-hidden="true">5</span>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-baseline justify-between gap-2 mb-2">
+                                  <h4 className="font-semibold text-ink">Write your annotation</h4>
+                                  <span className="text-xs text-bark flex-shrink-0">15 min</span>
+                                </div>
+                                <p className="text-sm text-bark leading-relaxed mb-3">
+                                  Look at where your two lines land. Write one sentence explaining what the gap means.
+                                  Use these as a starting point:
+                                </p>
+                                <div className="bg-[#EAF0EC] border border-sage rounded-lg px-4 py-3 text-xs text-ink space-y-2">
+                                  <p><strong className="text-moss">Mean &gt; Median:</strong> "The mean is pulled up by a small number of high-scoring outliers — the median better represents the typical result."</p>
+                                  <p><strong className="text-moss">Mean ≈ Median:</strong> "Mean and median tell the same story here — the distribution is roughly symmetric with no significant outliers."</p>
+                                  <p><strong className="text-moss">Mean &lt; Median:</strong> "A few very low values are pulling the mean down — the median gives a less distorted view of typical performance."</p>
+                                </div>
+                                <p className="text-xs text-bark mt-3">
+                                  In Tableau: <strong className="text-ink">Insert &rarr; Text</strong> in the dashboard (next step) — or double-click an empty area to add a text object. Position it near the reference lines.
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Step 6 */}
+                          <div className="px-6 py-5">
+                            <div className="flex items-start gap-4">
+                              <span className="w-7 h-7 rounded-full bg-moss text-cream text-sm font-bold flex items-center justify-center flex-shrink-0 mt-0.5" aria-hidden="true">6</span>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-baseline justify-between gap-2 mb-2">
+                                  <h4 className="font-semibold text-ink">Assemble a dashboard</h4>
+                                  <span className="text-xs text-bark flex-shrink-0">20 min</span>
+                                </div>
+                                <p className="text-sm text-bark leading-relaxed">
+                                  Click the <strong className="text-ink">New Dashboard</strong> icon in the bottom tab bar.
+                                  Drag your sheet from the left panel onto the canvas. Set dashboard size to{' '}
+                                  <strong className="text-ink">Automatic</strong> so it scales to any screen.
+                                </p>
+                                <p className="text-sm text-bark leading-relaxed mt-2">
+                                  Set the title to your key finding — not <em>"Restaurant Inspections"</em> but something like{' '}
+                                  <em>"Bronx Restaurants Average 22 Points Above the City Median — Driven by Repeat Violators."</em>{' '}
+                                  Your title is your argument.
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Step 7 */}
+                          <div className="px-6 py-5">
+                            <div className="flex items-start gap-4">
+                              <span className="w-7 h-7 rounded-full bg-sage text-cream text-sm font-bold flex items-center justify-center flex-shrink-0 mt-0.5" aria-hidden="true">7</span>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-baseline justify-between gap-2 mb-2">
+                                  <h4 className="font-semibold text-ink">Publish to Tableau Public</h4>
+                                  <span className="text-xs text-bark flex-shrink-0">15 min</span>
+                                </div>
+                                <p className="text-sm text-bark leading-relaxed">
+                                  Go to <strong className="text-ink">Server &rarr; Tableau Public &rarr; Save to Tableau Public As&hellip;</strong>{' '}
+                                  Sign in with your Tableau Public account —{' '}
+                                  <a href="https://public.tableau.com" target="_blank" rel="noopener noreferrer" className="text-amber-flask underline hover:text-moss transition-colors">
+                                    create a free account
+                                  </a>{' '}
+                                  if you don't have one. Name your workbook and wait 1–3 minutes for the upload.
+                                  Once it opens in your browser, <strong className="text-ink">copy the URL from the address bar</strong> — that's your first portfolio piece. Paste it into the submission form below.
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+
+                        </div>{/* end steps */}
+
+                        {/* Footer reminder */}
+                        <div className="bg-parchment px-6 py-4 border-t border-stone">
+                          <p className="text-xs text-bark">
+                            <strong className="text-ink">Time check:</strong> If you hit 4 hours, publish what you have.
+                            Done and published beats perfect and unfinished.
+                            You can always revise and republish — the URL stays the same.
+                          </p>
+                        </div>
+
+                      </div>
+                    )}{/* end Tableau guide */}
+
                     {/* Deliverables Checklist */}
                     <div className="bg-cream rounded-xl p-6 border border-stone mb-6">
                       <h3 className="font-bold text-ink mb-4">Deliverables Checklist</h3>
