@@ -10,15 +10,21 @@ CREATE POLICY "Submissions are insertable" ON submissions FOR INSERT WITH CHECK 
 CREATE POLICY "Submissions are readable" ON submissions FOR SELECT USING (true);
 CREATE POLICY "Submissions are updatable" ON submissions FOR UPDATE USING (true);
 
-INSERT INTO sprints (id, title, description, rubric_id) VALUES (1, 'Excel: Operational Bottleneck Analysis', 'Analyze delivery data to find root causes of late shipments at FastTrack Logistics.', 'sprint-1-rubric');
+INSERT INTO sprints (id, title, description, rubric_id, dataset_url, business_scenario, deliverables) VALUES (
+  1,
+  'Understand the Context',
+  'Analyze NYC restaurant inspection data and build a Tableau visualization for the NYC Health Commissioner.',
+  'sprint-1-rubric',
+  '/data/sprint-1-restaurants-sample.csv',
+  E'You''re a junior data analyst working with the NYC Department of Health and Mental Hygiene. The Health Commissioner is building next year''s inspection budget and needs data-backed answers.\n\nShe sends you the city''s restaurant inspection database and says: "I need to walk into the budget meeting knowing exactly where the problems are — which boroughs, which cuisine types, and whether things are getting better or worse."\n\nYour job: Analyze the inspection data, find the patterns that matter, and build a Tableau dashboard the Commissioner can present to the budget committee.',
+  '["Download the NYC Restaurant Inspections dataset and filter to 2022-present in Excel","Explore the data: count restaurants by borough, grade distribution, and cuisine type","Create pivot tables showing Grade C rates by borough and by cuisine type","Identify 2-3 key findings - where are the highest-risk areas? Is the trend improving?","Build a Tableau Public dashboard with at least 2 charts supporting your findings","Publish to Tableau Public, then write a 1-paragraph executive summary for the Commissioner"]'::jsonb
+);
 
-UPDATE sprints SET business_scenario = E'You\'ve just been hired as a Junior Data Analyst at FastTrack Logistics. The VP of Operations is concerned: late deliveries cost the company $2.3M last year.\n\nShe hands you a dataset of 5,000 delivery records and says: "Find out WHY our deliveries are late. I need answers by Friday."\n\nYour job: Analyze the data in Excel/Google Sheets, identify the root causes, and write a 1-page executive memo with your findings and recommendations.', dataset_url = '/data/sprint-1-deliveries.csv', deliverables = '["Download and explore the delivery dataset (5,000 rows)","Create pivot tables to analyze late delivery patterns","Add calculated fields (days_late, on_time flag)","Identify the primary and secondary causes of delays","Distinguish correlation from causation in the data","Write a 1-page executive memo to the VP of Operations"]'::jsonb WHERE id = 1;
-
-INSERT INTO sprints (id, title, description) VALUES (2, 'SQL: Customer Segmentation', 'Query a database to segment customers and identify high-value groups.');
-INSERT INTO sprints (id, title, description) VALUES (3, 'SQL + Excel: Sales Pipeline Analysis', 'Combine SQL queries with Excel dashboards to analyze sales funnel performance.');
-INSERT INTO sprints (id, title, description) VALUES (4, 'Python: Automated Reporting', 'Build a Python script to automate weekly KPI reporting.');
-INSERT INTO sprints (id, title, description) VALUES (5, 'Python + Viz: Market Analysis Dashboard', 'Create interactive visualizations to present market research findings.');
-INSERT INTO sprints (id, title, description) VALUES (6, 'Capstone: End-to-End Analysis', 'Complete a full data analysis project from data collection to presentation.');
+INSERT INTO sprints (id, title, description) VALUES (2, 'Choose the Right Visual', 'Match your data to the right chart type so your audience actually understands what you''re showing.');
+INSERT INTO sprints (id, title, description) VALUES (3, 'Eliminate Clutter', 'Strip away everything that doesn''t serve the story. Less is more — and harder than it sounds.');
+INSERT INTO sprints (id, title, description) VALUES (4, 'Focus Attention', 'Use color, size, and positioning to guide your audience''s eye to what matters most.');
+INSERT INTO sprints (id, title, description) VALUES (5, 'Think Like a Designer', 'Apply design principles to make your visualizations clear, trustworthy, and professional.');
+INSERT INTO sprints (id, title, description) VALUES (6, 'Tell a Story — Capstone', 'Bring it all together. One dataset, one audience, one complete narrative. Your portfolio centerpiece.');
 
 -- =============================================
 -- PHASE 4: Compadre Transformation
