@@ -4,16 +4,41 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Compadre</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
   <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'moss':        '#3D5A47',
+            'moss-dark':   '#2E4436',
+            'amber-flask': '#C17F24',
+            'sage':        '#5C8C6A',
+            'parchment':   '#F7F3EC',
+            'cream':       '#FDFAF4',
+            'ink':         '#1C2017',
+            'stone':       '#D4CEBD',
+            'bark':        '#7A6E5F',
+          },
+          fontFamily: {
+            'display': ['Lora', 'Georgia', 'serif'],
+            'body':    ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
   <!-- Supabase JS SDK — used for client-side auth only (anon key is safe to expose) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     body {
       margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-        'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
     }
@@ -28,6 +53,9 @@
       white-space: nowrap;
       border-width: 0;
     }
+    h1, h2, h3 {
+      font-family: 'Lora', Georgia, serif;
+    }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after {
         animation-duration: 0.01ms !important;
@@ -41,7 +69,7 @@
   <!-- Skip to main content — keyboard/screen reader navigation -->
   <a
     href="#main-content"
-    class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-purple-600 focus:text-white focus:rounded-lg focus:font-semibold focus:shadow-lg"
+    class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-moss focus:text-cream focus:rounded-lg focus:font-semibold"
   >
     Skip to main content
   </a>
@@ -777,19 +805,19 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
           case 'yellow': return 'bg-yellow-100 text-yellow-800 border-yellow-300';
           case 'orange': return 'bg-orange-100 text-orange-800 border-orange-300';
           case 'red': return 'bg-red-100 text-red-800 border-red-300';
-          default: return 'bg-gray-100 text-gray-800 border-gray-300';
+          default: return 'bg-stone bg-opacity-40 text-ink border-stone';
         }
       };
 
       const getReadinessColor = (level) => {
-        if (level <= 2) return 'text-emerald-600';
+        if (level <= 2) return 'text-sage';
         if (level === 3) return 'text-yellow-600';
         if (level === 4) return 'text-orange-600';
         return 'text-red-600';
       };
 
       const getScoreColor = (score) => {
-        if (score >= 75) return 'text-emerald-600';
+        if (score >= 75) return 'text-sage';
         if (score >= 60) return 'text-yellow-600';
         return 'text-red-600';
       };
@@ -830,9 +858,7 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
       // RENDER
       // =========================================================
       return (
-        <div className="min-h-screen flex flex-col" style={{
-          background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)'
-        }}>
+        <div className="min-h-screen flex flex-col bg-parchment">
           {/* ======================================================= */}
           {/* AUTH MODAL                                             */}
           {/* ======================================================= */}
@@ -842,16 +868,16 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="auth-modal-title"
-                className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8"
+                className="bg-cream rounded-xl border-2 border-stone max-w-md w-full p-8"
               >
 
                 {/* Header */}
                 <div className="text-center mb-6">
                   <img src="compadre_pixel_centered.png" alt="Compadre" className="w-16 h-16 mx-auto mb-3 mix-blend-multiply" />
-                  <h2 id="auth-modal-title" className="text-2xl font-bold text-gray-900" style={{ fontFamily: 'Georgia, serif' }}>
+                  <h2 id="auth-modal-title" className="text-2xl font-bold text-ink">
                     Welcome to Compadre
                   </h2>
-                  <p className="text-gray-500 mt-2 text-sm leading-relaxed">
+                  <p className="text-bark mt-2 text-sm leading-relaxed">
                     Save your progress and build a portfolio — or just dive in.
                   </p>
                 </div>
@@ -869,7 +895,7 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
                   onClick={handleGoogleSignIn}
                   disabled={authLoading}
                   aria-busy={authLoading}
-                  className="w-full flex items-center justify-center gap-3 px-4 py-3 border-2 border-gray-300 rounded-xl hover:border-gray-400 hover:bg-gray-50 transition-all font-medium text-gray-700 mb-4 disabled:opacity-50 disabled:cursor-not-allowed focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+                  className="w-full flex items-center justify-center gap-3 px-4 py-3 border-2 border-stone rounded-xl hover:border-bark hover:bg-parchment transition-colors font-medium text-ink mb-4 disabled:opacity-50 disabled:cursor-not-allowed focus:ring-2 focus:ring-moss focus:ring-offset-2"
                 >
                   <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true">
                     <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
@@ -882,15 +908,15 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
 
                 {/* Divider */}
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="flex-1 h-px bg-gray-200" />
-                  <span className="text-xs text-gray-500 font-medium">or</span>
-                  <div className="flex-1 h-px bg-gray-200" />
+                  <div className="flex-1 h-px bg-stone" />
+                  <span className="text-xs text-bark font-medium">or</span>
+                  <div className="flex-1 h-px bg-stone" />
                 </div>
 
                 {/* Email + Password */}
                 <div className="space-y-3 mb-4">
                   <div>
-                    <label htmlFor="auth-email" className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="auth-email" className="block text-sm font-medium text-ink mb-1">
                       Email
                     </label>
                     <input
@@ -902,11 +928,11 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
                       placeholder="you@example.com"
                       autoComplete="email"
                       aria-required="true"
-                      className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                      className="w-full px-4 py-3 border-2 border-stone rounded-xl focus:ring-2 focus:ring-moss focus:border-moss transition-colors"
                     />
                   </div>
                   <div>
-                    <label htmlFor="auth-password" className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="auth-password" className="block text-sm font-medium text-ink mb-1">
                       Password
                     </label>
                     <input
@@ -918,7 +944,7 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
                       placeholder="••••••••"
                       autoComplete="current-password"
                       aria-required="true"
-                      className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                      className="w-full px-4 py-3 border-2 border-stone rounded-xl focus:ring-2 focus:ring-moss focus:border-moss transition-colors"
                     />
                   </div>
                 </div>
@@ -929,7 +955,7 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
                     onClick={handleEmailSignIn}
                     disabled={authLoading || !authEmail || !authPassword}
                     aria-busy={authLoading}
-                    className="flex-1 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl font-semibold hover:from-purple-700 hover:to-indigo-700 transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+                    className="flex-1 py-3 bg-moss hover:bg-moss-dark text-cream rounded-xl font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus:ring-2 focus:ring-moss focus:ring-offset-2"
                   >
                     {authLoading ? 'Signing in…' : 'Sign In'}
                   </button>
@@ -937,7 +963,7 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
                     onClick={handleEmailSignUp}
                     disabled={authLoading || !authEmail || !authPassword}
                     aria-busy={authLoading}
-                    className="flex-1 py-3 border-2 border-purple-300 text-purple-700 rounded-xl font-semibold hover:border-purple-500 hover:bg-purple-50 transition-all disabled:opacity-50 disabled:cursor-not-allowed focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+                    className="flex-1 py-3 border-2 border-stone text-ink rounded-xl font-semibold hover:border-moss hover:bg-[#EAF0EC] transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus:ring-2 focus:ring-moss focus:ring-offset-2"
                   >
                     {authLoading ? 'Creating…' : 'Create Account'}
                   </button>
@@ -947,10 +973,10 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
                 <div className="text-center">
                   <button
                     onClick={handleSkip}
-                    className="text-gray-600 hover:text-gray-900 text-sm underline underline-offset-2 transition-colors focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 rounded"
+                    className="text-bark hover:text-ink text-sm underline underline-offset-2 transition-colors focus:ring-2 focus:ring-moss focus:ring-offset-2 rounded"
                   >
                     Skip for now →
-                    <span className="block text-xs text-gray-500 mt-0.5 no-underline">your progress won't be saved</span>
+                    <span className="block text-xs text-bark mt-0.5 no-underline">your progress won't be saved</span>
                   </button>
                 </div>
 
@@ -959,21 +985,21 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
           )}
 
           {/* Header */}
-          <header className="bg-white shadow-sm border-b border-gray-200">
+          <header className="bg-cream border-b-2 border-moss">
             <div className="max-w-4xl mx-auto px-4 py-4 flex items-center gap-3">
               <img src="compadre_pixel_centered.png" alt="Compadre" className="w-9 h-9 mix-blend-multiply flex-shrink-0" />
               <div className="flex-1">
-                <h1 className="text-2xl font-bold text-gray-900" style={{ fontFamily: 'Georgia, serif' }}>
+                <h1 className="text-2xl font-bold text-ink">
                   {headerTitle[currentView]}
                 </h1>
-                <p className="text-sm text-gray-700" aria-live="polite" aria-atomic="true">{headerSubtitle[currentView]}</p>
+                <p className="text-sm text-ink" aria-live="polite" aria-atomic="true">{headerSubtitle[currentView]}</p>
               </div>
 
               {/* How it works — persistent tutorial link, hidden while tutorial is open */}
               {currentView !== 'tutorial' && (
                 <button
                   onClick={openTutorial}
-                  className="text-sm text-gray-500 hover:text-gray-700 underline underline-offset-2 transition-colors focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 rounded flex-shrink-0 hidden sm:block"
+                  className="text-sm text-bark hover:text-ink underline underline-offset-2 transition-colors focus:ring-2 focus:ring-moss focus:ring-offset-2 rounded flex-shrink-0 hidden sm:block"
                   aria-label="Open tutorial: how Compadre works"
                 >
                   How it works
@@ -983,12 +1009,12 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
               {/* Auth indicator */}
               {user ? (
                 <div className="flex items-center gap-3 flex-shrink-0">
-                  <span className="text-sm text-gray-600 hidden sm:block" aria-label={`Signed in as ${user.email}`}>
+                  <span className="text-sm text-bark hidden sm:block" aria-label={`Signed in as ${user.email}`}>
                     {user.email}
                   </span>
                   <button
                     onClick={handleSignOut}
-                    className="text-sm text-gray-500 hover:text-gray-800 underline underline-offset-2 transition-colors focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 rounded"
+                    className="text-sm text-bark hover:text-ink underline underline-offset-2 transition-colors focus:ring-2 focus:ring-moss focus:ring-offset-2 rounded"
                   >
                     Sign out
                   </button>
@@ -996,7 +1022,7 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
               ) : isAnonymous ? (
                 <button
                   onClick={() => { setAuthError(null); setShowAuthModal(true); }}
-                  className="text-sm text-purple-600 hover:text-purple-800 underline underline-offset-2 transition-colors focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 rounded flex-shrink-0"
+                  className="text-sm text-amber-flask hover:text-moss-dark underline underline-offset-2 transition-colors focus:ring-2 focus:ring-moss focus:ring-offset-2 rounded flex-shrink-0"
                 >
                   Save progress
                 </button>
@@ -1006,7 +1032,7 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
 
           {/* Consent Banner — only during assessment */}
           {currentView === 'assessment' && (
-            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-blue-200 px-4 py-3">
+            <div className="bg-cream border-b border-stone px-4 py-3">
               <div className="max-w-4xl mx-auto">
                 <label htmlFor="consent-checkbox" className="flex items-start gap-3 cursor-pointer">
                   <input
@@ -1015,15 +1041,15 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
                     checked={consentGiven}
                     onChange={(e) => setConsentGiven(e.target.checked)}
                     aria-describedby="consent-description"
-                    className="mt-1 w-5 h-5 text-purple-600 border-gray-300 rounded focus:ring-purple-500 focus:ring-offset-2 cursor-pointer"
+                    className="mt-1 w-5 h-5 text-moss border-stone rounded focus:ring-moss focus:ring-offset-2 cursor-pointer"
                   />
-                  <span className="text-sm text-gray-800">
+                  <span className="text-sm text-ink">
                     <span className="font-medium">I consent to my anonymous assessment scores being used to improve Compadre.</span>
                     {' '}
-                    <a href="privacy.html" target="_blank" rel="noopener noreferrer" className="text-purple-600 hover:text-purple-800 underline">Learn more</a>
+                    <a href="privacy.html" target="_blank" rel="noopener noreferrer" className="text-amber-flask hover:text-moss-dark underline">Learn more</a>
                   </span>
                 </label>
-                <p id="consent-description" className="text-xs text-gray-600 mt-1 ml-8" aria-live="polite">
+                <p id="consent-description" className="text-xs text-bark mt-1 ml-8" aria-live="polite">
                   {consentGiven
                     ? "Your scores will help us identify common skill gaps and improve our curriculum."
                     : "You can still take the quiz - your results just won't be saved to our database."}
@@ -1052,10 +1078,10 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
                   <div className="max-w-4xl mx-auto space-y-4" role="log" aria-live="polite" aria-relevant="additions">
                     {messages.map((message, idx) => (
                       <div key={idx} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                        <div className={`max-w-[80%] rounded-2xl px-6 py-4 shadow-md ${
+                        <div className={`max-w-[80%] rounded-xl px-6 py-4 ${
                           message.role === 'user'
-                            ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white'
-                            : 'bg-white text-gray-800 border border-gray-200'
+                            ? 'bg-moss text-cream'
+                            : 'bg-cream text-ink border border-stone'
                         }`} aria-label={message.role === 'user' ? 'Your message' : 'AI tutor message'}>
                           <p className="whitespace-pre-wrap leading-relaxed" style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
                             {message.content}
@@ -1066,9 +1092,9 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
 
                     {isLoading && (
                       <div className="flex justify-start">
-                        <div className="bg-white rounded-2xl px-6 py-4 shadow-md border border-gray-200 flex items-center space-x-2">
+                        <div className="bg-cream rounded-xl px-6 py-4 border border-stone flex items-center space-x-2">
                           <LoaderIcon />
-                          <span className="text-gray-600">Thinking...</span>
+                          <span className="text-bark">Thinking...</span>
                         </div>
                       </div>
                     )}
@@ -1078,7 +1104,7 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
                 </ErrorBoundary>
               </main>
 
-              <footer className="bg-white border-t border-gray-200 px-4 py-4">
+              <footer className="bg-cream border-t border-stone px-4 py-4">
                 <div className="max-w-4xl mx-auto flex items-end space-x-3">
                   <label htmlFor="chat-input" className="sr-only">Type your response</label>
                   <textarea
@@ -1092,14 +1118,14 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
                     aria-label="Type your response"
                     disabled={isLoading}
                     rows="2"
-                    className="flex-1 px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:border-transparent resize-none disabled:bg-gray-100 disabled:cursor-not-allowed transition-all"
+                    className="flex-1 px-4 py-3 border-2 border-stone rounded-xl focus:ring-2 focus:ring-moss focus:border-moss resize-none disabled:bg-parchment disabled:cursor-not-allowed transition-colors"
                     style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}
                   />
                   <button
                     onClick={sendMessage}
                     disabled={!input.trim() || isLoading}
                     aria-label="Send message"
-                    className="px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl font-semibold hover:from-purple-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl flex items-center space-x-2 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+                    className="px-6 py-3 bg-moss hover:bg-moss-dark text-cream rounded-xl font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center space-x-2 focus:ring-2 focus:ring-moss focus:ring-offset-2"
                   >
                     <span>Send</span>
                     <SendIcon />
@@ -1116,8 +1142,8 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
             <ErrorBoundary name="Results Dashboard">
               <main id="main-content" className="flex-1 overflow-y-auto px-4 py-6">
                 <div className="max-w-4xl mx-auto">
-                  <div className="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-2xl p-8 shadow-xl border border-purple-200">
-                    <h2 className="text-3xl font-bold mb-2" style={{ fontFamily: 'Georgia, serif' }}>
+                  <div className="bg-cream rounded-xl p-8 border border-stone">
+                    <h2 className="text-3xl font-bold mb-2">
                       Assessment Complete!
                     </h2>
                     <p className={`text-xl font-semibold mb-6 ${getReadinessColor(assessmentResults.readiness_level)}`}>
@@ -1125,20 +1151,20 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
                     </p>
 
                     {/* Overall Message */}
-                    <div className="bg-white rounded-xl p-6 mb-6 shadow-md">
-                      <p className="text-gray-700 leading-relaxed">{assessmentResults.overall_message}</p>
+                    <div className="bg-cream rounded-xl p-6 mb-6 border border-stone">
+                      <p className="text-ink leading-relaxed">{assessmentResults.overall_message}</p>
                     </div>
 
                     {/* Pillar Results */}
                     <div className="grid md:grid-cols-2 gap-4 mb-6">
                       {Object.entries(assessmentResults.pillars).map(([pillar, data]) => (
-                        <div key={pillar} className="bg-white rounded-xl p-4 shadow-md border-l-4" style={{
+                        <div key={pillar} className="bg-cream rounded-xl p-4 border-l-4" style={{
                           borderColor: data.color === 'green' ? '#10b981' :
                                        data.color === 'yellow' ? '#f59e0b' :
                                        data.color === 'orange' ? '#f97316' : '#ef4444'
                         }}>
                           <div className="flex items-center justify-between mb-2">
-                            <h3 className="font-semibold text-gray-900 capitalize">{pillar}</h3>
+                            <h3 className="font-semibold text-ink capitalize">{pillar}</h3>
                             {data.color === 'green' ? <CheckCircleIcon /> : <CircleIcon />}
                           </div>
                           <div className={`inline-block px-3 py-1 rounded-full text-sm font-medium border ${getColorClass(data.color)}`}>
@@ -1168,11 +1194,11 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
 
                     {/* Areas to Develop */}
                     {assessmentResults.areas_to_develop && assessmentResults.areas_to_develop.length > 0 && (
-                      <div className="bg-blue-50 rounded-xl p-6 mb-4 border border-blue-200">
-                        <h3 className="font-bold text-blue-900 mb-3">Areas to Develop</h3>
+                      <div className="bg-parchment rounded-xl p-6 mb-4 border border-stone">
+                        <h3 className="font-bold text-ink mb-3">Areas to Develop</h3>
                         <ul className="space-y-2">
                           {assessmentResults.areas_to_develop.map((area, idx) => (
-                            <li key={idx} className="text-blue-800 flex items-start">
+                            <li key={idx} className="text-ink flex items-start">
                               <span className="mr-2">-</span>
                               <span>{area}</span>
                             </li>
@@ -1183,8 +1209,8 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
 
                     {/* Phase B: Data Skills Breakdown */}
                     {assessmentResults.phase_b && assessmentResults.phase_b.skills && (
-                      <div className="bg-indigo-50 rounded-xl p-6 mb-4 border border-indigo-200">
-                        <h3 className="font-bold text-indigo-900 mb-4">Data Skills Placement</h3>
+                      <div className="bg-parchment rounded-xl p-6 mb-4 border border-stone">
+                        <h3 className="font-bold text-ink mb-4">Data Skills Placement</h3>
                         <div className="grid md:grid-cols-2 gap-3">
                           {Object.entries(assessmentResults.phase_b.skills).map(([skill, info]) => {
                             const levelColors = {
@@ -1202,8 +1228,8 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
                               business_thinking: 'Business Thinking'
                             };
                             return (
-                              <div key={skill} className="bg-white rounded-lg p-3 shadow-sm border border-indigo-100 flex items-center justify-between">
-                                <span className="font-medium text-gray-900">{skillNames[skill] || skill}</span>
+                              <div key={skill} className="bg-parchment rounded-lg p-3 border border-stone flex items-center justify-between">
+                                <span className="font-medium text-ink">{skillNames[skill] || skill}</span>
                                 <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${colorClass}`}>{info.level}</span>
                               </div>
                             );
@@ -1214,24 +1240,24 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
 
                     {/* Study Plan */}
                     {assessmentResults.phase_b && (
-                      <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl p-6 mb-4 border border-indigo-200">
-                        <h3 className="font-bold text-indigo-900 mb-3">Your Personalized Study Plan</h3>
+                      <div className="bg-cream rounded-xl p-6 mb-4 border border-stone">
+                        <h3 className="font-bold text-ink mb-3">Your Personalized Study Plan</h3>
                         <div className="grid md:grid-cols-3 gap-4 mb-4">
-                          <div className="bg-white rounded-lg p-4 text-center shadow-sm">
-                            <p className="text-3xl font-bold text-indigo-600">Sprint {assessmentResults.phase_b.recommended_start_sprint}</p>
-                            <p className="text-sm text-gray-600 mt-1">Starting Point</p>
+                          <div className="bg-parchment rounded-lg p-4 text-center border border-stone">
+                            <p className="text-3xl font-bold text-moss">Sprint {assessmentResults.phase_b.recommended_start_sprint}</p>
+                            <p className="text-sm text-bark mt-1">Starting Point</p>
                           </div>
-                          <div className="bg-white rounded-lg p-4 text-center shadow-sm">
-                            <p className="text-3xl font-bold text-purple-600">{assessmentResults.phase_b.estimated_completion || '--'}</p>
-                            <p className="text-sm text-gray-600 mt-1">Est. Completion</p>
+                          <div className="bg-parchment rounded-lg p-4 text-center border border-stone">
+                            <p className="text-3xl font-bold text-amber-flask">{assessmentResults.phase_b.estimated_completion || '--'}</p>
+                            <p className="text-sm text-bark mt-1">Est. Completion</p>
                           </div>
-                          <div className="bg-white rounded-lg p-4 text-center shadow-sm">
-                            <p className="text-3xl font-bold text-emerald-600">{assessmentResults.phase_b.sprints_to_skip?.length || 0}</p>
-                            <p className="text-sm text-gray-600 mt-1">Sprints Skipped</p>
+                          <div className="bg-parchment rounded-lg p-4 text-center border border-stone">
+                            <p className="text-3xl font-bold text-sage">{assessmentResults.phase_b.sprints_to_skip?.length || 0}</p>
+                            <p className="text-sm text-bark mt-1">Sprints Skipped</p>
                           </div>
                         </div>
                         {assessmentResults.phase_b.sprints_to_focus && assessmentResults.phase_b.sprints_to_focus.length > 0 && (
-                          <p className="text-indigo-800 text-sm">
+                          <p className="text-ink text-sm">
                             <span className="font-semibold">Focus sprints:</span>{' '}
                             {assessmentResults.phase_b.sprints_to_focus.map(s => typeof s === 'number' ? `Sprint ${s}` : String(s)).join(', ')}
                           </p>
@@ -1240,12 +1266,12 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
                     )}
 
                     {/* Next Steps */}
-                    <div className="bg-purple-50 rounded-xl p-6 border border-purple-200">
-                      <h3 className="font-bold text-purple-900 mb-3">Next Steps</h3>
-                      <p className="text-purple-800 mb-4">{assessmentResults.next_steps}</p>
-                      <div className="flex items-center text-purple-700">
+                    <div className="bg-[#EAF0EC] rounded-xl p-6 border border-stone">
+                      <h3 className="font-bold text-ink mb-3">Next Steps</h3>
+                      <p className="text-ink mb-4">{assessmentResults.next_steps}</p>
+                      <div className="flex items-center text-ink">
                         <span className="font-semibold">Estimated prep time:</span>
-                        <span className="ml-2 bg-purple-100 px-3 py-1 rounded-full text-sm">
+                        <span className="ml-2 bg-moss bg-opacity-20 text-moss px-3 py-1 rounded-full text-sm">
                           {assessmentResults.estimated_prep_time}
                         </span>
                       </div>
@@ -1255,13 +1281,13 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
                     <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-4">
                       <button
                         onClick={() => setCurrentView('dashboard')}
-                        className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-lg font-semibold hover:from-emerald-600 hover:to-teal-600 transition-all shadow-lg hover:shadow-xl focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+                        className="px-6 py-3 bg-sage hover:bg-[#4A7558] text-cream rounded-lg font-semibold transition-colors focus:ring-2 focus:ring-sage focus:ring-offset-2"
                       >
                         Go to Sprint Dashboard
                       </button>
                       <button
                         onClick={resetAssessment}
-                        className="px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg font-semibold hover:from-purple-700 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+                        className="px-6 py-3 bg-moss hover:bg-moss-dark text-cream rounded-lg font-semibold transition-colors focus:ring-2 focus:ring-moss focus:ring-offset-2"
                       >
                         Take Assessment Again
                       </button>
@@ -1285,34 +1311,34 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
                 <div className="flex justify-end mb-6">
                   <button
                     onClick={skipTutorial}
-                    className="text-sm text-gray-500 hover:text-gray-700 underline underline-offset-2 transition-colors focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 rounded"
+                    className="text-sm text-bark hover:text-ink underline underline-offset-2 transition-colors focus:ring-2 focus:ring-moss focus:ring-offset-2 rounded"
                   >
                     {tutorialReturnView ? 'Close' : 'Skip tutorial'}
                   </button>
                 </div>
 
                 {/* Step content card */}
-                <div className="bg-white rounded-2xl p-8 shadow-xl border border-gray-200">
+                <div className="bg-cream rounded-xl p-8 border border-stone">
 
                   {/* Step 1: How Compadre works */}
                   {tutorialStep === 0 && (
                     <div>
-                      <h2 className="text-2xl font-bold text-gray-900 mb-2" style={{ fontFamily: 'Georgia, serif' }}>
+                      <h2 className="text-2xl font-bold text-ink mb-2">
                         Here's how Compadre works.
                       </h2>
-                      <p className="text-gray-600 mb-8">Four phases per sprint. One real portfolio piece at the end.</p>
+                      <p className="text-bark mb-8">Four phases per sprint. One real portfolio piece at the end.</p>
                       <div className="space-y-3">
                         {[
-                          { phase: 'LEARN', color: 'from-purple-600 to-indigo-600', desc: 'Master one data storytelling principle' },
-                          { phase: 'CHOOSE', color: 'from-indigo-600 to-blue-600', desc: 'Pick a real dataset and define your audience' },
-                          { phase: 'BUILD', color: 'from-blue-600 to-cyan-600', desc: 'Analyze in Excel, visualize in Tableau' },
-                          { phase: 'PUBLISH', color: 'from-emerald-500 to-teal-500', desc: 'Share your viz — it goes on your portfolio' },
+                          { phase: 'LEARN', color: 'bg-moss', desc: 'Master one data storytelling principle' },
+                          { phase: 'CHOOSE', color: 'bg-amber-flask', desc: 'Pick a real dataset and define your audience' },
+                          { phase: 'BUILD', color: 'bg-sage', desc: 'Analyze in Excel, visualize in Tableau' },
+                          { phase: 'PUBLISH', color: 'bg-[#5A4A3A]', desc: 'Share your viz — it goes on your portfolio' },
                         ].map(item => (
                           <div key={item.phase} className="flex items-center gap-4">
-                            <div className={`bg-gradient-to-r ${item.color} text-white rounded-xl py-2 px-4 font-bold text-sm w-24 text-center flex-shrink-0`}>
+                            <div className={`${item.color} text-cream rounded-xl py-2 px-4 font-bold text-sm w-24 text-center flex-shrink-0`}>
                               {item.phase}
                             </div>
-                            <p className="text-sm text-gray-600">{item.desc}</p>
+                            <p className="text-sm text-bark">{item.desc}</p>
                           </div>
                         ))}
                       </div>
@@ -1322,10 +1348,10 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
                   {/* Step 2: Six sprints, six skills */}
                   {tutorialStep === 1 && (
                     <div>
-                      <h2 className="text-2xl font-bold text-gray-900 mb-2" style={{ fontFamily: 'Georgia, serif' }}>
+                      <h2 className="text-2xl font-bold text-ink mb-2">
                         You'll learn one skill per sprint.
                       </h2>
-                      <p className="text-gray-600 mb-6">
+                      <p className="text-bark mb-6">
                         Six sprints. Six principles from <em>Storytelling with Data</em> by Cole Nussbaumer Knaflic.
                       </p>
                       <div className="space-y-2">
@@ -1337,14 +1363,14 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
                           { n: 5, title: 'Think Like a Designer', current: false },
                           { n: 6, title: 'Tell a Story — Capstone', current: false },
                         ].map(s => (
-                          <div key={s.n} className={`flex items-center gap-3 p-3 rounded-xl ${s.current ? 'bg-purple-50 border border-purple-200' : 'bg-gray-50 border border-gray-200'}`}>
-                            <span className={`text-xs font-bold px-2 py-1 rounded-full flex-shrink-0 ${s.current ? 'bg-purple-600 text-white' : 'bg-gray-300 text-gray-600'}`}>
+                          <div key={s.n} className={`flex items-center gap-3 p-3 rounded-xl ${s.current ? 'bg-[#EAF0EC] border border-moss' : 'bg-parchment border border-stone'}`}>
+                            <span className={`text-xs font-bold px-2 py-1 rounded-full flex-shrink-0 ${s.current ? 'bg-moss text-cream' : 'bg-stone text-bark'}`}>
                               {s.n}
                             </span>
-                            <span className={`text-sm font-medium ${s.current ? 'text-purple-900' : 'text-gray-600'}`}>
+                            <span className={`text-sm font-medium ${s.current ? 'text-ink' : 'text-bark'}`}>
                               {s.title}
                             </span>
-                            {s.current && <span className="ml-auto text-xs text-purple-600 font-semibold flex-shrink-0">Starting here →</span>}
+                            {s.current && <span className="ml-auto text-xs text-amber-flask font-semibold flex-shrink-0">Starting here →</span>}
                           </div>
                         ))}
                       </div>
@@ -1354,10 +1380,10 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
                   {/* Step 3: Real datasets */}
                   {tutorialStep === 2 && (
                     <div>
-                      <h2 className="text-2xl font-bold text-gray-900 mb-2" style={{ fontFamily: 'Georgia, serif' }}>
+                      <h2 className="text-2xl font-bold text-ink mb-2">
                         You pick the data that matters to you.
                       </h2>
-                      <p className="text-gray-600 mb-6">
+                      <p className="text-bark mb-6">
                         We give you a starter dataset — or you can bring your own. Either way, it's real data.
                       </p>
                       <div className="space-y-3">
@@ -1367,12 +1393,12 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
                           { name: 'Spotify Top Songs', desc: 'Audio features + streaming counts', tag: 'Bring your own', highlight: false },
                           { name: 'Your choice', desc: 'Any CSV from NYC Open Data, Kaggle, or data.gov', tag: 'Bring your own', highlight: false },
                         ].map((d, i) => (
-                          <div key={i} className={`flex items-start gap-3 p-4 rounded-xl border ${d.highlight ? 'bg-emerald-50 border-emerald-200' : 'bg-gray-50 border-gray-200'}`}>
+                          <div key={i} className={`flex items-start gap-3 p-4 rounded-xl border ${d.highlight ? 'bg-[#EAF0EC] border-sage' : 'bg-parchment border-stone'}`}>
                             <div className="flex-1">
-                              <p className={`font-semibold text-sm ${d.highlight ? 'text-emerald-900' : 'text-gray-900'}`}>{d.name}</p>
-                              <p className="text-xs text-gray-600 mt-0.5">{d.desc}</p>
+                              <p className={`font-semibold text-sm ${d.highlight ? 'text-ink' : 'text-ink'}`}>{d.name}</p>
+                              <p className="text-xs text-bark mt-0.5">{d.desc}</p>
                             </div>
-                            <span className={`text-xs px-2 py-1 rounded-full font-medium whitespace-nowrap ${d.highlight ? 'bg-emerald-200 text-emerald-800' : 'bg-gray-200 text-gray-600'}`}>
+                            <span className={`text-xs px-2 py-1 rounded-full font-medium whitespace-nowrap ${d.highlight ? 'bg-sage bg-opacity-30 text-[#3A6648]' : 'bg-stone text-bark'}`}>
                               {d.tag}
                             </span>
                           </div>
@@ -1384,28 +1410,28 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
                   {/* Step 4: Real portfolio output */}
                   {tutorialStep === 3 && (
                     <div>
-                      <h2 className="text-2xl font-bold text-gray-900 mb-2" style={{ fontFamily: 'Georgia, serif' }}>
+                      <h2 className="text-2xl font-bold text-ink mb-2">
                         Your final project is real. And it's yours.
                       </h2>
-                      <p className="text-gray-600 mb-6">
+                      <p className="text-bark mb-6">
                         Every sprint ends with a published Tableau visualization — a portfolio piece you can share with employers.
                       </p>
-                      <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl p-6 border border-indigo-200 mb-5">
+                      <div className="bg-cream rounded-xl p-6 border border-stone mb-5">
                         <div className="flex items-center gap-3 mb-4">
-                          <div className="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold text-sm flex-shrink-0" aria-hidden="true">T</div>
+                          <div className="w-10 h-10 bg-moss rounded-lg flex items-center justify-center text-cream font-bold text-sm flex-shrink-0" aria-hidden="true">T</div>
                           <div>
-                            <p className="font-semibold text-gray-900 text-sm">Tableau Public</p>
-                            <p className="text-xs text-gray-600">Free · Shareable link · No download required to view</p>
+                            <p className="font-semibold text-ink text-sm">Tableau Public</p>
+                            <p className="text-xs text-bark">Free · Shareable link · No download required to view</p>
                           </div>
                         </div>
-                        <p className="text-sm text-gray-700 italic mb-3">
+                        <p className="text-sm text-ink italic mb-3">
                           Example: "Manhattan Has 3× More Grade A Restaurants Than the Bronx"
                         </p>
-                        <p className="text-xs text-gray-600">
+                        <p className="text-xs text-bark">
                           You'll paste your Tableau URL into Compadre when you're done. It lands on your portfolio — visible to anyone, shareable anywhere.
                         </p>
                       </div>
-                      <p className="text-sm text-gray-600">
+                      <p className="text-sm text-bark">
                         No screenshots. No PDFs. A live, interactive visualization with your name on it.
                       </p>
                     </div>
@@ -1415,13 +1441,13 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
                   {tutorialStep === 4 && (
                     <div className="text-center py-4">
                       <img src="compadre_pixel_centered.png" alt="Compadre" className="w-20 h-20 mx-auto mb-6 mix-blend-multiply" />
-                      <h2 className="text-2xl font-bold text-gray-900 mb-4" style={{ fontFamily: 'Georgia, serif' }}>
+                      <h2 className="text-2xl font-bold text-ink mb-4">
                         I'll be with you the whole way.
                       </h2>
-                      <p className="text-gray-600 mb-4 leading-relaxed">
+                      <p className="text-bark mb-4 leading-relaxed">
                         Every lesson, every sprint, every question — I'm here. You don't need a CS degree. You don't need to know SQL. You just need to show up.
                       </p>
-                      <p className="text-gray-600 leading-relaxed">
+                      <p className="text-bark leading-relaxed">
                         By the end of Sprint 1, you'll have built something real. Let's go.
                       </p>
                     </div>
@@ -1438,7 +1464,7 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
                       <div
                         key={i}
                         aria-label={`Step ${i + 1} of 5${i === tutorialStep ? ' (current)' : ''}`}
-                        className={`w-2.5 h-2.5 rounded-full transition-colors ${i === tutorialStep ? 'bg-purple-600' : 'bg-gray-300'}`}
+                        className={`w-3 h-3 rounded-full transition-colors ${i === tutorialStep ? 'bg-moss' : 'bg-stone'}`}
                       />
                     ))}
                   </div>
@@ -1447,14 +1473,14 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
                   {tutorialStep < 4 ? (
                     <button
                       onClick={() => setTutorialStep(t => t + 1)}
-                      className="px-6 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl font-semibold hover:from-purple-700 hover:to-indigo-700 transition-all shadow-md focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+                      className="px-6 py-2.5 bg-moss hover:bg-moss-dark text-cream rounded-xl font-semibold transition-colors focus:ring-2 focus:ring-moss focus:ring-offset-2"
                     >
                       Next →
                     </button>
                   ) : (
                     <button
                       onClick={completeTutorial}
-                      className="px-6 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-xl font-semibold hover:from-emerald-600 hover:to-teal-600 transition-all shadow-md focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+                      className="px-6 py-2.5 bg-sage hover:bg-[#4A7558] text-cream rounded-xl font-semibold transition-colors focus:ring-2 focus:ring-sage focus:ring-offset-2"
                     >
                       {tutorialReturnView ? 'Got it →' : 'Start Sprint 1 →'}
                     </button>
@@ -1475,14 +1501,14 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
                 {skippedAssessment ? (
                   <a
                     href="index.html"
-                    className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6 text-sm font-medium transition-colors"
+                    className="flex items-center gap-2 text-bark hover:text-ink mb-6 text-sm font-medium transition-colors"
                   >
                     <ArrowLeftIcon /> Back to Landing Page
                   </a>
                 ) : (
                   <button
                     onClick={() => setCurrentView('results')}
-                    className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6 text-sm font-medium transition-colors"
+                    className="flex items-center gap-2 text-bark hover:text-ink mb-6 text-sm font-medium transition-colors"
                   >
                     <ArrowLeftIcon /> Back to Results
                   </button>
@@ -1495,24 +1521,24 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
                         <div className="flex items-center justify-between mb-3">
                           <span className={`text-xs font-bold px-2 py-1 rounded-full ${
                             sprint.locked
-                              ? 'bg-gray-200 text-gray-700'
-                              : 'bg-purple-100 text-purple-700'
+                              ? 'bg-stone text-bark'
+                              : 'bg-moss bg-opacity-20 text-moss'
                           }`}>
                             Sprint {sprint.id}
                           </span>
                           {sprint.locked && <LockIcon />}
                         </div>
-                        <h3 className={`font-bold mb-2 text-left ${sprint.locked ? 'text-gray-600' : 'text-gray-900'}`}>
+                        <h3 className={`font-bold mb-2 text-left ${sprint.locked ? 'text-bark' : 'text-ink'}`}>
                           {sprint.title}
                         </h3>
-                        <p className={`text-sm text-left ${sprint.locked ? 'text-gray-600' : 'text-gray-600'}`}>
+                        <p className={`text-sm text-left ${sprint.locked ? 'text-bark' : 'text-bark'}`}>
                           {sprint.description}
                         </p>
                         {sprint.locked && (
-                          <p className="mt-3 text-xs font-semibold text-gray-600">Coming Soon</p>
+                          <p className="mt-3 text-xs font-semibold text-bark">Coming Soon</p>
                         )}
                         {!sprint.locked && (
-                          <p className="mt-3 text-xs font-semibold text-purple-600">Click to start →</p>
+                          <p className="mt-3 text-xs font-semibold text-amber-flask">Click to start →</p>
                         )}
                       </>
                     );
@@ -1520,7 +1546,7 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
                     return sprint.locked ? (
                       <div
                         key={sprint.id}
-                        className="rounded-xl p-6 shadow-md border-2 bg-gray-50 border-gray-200"
+                        className="rounded-xl p-6 border border-stone bg-parchment opacity-70"
                         aria-label={`Sprint ${sprint.id}: ${sprint.title} — Coming Soon`}
                       >
                         {inner}
@@ -1528,7 +1554,7 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
                     ) : (
                       <button
                         key={sprint.id}
-                        className="rounded-xl p-6 shadow-md border-2 bg-white border-purple-200 hover:border-purple-400 hover:shadow-lg transition-all text-left w-full focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+                        className="rounded-xl p-6 border-2 bg-cream border-stone hover:border-moss transition-colors text-left w-full focus:ring-2 focus:ring-moss focus:ring-offset-2"
                         onClick={() => { setCurrentSprint(sprint); setSprintPhase('learn'); setCurrentView('sprint'); }}
                         aria-label={`Start Sprint ${sprint.id}: ${sprint.title}`}
                       >
@@ -1557,7 +1583,7 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
                     if (sprintPhase === 'build')   setSprintPhase('choose');
                     if (sprintPhase === 'publish') setSprintPhase('build');
                   }}
-                  className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6 text-sm font-medium transition-colors focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 rounded"
+                  className="flex items-center gap-2 text-bark hover:text-ink mb-6 text-sm font-medium transition-colors focus:ring-2 focus:ring-moss focus:ring-offset-2 rounded"
                 >
                   <ArrowLeftIcon />
                   {sprintPhase === 'learn' ? 'Back to Dashboard' : 'Back'}
@@ -1577,23 +1603,23 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
                       {phases.map((phase, i) => (
                         <React.Fragment key={phase}>
                           <div className="flex flex-col items-center">
-                            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${
-                              i < currentIdx  ? 'bg-emerald-500 text-white' :
-                              i === currentIdx ? 'bg-purple-600 text-white' :
-                              'bg-gray-200 text-gray-500'
+                            <div className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${
+                              i < currentIdx  ? 'bg-sage text-cream' :
+                              i === currentIdx ? 'bg-moss text-cream' :
+                              'bg-stone text-bark'
                             }`} aria-hidden="true">
                               {i < currentIdx ? '✓' : i + 1}
                             </div>
-                            <span className={`text-xs font-bold mt-1 uppercase tracking-wide ${
-                              i === currentIdx ? 'text-purple-700' :
-                              i < currentIdx  ? 'text-emerald-600' :
-                              'text-gray-400'
+                            <span className={`text-xs font-bold mt-1 uppercase tracking-widest ${
+                              i === currentIdx ? 'text-moss' :
+                              i < currentIdx  ? 'text-sage' :
+                              'text-bark'
                             }`}>
                               {phase}
                             </span>
                           </div>
                           {i < phases.length - 1 && (
-                            <div className={`flex-1 h-0.5 mx-2 mb-4 ${i < currentIdx ? 'bg-emerald-400' : 'bg-gray-200'}`} />
+                            <div className={`flex-1 h-0.5 mx-2 mb-4 ${i < currentIdx ? 'bg-sage' : 'bg-stone'}`} />
                           )}
                         </React.Fragment>
                       ))}
@@ -1622,15 +1648,15 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
                               <div
                                 key={i}
                                 aria-hidden="true"
-                                className={`w-2.5 h-2.5 rounded-full transition-colors ${
-                                  i < learnCardIndex  ? 'bg-emerald-500' :
-                                  i === learnCardIndex ? 'bg-purple-600' :
-                                  'bg-gray-300'
+                                className={`w-3 h-3 rounded-full transition-colors ${
+                                  i < learnCardIndex  ? 'bg-sage' :
+                                  i === learnCardIndex ? 'bg-moss' :
+                                  'bg-stone'
                                 }`}
                               />
                             ))}
                           </div>
-                          <p className="text-xs text-gray-500" aria-live="polite" aria-atomic="true">
+                          <p className="text-sm font-medium text-bark" aria-live="polite" aria-atomic="true">
                             Card {learnCardIndex + 1} of 5
                           </p>
                         </div>
@@ -1640,15 +1666,15 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
                             One click = move to card 2. No Next button.
                             ============================================== */}
                         {learnCardIndex === 0 && (
-                          <div className="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden">
-                            <div className="bg-gradient-to-r from-purple-600 to-indigo-600 px-8 py-6">
+                          <div className="bg-cream rounded-xl border border-stone overflow-hidden">
+                            <div className="bg-moss px-8 py-6">
                               <div className="flex items-center justify-between">
                                 <span className="bg-white bg-opacity-20 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">
                                   Sprint 1 · Learn
                                 </span>
                                 <span className="text-white text-sm opacity-80">About 8 minutes</span>
                               </div>
-                              <h2 className="text-2xl font-bold text-white mt-5" style={{ fontFamily: 'Georgia, serif' }}>
+                              <h2 className="text-2xl font-bold text-white mt-5">
                                 Before we start —
                               </h2>
                               <p className="text-white opacity-90 mt-1">
@@ -1664,7 +1690,7 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
                                 <button
                                   key={id}
                                   onClick={() => { setLearnPick1(id); setLearnCardIndex(1); }}
-                                  className="w-full flex items-center gap-4 px-5 py-4 rounded-xl border-2 border-gray-200 hover:border-purple-400 hover:bg-purple-50 transition-all text-left font-medium text-gray-800 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+                                  className="w-full flex items-center gap-4 px-5 py-4 rounded-xl border-2 border-stone hover:border-moss hover:bg-[#EAF0EC] transition-all text-left font-medium text-ink focus:ring-2 focus:ring-moss focus:ring-offset-2"
                                 >
                                   <span className="text-2xl" aria-hidden="true">{emoji}</span>
                                   <span>{label}</span>
@@ -1679,19 +1705,19 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
                             Binary A/B pick → inline reveal → Next →
                             ============================================== */}
                         {learnCardIndex === 1 && (
-                          <div className="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden">
+                          <div className="bg-cream rounded-xl border border-stone overflow-hidden">
                             <div className="px-8 py-6">
-                              <span className="inline-block bg-orange-100 text-orange-700 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide mb-4">
+                              <span className="inline-block bg-amber-flask bg-opacity-20 text-[#9A6110] text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide mb-4">
                                 Problem
                               </span>
-                              <h2 className="text-xl font-bold text-gray-900 mb-3" style={{ fontFamily: 'Georgia, serif' }}>
+                              <h2 className="text-xl font-bold text-ink mb-3">
                                 A VP has exactly 3 minutes.
                               </h2>
-                              <p className="text-gray-700 leading-relaxed mb-5">
+                              <p className="text-ink leading-relaxed mb-5">
                                 You've been analyzing NYC restaurant inspection data for two weeks. She pokes her head in:{' '}
                                 <strong>"Just tell me the one thing I need to know."</strong>
                               </p>
-                              <p className="text-gray-700 font-medium mb-4">Which do you say?</p>
+                              <p className="text-ink font-medium mb-4">Which do you say?</p>
 
                               {!learnPick2 ? (
                                 <div className="space-y-3">
@@ -1702,38 +1728,38 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
                                     <button
                                       key={id}
                                       onClick={() => setLearnPick2(id)}
-                                      className="w-full flex items-start gap-4 px-5 py-4 rounded-xl border-2 border-gray-200 hover:border-purple-400 hover:bg-purple-50 transition-all text-left focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+                                      className="w-full flex items-start gap-4 px-5 py-4 rounded-xl border-2 border-stone hover:border-moss hover:bg-[#EAF0EC] transition-all text-left focus:ring-2 focus:ring-moss focus:ring-offset-2"
                                     >
-                                      <span className="font-bold text-purple-700 mt-0.5 flex-shrink-0">{id}</span>
-                                      <span className="text-gray-700 leading-relaxed">{text}</span>
+                                      <span className="font-bold text-moss mt-0.5 flex-shrink-0">{id}</span>
+                                      <span className="text-ink leading-relaxed">{text}</span>
                                     </button>
                                   ))}
                                 </div>
                               ) : (
                                 <div
-                                  className={`rounded-xl p-5 border-2 ${learnPick2 === 'B' ? 'bg-emerald-50 border-emerald-200' : 'bg-amber-50 border-amber-200'}`}
+                                  className={`rounded-xl p-5 border-2 ${learnPick2 === 'B' ? 'bg-[#EAF0EC] border-sage' : 'bg-amber-50 border-amber-300'}`}
                                   role="alert"
                                   aria-live="polite"
                                 >
-                                  <p className="font-semibold text-gray-900 mb-2">
+                                  <p className="font-semibold text-ink mb-2">
                                     {learnPick2 === 'B' ? '✓ Exactly right.' : 'Good instinct — but not quite.'}
                                   </p>
-                                  <p className="text-gray-700 text-sm leading-relaxed mb-3">
+                                  <p className="text-ink text-sm leading-relaxed mb-3">
                                     {learnPick2 === 'B'
                                       ? "She has 3 minutes and a decision to make. A specific finding gives her something to act on. A dataset description just tells her what you have."
                                       : "That's describing your tools, not answering her question. She doesn't need to know how big your dataset is — she needs a finding she can use."}
                                   </p>
-                                  <p className="text-sm text-gray-700 leading-relaxed">
+                                  <p className="text-sm text-ink leading-relaxed">
                                     <strong>B is the answer.</strong> "The Bronx has the highest Grade C rate — and it's getting worse" tells her where to focus and implies what to do next.
                                   </p>
                                 </div>
                               )}
                             </div>
                             {learnPick2 && (
-                              <div className="px-8 py-4 bg-gray-50 border-t border-gray-200 flex justify-end">
+                              <div className="px-8 py-4 bg-parchment border-t border-stone flex justify-end">
                                 <button
                                   onClick={() => setLearnCardIndex(2)}
-                                  className="px-6 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl font-semibold hover:from-purple-700 hover:to-indigo-700 transition-all shadow-md focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+                                  className="px-6 py-2.5 bg-moss hover:bg-moss-dark text-cream rounded-xl font-semibold transition-colors focus:ring-2 focus:ring-moss focus:ring-offset-2"
                                 >
                                   Next →
                                 </button>
@@ -1748,26 +1774,26 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
                             One lightweight interaction before Next →
                             ============================================== */}
                         {learnCardIndex === 2 && (
-                          <div className="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden">
+                          <div className="bg-cream rounded-xl border border-stone overflow-hidden">
                             <div className="px-8 py-6">
-                              <span className="inline-block bg-blue-100 text-blue-700 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide mb-4">
+                              <span className="inline-block bg-sage bg-opacity-20 text-[#3A6648] text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide mb-4">
                                 Concept
                               </span>
-                              <h2 className="text-xl font-bold text-gray-900 mb-4" style={{ fontFamily: 'Georgia, serif' }}>
+                              <h2 className="text-xl font-bold text-ink mb-4">
                                 Context is what separates insight from information.
                               </h2>
 
-                              <div className="bg-gray-50 rounded-xl p-4 mb-6 border border-gray-200">
-                                <p className="text-gray-500 text-sm mb-2 line-through decoration-gray-400">
+                              <div className="bg-parchment rounded-xl p-4 mb-6 border border-stone">
+                                <p className="text-bark text-sm mb-2 line-through decoration-stone">
                                   "Sales are up 10%." — information.
                                 </p>
-                                <p className="text-gray-900 text-sm font-medium">
+                                <p className="text-ink text-sm font-medium">
                                   "Sales are up 10% — but only because we ran a promotion that cost 12% of revenue." —{' '}
-                                  <span className="text-emerald-700 font-bold">insight.</span>
+                                  <span className="text-sage font-bold">insight.</span>
                                 </p>
                               </div>
 
-                              <p className="text-gray-700 font-medium mb-3">
+                              <p className="text-ink font-medium mb-3">
                                 Three questions every analyst asks before touching the data:
                               </p>
                               <div className="space-y-3 mb-6">
@@ -1776,17 +1802,17 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
                                   { emoji: '🎯', q: 'What do they need to decide?',  desc: 'Every chart you build should point toward this question.' },
                                   { emoji: '🔑', q: 'What would change their mind?', desc: "If nothing would change their mind, they've already decided — they don't need analysis." },
                                 ].map(({ emoji, q, desc }) => (
-                                  <div key={q} className="flex gap-4 p-4 rounded-xl bg-indigo-50 border border-indigo-100">
+                                  <div key={q} className="flex gap-4 p-4 rounded-xl bg-parchment border border-stone">
                                     <span className="text-xl flex-shrink-0" aria-hidden="true">{emoji}</span>
                                     <div>
-                                      <p className="font-semibold text-gray-900 text-sm">{q}</p>
-                                      <p className="text-gray-600 text-sm mt-0.5">{desc}</p>
+                                      <p className="font-semibold text-ink text-sm">{q}</p>
+                                      <p className="text-bark text-sm mt-0.5">{desc}</p>
                                     </div>
                                   </div>
                                 ))}
                               </div>
 
-                              <p className="text-gray-700 font-medium mb-3">
+                              <p className="text-ink font-medium mb-3">
                                 Quick — which of these is an <em>insight</em>, not just information?
                               </p>
                               {!learnPick3 ? (
@@ -1799,23 +1825,23 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
                                     <button
                                       key={id}
                                       onClick={() => setLearnPick3(id)}
-                                      className="w-full flex items-start gap-3 px-4 py-3 rounded-xl border-2 border-gray-200 hover:border-indigo-400 hover:bg-indigo-50 transition-all text-left text-sm focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+                                      className="w-full flex items-start gap-3 px-4 py-3 rounded-xl border-2 border-stone hover:border-moss hover:bg-[#EAF0EC] transition-all text-left text-sm focus:ring-2 focus:ring-moss focus:ring-offset-2"
                                     >
-                                      <span className="font-bold text-indigo-700 flex-shrink-0">{id}</span>
-                                      <span className="text-gray-700">{text}</span>
+                                      <span className="font-bold text-moss flex-shrink-0">{id}</span>
+                                      <span className="text-ink">{text}</span>
                                     </button>
                                   ))}
                                 </div>
                               ) : (
                                 <div
-                                  className={`rounded-xl p-4 border-2 text-sm ${learnPick3 === 'B' ? 'bg-emerald-50 border-emerald-200' : 'bg-amber-50 border-amber-200'}`}
+                                  className={`rounded-xl p-4 border-2 text-sm ${learnPick3 === 'B' ? 'bg-[#EAF0EC] border-sage' : 'bg-amber-50 border-amber-300'}`}
                                   role="alert"
                                   aria-live="polite"
                                 >
-                                  <p className="font-semibold text-gray-900 mb-1">
+                                  <p className="font-semibold text-ink mb-1">
                                     {learnPick3 === 'B' ? "✓ That's it." : 'Not quite — but here\'s the difference:'}
                                   </p>
-                                  <p className="text-gray-700 leading-relaxed">
+                                  <p className="text-ink leading-relaxed">
                                     {learnPick3 === 'A' && "A count is information — it describes what exists. Insight adds direction: where is this going, and what does it mean for a decision?"}
                                     {learnPick3 === 'B' && "Insight = information + direction + implication. The trend (up 18%) and the comparison (fastest of any borough) make this actionable."}
                                     {learnPick3 === 'C' && "That's metadata — it describes the dataset, not what the data shows. Insight lives in what the data reveals."}
@@ -1824,10 +1850,10 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
                               )}
                             </div>
                             {learnPick3 && (
-                              <div className="px-8 py-4 bg-gray-50 border-t border-gray-200 flex justify-end">
+                              <div className="px-8 py-4 bg-parchment border-t border-stone flex justify-end">
                                 <button
                                   onClick={() => setLearnCardIndex(3)}
-                                  className="px-6 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl font-semibold hover:from-purple-700 hover:to-indigo-700 transition-all shadow-md focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+                                  className="px-6 py-2.5 bg-moss hover:bg-moss-dark text-cream rounded-xl font-semibold transition-colors focus:ring-2 focus:ring-moss focus:ring-offset-2"
                                 >
                                   Next →
                                 </button>
@@ -1842,18 +1868,18 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
                             narrative bridge to what they're about to do.
                             ============================================== */}
                         {learnCardIndex === 3 && (
-                          <div className="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden">
+                          <div className="bg-cream rounded-xl border border-stone overflow-hidden">
                             <div className="px-8 py-6">
-                              <span className="inline-block bg-emerald-100 text-emerald-700 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide mb-4">
+                              <span className="inline-block bg-sage bg-opacity-20 text-[#3A6648] text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide mb-4">
                                 Your Sprint
                               </span>
-                              <h2 className="text-xl font-bold text-gray-900 mb-3" style={{ fontFamily: 'Georgia, serif' }}>
+                              <h2 className="text-xl font-bold text-ink mb-3">
                                 This is your Sprint 1 scenario.
                               </h2>
-                              <p className="text-gray-700 leading-relaxed mb-4">
+                              <p className="text-ink leading-relaxed mb-4">
                                 Your audience is the <strong>NYC Health Commissioner</strong>. She needs to allocate inspection resources for next year.
                               </p>
-                              <p className="text-gray-700 leading-relaxed mb-4">
+                              <p className="text-ink leading-relaxed mb-4">
                                 She doesn't need to know what columns are in your dataset. She needs to know:
                               </p>
                               <ul className="space-y-2 mb-5">
@@ -1863,21 +1889,21 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
                                   'Is the overall trend improving or declining?',
                                 ].map(q => (
                                   <li key={q} className="flex items-start gap-3">
-                                    <span className="text-purple-600 font-bold flex-shrink-0 mt-0.5" aria-hidden="true">→</span>
-                                    <span className="text-gray-700">{q}</span>
+                                    <span className="text-amber-flask font-bold flex-shrink-0 mt-0.5" aria-hidden="true">→</span>
+                                    <span className="text-ink">{q}</span>
                                   </li>
                                 ))}
                               </ul>
-                              <div className="bg-purple-50 rounded-xl p-4 border border-purple-200">
-                                <p className="text-sm text-purple-900 font-medium">
+                              <div className="bg-[#EAF0EC] rounded-xl p-4 border border-stone">
+                                <p className="text-sm text-ink font-medium">
                                   Answer those three questions with your data and you've applied SWD Principle 1. The principle doesn't change — the dataset does.
                                 </p>
                               </div>
                             </div>
-                            <div className="px-8 py-4 bg-gray-50 border-t border-gray-200 flex justify-end">
+                            <div className="px-8 py-4 bg-parchment border-t border-stone flex justify-end">
                               <button
                                 onClick={() => setLearnCardIndex(4)}
-                                className="px-6 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl font-semibold hover:from-purple-700 hover:to-indigo-700 transition-all shadow-md focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+                                className="px-6 py-2.5 bg-moss hover:bg-moss-dark text-cream rounded-xl font-semibold transition-colors focus:ring-2 focus:ring-moss focus:ring-offset-2"
                               >
                                 Next →
                               </button>
@@ -1893,18 +1919,18 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
                             "Continue to Choose →" appears when both done.
                             ============================================== */}
                         {learnCardIndex === 4 && (
-                          <div className="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden">
+                          <div className="bg-cream rounded-xl border border-stone overflow-hidden">
                             <div className="px-8 py-6">
                               <span className="inline-block bg-yellow-100 text-yellow-700 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide mb-4">
                                 Quick Check
                               </span>
-                              <h2 className="text-xl font-bold text-gray-900 mb-6" style={{ fontFamily: 'Georgia, serif' }}>
+                              <h2 className="text-xl font-bold text-ink mb-6">
                                 Two quick ones before you move on.
                               </h2>
 
                               {/* Q1 */}
                               <div className="mb-6">
-                                <p className="text-gray-700 font-medium mb-3">
+                                <p className="text-ink font-medium mb-3">
                                   1. Before you open your dataset, your first question should be:
                                 </p>
                                 {!learnQC[0] ? (
@@ -1917,16 +1943,16 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
                                       <button
                                         key={id}
                                         onClick={() => setLearnQC(prev => [id, prev[1]])}
-                                        className="w-full flex items-start gap-3 px-4 py-3 rounded-xl border-2 border-gray-200 hover:border-yellow-400 hover:bg-yellow-50 transition-all text-left text-sm focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+                                        className="w-full flex items-start gap-3 px-4 py-3 rounded-xl border-2 border-stone hover:border-yellow-400 hover:bg-yellow-50 transition-all text-left text-sm focus:ring-2 focus:ring-moss focus:ring-offset-2"
                                       >
                                         <span className="font-bold text-yellow-700 flex-shrink-0">{id}</span>
-                                        <span className="text-gray-700">{text}</span>
+                                        <span className="text-ink">{text}</span>
                                       </button>
                                     ))}
                                   </div>
                                 ) : (
                                   <div
-                                    className={`rounded-xl p-3 border-2 text-sm ${learnQC[0] === 'B' ? 'bg-emerald-50 border-emerald-200' : 'bg-amber-50 border-amber-200'}`}
+                                    className={`rounded-xl p-3 border-2 text-sm ${learnQC[0] === 'B' ? 'bg-[#EAF0EC] border-sage' : 'bg-amber-50 border-amber-300'}`}
                                     role="alert"
                                     aria-live="polite"
                                   >
@@ -1941,7 +1967,7 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
                               {/* Q2 — only shows after Q1 is answered */}
                               {learnQC[0] && (
                                 <div>
-                                  <p className="text-gray-700 font-medium mb-3">
+                                  <p className="text-ink font-medium mb-3">
                                     2. Which of these is an insight, not just information?
                                   </p>
                                   {!learnQC[1] ? (
@@ -1954,16 +1980,16 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
                                         <button
                                           key={id}
                                           onClick={() => setLearnQC(prev => [prev[0], id])}
-                                          className="w-full flex items-start gap-3 px-4 py-3 rounded-xl border-2 border-gray-200 hover:border-yellow-400 hover:bg-yellow-50 transition-all text-left text-sm focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+                                          className="w-full flex items-start gap-3 px-4 py-3 rounded-xl border-2 border-stone hover:border-yellow-400 hover:bg-yellow-50 transition-all text-left text-sm focus:ring-2 focus:ring-moss focus:ring-offset-2"
                                         >
                                           <span className="font-bold text-yellow-700 flex-shrink-0">{id}</span>
-                                          <span className="text-gray-700">{text}</span>
+                                          <span className="text-ink">{text}</span>
                                         </button>
                                       ))}
                                     </div>
                                   ) : (
                                     <div
-                                      className={`rounded-xl p-3 border-2 text-sm ${learnQC[1] === 'C' ? 'bg-emerald-50 border-emerald-200' : 'bg-amber-50 border-amber-200'}`}
+                                      className={`rounded-xl p-3 border-2 text-sm ${learnQC[1] === 'C' ? 'bg-[#EAF0EC] border-sage' : 'bg-amber-50 border-amber-300'}`}
                                       role="alert"
                                       aria-live="polite"
                                     >
@@ -1979,10 +2005,10 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
 
                             {/* Continue button — only after both questions answered */}
                             {learnQC[0] && learnQC[1] && (
-                              <div className="px-8 py-4 bg-gray-50 border-t border-gray-200 flex justify-end">
+                              <div className="px-8 py-4 bg-parchment border-t border-stone flex justify-end">
                                 <button
                                   onClick={() => setSprintPhase('choose')}
-                                  className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-xl font-semibold hover:from-emerald-600 hover:to-teal-600 transition-all shadow-md focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+                                  className="px-6 py-3 bg-sage hover:bg-[#4A7558] text-cream rounded-xl font-semibold transition-colors focus:ring-2 focus:ring-sage focus:ring-offset-2"
                                 >
                                   Continue to Choose →
                                 </button>
@@ -1995,20 +2021,20 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
                     ) : (
                       /* ── Generic placeholder for non-Sprint-1 sprints ── */
                       <div>
-                        <div className="bg-white rounded-xl p-8 shadow-md border border-gray-200 mb-6">
+                        <div className="bg-cream rounded-xl p-8 border border-stone mb-6">
                           <div className="flex items-center gap-2 mb-4">
-                            <span className="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide">Learn</span>
-                            <span className="text-sm text-gray-500">Sprint {currentSprint.id} · SWD Principle {currentSprint.id}</span>
+                            <span className="bg-moss bg-opacity-20 text-moss px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide">Learn</span>
+                            <span className="text-sm text-bark">Sprint {currentSprint.id} · SWD Principle {currentSprint.id}</span>
                           </div>
-                          <h2 className="text-2xl font-bold text-gray-900 mb-2" style={{ fontFamily: 'Georgia, serif' }}>
+                          <h2 className="text-2xl font-bold text-ink mb-2">
                             {currentSprint.title}
                           </h2>
-                          <p className="text-gray-600 leading-relaxed">Lesson content coming soon.</p>
+                          <p className="text-bark leading-relaxed">Lesson content coming soon.</p>
                         </div>
                         <div className="flex justify-end">
                           <button
                             onClick={() => setSprintPhase('choose')}
-                            className="px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl font-semibold hover:from-purple-700 hover:to-indigo-700 transition-all shadow-md focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+                            className="px-6 py-3 bg-moss hover:bg-moss-dark text-cream rounded-xl font-semibold transition-colors focus:ring-2 focus:ring-moss focus:ring-offset-2"
                           >
                             Continue to Choose →
                           </button>
@@ -2029,18 +2055,18 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
                   <div>
 
                     {/* ── Step 1: Dataset picker ── */}
-                    <div className="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-4">
+                    <div className="bg-cream rounded-xl border border-stone overflow-hidden mb-4">
                       <div className="px-8 py-6">
                         <div className="flex items-center justify-between mb-1">
-                          <span className="bg-indigo-100 text-indigo-700 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">
+                          <span className="bg-amber-flask bg-opacity-20 text-[#9A6110] text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">
                             Choose
                           </span>
-                          <span className="text-xs text-gray-500">About 5 minutes</span>
+                          <span className="text-xs text-bark">About 5 minutes</span>
                         </div>
-                        <h2 className="text-xl font-bold text-gray-900 mt-4 mb-1" style={{ fontFamily: 'Georgia, serif' }}>
+                        <h2 className="text-xl font-bold text-ink mt-4 mb-1">
                           Pick your dataset.
                         </h2>
-                        <p className="text-gray-600 text-sm mb-6">
+                        <p className="text-bark text-sm mb-6">
                           Which one sounds most interesting to you?
                         </p>
 
@@ -2056,29 +2082,29 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
                                   setDecisionText(ds.defaultDecision);
                                 }}
                                 aria-pressed={isSelected}
-                                className={`w-full flex items-start gap-4 px-5 py-4 rounded-xl border-2 transition-all text-left focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 ${
+                                className={`w-full flex items-start gap-4 px-5 py-4 rounded-xl border-2 transition-all text-left focus:ring-2 focus:ring-moss focus:ring-offset-2 ${
                                   isSelected
-                                    ? 'border-purple-500 bg-purple-50 shadow-md'
-                                    : 'border-gray-200 hover:border-indigo-300 hover:bg-indigo-50'
+                                    ? 'border-moss bg-[#EAF0EC]'
+                                    : 'border-stone hover:border-moss hover:bg-[#EAF0EC]'
                                 }`}
                               >
                                 <span className="text-2xl flex-shrink-0 mt-0.5" aria-hidden="true">{ds.emoji}</span>
                                 <div className="flex-1 min-w-0">
                                   <div className="flex items-center gap-2 flex-wrap mb-1">
-                                    <span className="font-semibold text-gray-900">{ds.title}</span>
+                                    <span className="font-semibold text-ink">{ds.title}</span>
                                     {ds.recommended && (
-                                      <span className="bg-emerald-100 text-emerald-700 text-xs font-bold px-2 py-0.5 rounded-full">
+                                      <span className="bg-sage bg-opacity-20 text-[#3A6648] text-xs font-bold px-2 py-0.5 rounded-full">
                                         Recommended
                                       </span>
                                     )}
                                     {isSelected && (
-                                      <span className="bg-purple-100 text-purple-700 text-xs font-bold px-2 py-0.5 rounded-full">
+                                      <span className="bg-moss text-cream text-xs font-bold px-2 py-0.5 rounded-full">
                                         Selected ✓
                                       </span>
                                     )}
                                   </div>
-                                  <p className="text-xs text-gray-500 mb-1">{ds.stats}</p>
-                                  <p className="text-sm text-gray-700">{ds.description}</p>
+                                  <p className="text-xs text-bark mb-1">{ds.stats}</p>
+                                  <p className="text-sm text-ink">{ds.description}</p>
                                 </div>
                               </button>
                             );
@@ -2086,13 +2112,13 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
                         </div>
 
                         {/* Deprioritized own-dataset link — text only, not a card */}
-                        <p className="text-xs text-gray-500 mt-4 text-center">
+                        <p className="text-xs text-bark mt-4 text-center">
                           Working on something else?{' '}
                           <a
                             href="https://opendata.cityofnewyork.us/data/"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-indigo-600 hover:text-indigo-800 underline underline-offset-2 focus:ring-2 focus:ring-purple-500 focus:ring-offset-1 rounded"
+                            className="text-moss hover:text-moss-dark underline underline-offset-2 focus:ring-2 focus:ring-moss focus:ring-offset-1 rounded"
                           >
                             Browse NYC Open Data
                           </a>
@@ -2103,13 +2129,13 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
 
                     {/* ── Step 2: Audience definition (appears after dataset pick) ── */}
                     {chosenDataset && (
-                      <div className="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-4">
+                      <div className="bg-cream rounded-xl border border-stone overflow-hidden mb-4">
                         <div className="px-8 py-6">
-                          <p className="text-xs font-bold text-indigo-700 uppercase tracking-wide mb-1">Step 2 of 2</p>
-                          <h3 className="text-lg font-bold text-gray-900 mb-1" style={{ fontFamily: 'Georgia, serif' }}>
+                          <p className="text-xs font-bold text-moss uppercase tracking-wide mb-1">Step 2 of 2</p>
+                          <h3 className="text-lg font-bold text-ink mb-1">
                             Define your audience.
                           </h3>
-                          <p className="text-sm text-gray-600 mb-5">
+                          <p className="text-sm text-bark mb-5">
                             Apply the 3 questions from your LEARN phase. We've pre-filled these based on your dataset — edit them if you want to go a different direction.
                           </p>
 
@@ -2117,7 +2143,7 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
                             <div>
                               <label
                                 htmlFor="audience-input"
-                                className="block text-sm font-semibold text-gray-800 mb-1"
+                                className="block text-sm font-semibold text-ink mb-1"
                               >
                                 👥 Who is your audience?
                               </label>
@@ -2128,14 +2154,14 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
                                 onChange={e => setAudienceText(e.target.value)}
                                 placeholder="e.g. NYC Health Commissioner"
                                 aria-required="true"
-                                className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:border-transparent transition-all text-gray-900"
+                                className="w-full px-4 py-3 border-2 border-stone rounded-xl focus:ring-2 focus:ring-moss focus:border-moss transition-colors text-ink"
                                 style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}
                               />
                             </div>
                             <div>
                               <label
                                 htmlFor="decision-input"
-                                className="block text-sm font-semibold text-gray-800 mb-1"
+                                className="block text-sm font-semibold text-ink mb-1"
                               >
                                 🎯 What do they need to decide?
                               </label>
@@ -2146,15 +2172,15 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
                                 onChange={e => setDecisionText(e.target.value)}
                                 placeholder="e.g. Where to allocate inspection resources next year"
                                 aria-required="true"
-                                className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:border-transparent transition-all text-gray-900"
+                                className="w-full px-4 py-3 border-2 border-stone rounded-xl focus:ring-2 focus:ring-moss focus:border-moss transition-colors text-ink"
                                 style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}
                               />
                             </div>
                           </div>
                         </div>
 
-                        <div className="px-8 py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-between">
-                          <p className="text-xs text-gray-500">
+                        <div className="px-8 py-4 bg-parchment border-t border-stone flex items-center justify-between">
+                          <p className="text-xs text-bark">
                             {(!audienceText.trim() || !decisionText.trim())
                               ? 'Fill in both fields to continue.'
                               : 'Ready to start building.'}
@@ -2162,7 +2188,7 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
                           <button
                             onClick={() => setSprintPhase('build')}
                             disabled={!audienceText.trim() || !decisionText.trim()}
-                            className="px-6 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl font-semibold hover:from-purple-700 hover:to-indigo-700 transition-all shadow-md focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none"
+                            className="px-6 py-2.5 bg-moss hover:bg-moss-dark text-cream rounded-xl font-semibold transition-colors focus:ring-2 focus:ring-moss focus:ring-offset-2 disabled:opacity-40 disabled:cursor-not-allowed"
                           >
                             Start Building →
                           </button>
@@ -2184,31 +2210,31 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
                     {/* Shows what the student committed to in the CHOOSE phase.
                         Keeps the audience/decision visible while they work. */}
                     {chosenDataset && (
-                      <div className="bg-indigo-50 rounded-xl px-6 py-4 border border-indigo-200 mb-6 flex flex-wrap gap-4">
+                      <div className="bg-cream rounded-xl px-6 py-4 border border-stone mb-6 flex flex-wrap gap-4">
                         <div>
-                          <p className="text-xs font-bold text-indigo-600 uppercase tracking-wide mb-0.5">Your Dataset</p>
-                          <p className="text-sm font-semibold text-gray-900">
+                          <p className="text-xs font-bold text-moss uppercase tracking-wide mb-0.5">Your Dataset</p>
+                          <p className="text-sm font-semibold text-ink">
                             {CHOOSE_DATASETS.find(d => d.id === chosenDataset)?.emoji}{' '}
                             {CHOOSE_DATASETS.find(d => d.id === chosenDataset)?.title}
                           </p>
                         </div>
-                        <div className="border-l border-indigo-200 pl-4">
-                          <p className="text-xs font-bold text-indigo-600 uppercase tracking-wide mb-0.5">Your Audience</p>
-                          <p className="text-sm font-semibold text-gray-900">{audienceText}</p>
+                        <div className="border-l border-stone pl-4">
+                          <p className="text-xs font-bold text-moss uppercase tracking-wide mb-0.5">Your Audience</p>
+                          <p className="text-sm font-semibold text-ink">{audienceText}</p>
                         </div>
-                        <div className="border-l border-indigo-200 pl-4">
-                          <p className="text-xs font-bold text-indigo-600 uppercase tracking-wide mb-0.5">Their Decision</p>
-                          <p className="text-sm font-semibold text-gray-900">{decisionText}</p>
+                        <div className="border-l border-stone pl-4">
+                          <p className="text-xs font-bold text-moss uppercase tracking-wide mb-0.5">Their Decision</p>
+                          <p className="text-sm font-semibold text-ink">{decisionText}</p>
                         </div>
                       </div>
                     )}
 
                     {/* Business Scenario */}
-                    <div className="bg-white rounded-xl p-6 shadow-md border border-gray-200 mb-6">
-                      <h2 className="text-xl font-bold text-gray-900 mb-4" style={{ fontFamily: 'Georgia, serif' }}>
+                    <div className="bg-cream rounded-xl p-6 border border-stone mb-6">
+                      <h2 className="text-xl font-bold text-ink mb-4">
                         Business Scenario
                       </h2>
-                      <p className="text-gray-700 leading-relaxed whitespace-pre-line">
+                      <p className="text-ink leading-relaxed whitespace-pre-line">
                         {currentSprint.business_scenario}
                       </p>
                     </div>
@@ -2220,16 +2246,16 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
                       if (!href) return null;
                       const isExternal = href.startsWith('http');
                       return (
-                        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 shadow-md border border-blue-200 mb-6">
+                        <div className="bg-cream rounded-xl p-6 border border-stone mb-6">
                           <div className="flex items-center justify-between flex-wrap gap-4">
                             <div>
-                              <h3 className="font-bold text-blue-900 mb-1">Your Dataset</h3>
+                              <h3 className="font-bold text-ink mb-1">Your Dataset</h3>
                               {ds && (
-                                <p className="text-sm text-blue-800 font-medium mb-0.5">
+                                <p className="text-sm text-ink font-medium mb-0.5">
                                   {ds.emoji} {ds.title}
                                 </p>
                               )}
-                              <p className="text-sm text-blue-700">
+                              <p className="text-sm text-bark">
                                 {ds?.id === 'restaurants' && '~150K rows · Filter to 2022–present · A/B/C grades'}
                                 {ds?.id === 'mta'         && '~1,800 rows · Daily ridership by mode · Ready to use'}
                                 {ds?.id === '311'         && '~40M total rows — filter by year before loading'}
@@ -2241,7 +2267,7 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
                                 href={href}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors shadow-md focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex-shrink-0"
+                                className="flex items-center gap-2 px-4 py-2 bg-moss text-cream rounded-lg font-semibold hover:bg-moss-dark transition-colors focus:ring-2 focus:ring-moss focus:ring-offset-2 flex-shrink-0"
                                 aria-label={`Download ${ds?.title || 'dataset'} from NYC Open Data`}
                               >
                                 <DownloadIcon />
@@ -2251,7 +2277,7 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
                               <a
                                 href={href}
                                 download
-                                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors shadow-md focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex-shrink-0"
+                                className="flex items-center gap-2 px-4 py-2 bg-moss text-cream rounded-lg font-semibold hover:bg-moss-dark transition-colors focus:ring-2 focus:ring-moss focus:ring-offset-2 flex-shrink-0"
                                 aria-label="Download sample dataset CSV"
                               >
                                 <DownloadIcon />
@@ -2260,12 +2286,12 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
                             )}
                           </div>
                           {ds?.id === 'restaurants' && (
-                            <p className="text-xs text-blue-600 mt-3 pt-3 border-t border-blue-200">
+                            <p className="text-xs text-bark mt-3 pt-3 border-t border-stone">
                               💡 After downloading, filter the <strong>inspection_date</strong> column to 2022–present in Excel to keep it manageable (~150K rows).
                             </p>
                           )}
                           {ds?.id === '311' && (
-                            <p className="text-xs text-blue-600 mt-3 pt-3 border-t border-blue-200">
+                            <p className="text-xs text-bark mt-3 pt-3 border-t border-stone">
                               💡 Filter by year (e.g. 2024) and complaint type before loading into Excel — the full dataset is very large.
                             </p>
                           )}
@@ -2274,29 +2300,29 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
                     })()}
 
                     {/* Deliverables Checklist */}
-                    <div className="bg-white rounded-xl p-6 shadow-md border border-gray-200 mb-6">
-                      <h3 className="font-bold text-gray-900 mb-4">Deliverables Checklist</h3>
+                    <div className="bg-cream rounded-xl p-6 border border-stone mb-6">
+                      <h3 className="font-bold text-ink mb-4">Deliverables Checklist</h3>
                       <ul className="space-y-3">
                         {currentSprint.deliverables.map((item, idx) => (
                           <li key={idx} className="flex items-start gap-3">
-                            <span className="mt-0.5 w-5 h-5 rounded border-2 border-gray-300 flex-shrink-0 flex items-center justify-center text-xs text-gray-600">
+                            <span className="mt-0.5 w-5 h-5 rounded border-2 border-stone flex-shrink-0 flex items-center justify-center text-xs text-bark">
                               {idx + 1}
                             </span>
-                            <span className="text-gray-700">{item}</span>
+                            <span className="text-ink">{item}</span>
                           </li>
                         ))}
                       </ul>
                     </div>
 
                     {/* Submission Form */}
-                    <div className="bg-white rounded-xl p-6 shadow-md border-2 border-purple-200">
-                      <h3 className="font-bold text-gray-900 mb-4" style={{ fontFamily: 'Georgia, serif' }}>
+                    <div className="bg-cream rounded-xl p-6 border-2 border-stone">
+                      <h3 className="font-bold text-ink mb-4">
                         Submit Your Work
                       </h3>
 
                       {/* Tableau Public URL */}
                       <div className="mb-4">
-                        <label htmlFor="sheets-url" className="block text-sm font-medium text-gray-700 mb-1">
+                        <label htmlFor="sheets-url" className="block text-sm font-medium text-ink mb-1">
                           Tableau Public URL (optional)
                         </label>
                         <input
@@ -2305,14 +2331,14 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
                           value={sheetsUrl}
                           onChange={(e) => setSheetsUrl(e.target.value)}
                           placeholder="https://public.tableau.com/views/..."
-                          className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                          className="w-full px-4 py-2 border-2 border-stone rounded-lg focus:ring-2 focus:ring-moss focus:border-moss transition-colors"
                         />
-                        <p className="text-xs text-gray-500 mt-1">Paste your published dashboard link — Compadre will add it to your portfolio.</p>
+                        <p className="text-xs text-bark mt-1">Paste your published dashboard link — Compadre will add it to your portfolio.</p>
                       </div>
 
                       {/* Executive Memo */}
                       <div className="mb-4">
-                        <label htmlFor="memo-text" className="block text-sm font-medium text-gray-700 mb-1">
+                        <label htmlFor="memo-text" className="block text-sm font-medium text-ink mb-1">
                           Executive Memo
                         </label>
                         <textarea
@@ -2322,14 +2348,14 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
                           placeholder="Write your executive summary for the Health Commissioner. Lead with your key finding. Then support it with 2–3 specific data points from your analysis. Keep it under 300 words."
                           rows="10"
                           maxLength={5000}
-                          className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-y transition-all"
+                          className="w-full px-4 py-3 border-2 border-stone rounded-lg focus:ring-2 focus:ring-moss focus:border-moss resize-y transition-colors"
                           style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}
                         />
                         <div className="flex justify-between items-center mt-1">
-                          <p className={`text-xs ${memoText.length < 200 ? 'text-red-500' : memoText.length > 4500 ? 'text-yellow-600' : 'text-gray-500'}`}>
+                          <p className={`text-xs ${memoText.length < 200 ? 'text-red-500' : memoText.length > 4500 ? 'text-yellow-600' : 'text-bark'}`}>
                             {memoText.length < 200 ? `${200 - memoText.length} more characters needed` : `${memoText.length}/5000 characters`}
                           </p>
-                          <p className="text-xs text-gray-600">Min 200, Max 5000</p>
+                          <p className="text-xs text-bark">Min 200, Max 5000</p>
                         </div>
                       </div>
 
@@ -2345,7 +2371,7 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
                         onClick={handleSubmit}
                         disabled={isSubmitting || memoText.length < 200}
                         aria-busy={isSubmitting}
-                        className="w-full py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg font-semibold hover:from-purple-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+                        className="w-full py-3 bg-moss hover:bg-moss-dark text-cream rounded-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2 focus:ring-2 focus:ring-moss focus:ring-offset-2"
                       >
                         {isSubmitting ? (
                           <>
@@ -2365,15 +2391,15 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
                     Placeholder — Tableau URL submission added in Task 3.2
                     ========================================================= */}
                 {sprintPhase === 'publish' && (
-                  <div className="bg-white rounded-xl p-8 shadow-md border border-gray-200">
+                  <div className="bg-cream rounded-xl p-8 border border-stone">
                     <div className="flex items-center gap-2 mb-4">
-                      <span className="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide">Publish</span>
-                      <span className="text-sm text-gray-500">Share your work</span>
+                      <span className="bg-[#5A4A3A] bg-opacity-15 text-[#5A4A3A] px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide">Publish</span>
+                      <span className="text-sm text-bark">Share your work</span>
                     </div>
-                    <h2 className="text-2xl font-bold text-gray-900 mb-2" style={{ fontFamily: 'Georgia, serif' }}>
+                    <h2 className="text-2xl font-bold text-ink mb-2">
                       Publish Your Work
                     </h2>
-                    <p className="text-gray-600 leading-relaxed">
+                    <p className="text-bark leading-relaxed">
                       Tableau Public URL submission and portfolio save coming in Task 3.2.
                     </p>
                   </div>
@@ -2392,28 +2418,28 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
                 <div className="max-w-4xl mx-auto">
 
                   {/* Overall Score */}
-                  <div className={`rounded-2xl p-8 shadow-xl border-2 mb-6 text-center ${getScoreBg(submissionFeedback.overall_score)}`}>
+                  <div className={`rounded-xl p-8 border-2 mb-6 text-center ${getScoreBg(submissionFeedback.overall_score)}`}>
                     <p className={`text-6xl font-bold mb-2 ${getScoreColor(submissionFeedback.overall_score)}`}>
                       {submissionFeedback.overall_score}
                     </p>
-                    <p className="text-lg font-semibold text-gray-700 mb-2">Overall Score</p>
-                    <p className={`text-xl font-bold ${submissionFeedback.passed ? 'text-emerald-600' : 'text-red-600'}`}>
+                    <p className="text-lg font-semibold text-ink mb-2">Overall Score</p>
+                    <p className={`text-xl font-bold ${submissionFeedback.passed ? 'text-sage' : 'text-red-600'}`}>
                       {submissionFeedback.passed ? 'PASSED' : 'NOT YET — Keep Going!'}
                     </p>
                     {submissionFeedback.overall_feedback && (
-                      <p className="text-gray-700 mt-4 max-w-2xl mx-auto leading-relaxed">{submissionFeedback.overall_feedback}</p>
+                      <p className="text-ink mt-4 max-w-2xl mx-auto leading-relaxed">{submissionFeedback.overall_feedback}</p>
                     )}
                   </div>
 
                   {/* Category Scores */}
                   <div className="grid md:grid-cols-2 gap-4 mb-6">
                     {submissionFeedback.category_scores && Object.entries(submissionFeedback.category_scores).map(([category, data]) => (
-                      <div key={category} className="bg-white rounded-xl p-5 shadow-md border border-gray-200">
+                      <div key={category} className="bg-cream rounded-xl p-5 border border-stone">
                         <div className="flex items-center justify-between mb-3">
-                          <h3 className="font-bold text-gray-900">{category}</h3>
+                          <h3 className="font-bold text-ink">{category}</h3>
                           <span className={`text-2xl font-bold ${getScoreColor(data.score)}`}>{data.score}</span>
                         </div>
-                        <p className="text-sm text-gray-600 leading-relaxed">{data.feedback}</p>
+                        <p className="text-sm text-bark leading-relaxed">{data.feedback}</p>
                       </div>
                     ))}
                   </div>
@@ -2438,11 +2464,11 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
 
                   {/* Areas for Improvement */}
                   {submissionFeedback.areas_for_improvement && submissionFeedback.areas_for_improvement.length > 0 && (
-                    <div className="bg-blue-50 rounded-xl p-6 mb-4 border border-blue-200">
-                      <h3 className="font-bold text-blue-900 mb-3">Areas for Improvement</h3>
+                    <div className="bg-parchment rounded-xl p-6 mb-4 border border-stone">
+                      <h3 className="font-bold text-ink mb-3">Areas for Improvement</h3>
                       <ul className="space-y-2">
                         {submissionFeedback.areas_for_improvement.map((a, idx) => (
-                          <li key={idx} className="text-blue-800 flex items-start">
+                          <li key={idx} className="text-ink flex items-start">
                             <span className="mr-2">-</span>
                             <span>{a}</span>
                           </li>
@@ -2453,9 +2479,9 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
 
                   {/* Next Steps */}
                   {submissionFeedback.next_steps && (
-                    <div className="bg-purple-50 rounded-xl p-6 mb-6 border border-purple-200">
-                      <h3 className="font-bold text-purple-900 mb-3">Next Steps</h3>
-                      <p className="text-purple-800">{submissionFeedback.next_steps}</p>
+                    <div className="bg-[#EAF0EC] rounded-xl p-6 mb-6 border border-stone">
+                      <h3 className="font-bold text-ink mb-3">Next Steps</h3>
+                      <p className="text-moss-dark">{submissionFeedback.next_steps}</p>
                     </div>
                   )}
 
@@ -2468,14 +2494,14 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
                           setSubmitError(null);
                           setCurrentView('sprint');
                         }}
-                        className="px-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-lg font-semibold hover:from-orange-600 hover:to-red-600 transition-all shadow-lg hover:shadow-xl focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
+                        className="px-6 py-3 bg-red-700 text-white rounded-lg font-semibold hover:bg-red-800 transition-colors focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
                       >
                         Try Again
                       </button>
                     )}
                     <button
                       onClick={() => setCurrentView('dashboard')}
-                      className="px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg font-semibold hover:from-purple-700 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+                      className="px-6 py-3 bg-moss hover:bg-moss-dark text-cream rounded-lg font-semibold transition-colors focus:ring-2 focus:ring-moss focus:ring-offset-2"
                     >
                       Back to Dashboard
                     </button>
