@@ -278,6 +278,31 @@ async function updateSubmission(submissionId, updates) {
   }
 }
 
+/**
+ * Get all submissions for a session (portfolio view)
+ *
+ * @param {string} sessionId - The user's session UUID
+ * @returns {Array} - Array of submission objects, newest first
+ */
+async function getSubmissionsBySessionId(sessionId) {
+  try {
+    const columns = 'id,sprint_id,submission_text,submission_urls,score,feedback,status,submitted_at,evaluated_at';
+    const { data, error } = await supabaseRequest(
+      `/rest/v1/submissions?session_id=eq.${encodeURIComponent(sessionId)}&select=${columns}&order=submitted_at.desc`
+    );
+
+    if (error) {
+      console.error('[DB] Portfolio query error:', error);
+      return [];
+    }
+
+    return Array.isArray(data) ? data : [];
+  } catch (error) {
+    console.error('[DB] Portfolio query error:', error.message);
+    return [];
+  }
+}
+
 // Export the same interface as the old db.js + new sprint functions
 // TEACHING MOMENT: By keeping the same function names and signatures,
 // we can swap databases without changing any code that uses them.
@@ -288,5 +313,6 @@ module.exports = {
   getSprintById,
   insertSubmission,
   getSubmissionById,
-  updateSubmission
+  updateSubmission,
+  getSubmissionsBySessionId
 };

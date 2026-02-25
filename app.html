@@ -297,7 +297,7 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
     // Main App Component
     // =========================================================
     function App() {
-      // View state: 'assessment' | 'results' | 'tutorial' | 'dashboard' | 'sprint' | 'feedback'
+      // View state: 'assessment' | 'results' | 'tutorial' | 'dashboard' | 'sprint' | 'feedback' | 'portfolio'
       // Start in tutorial if it hasn't been completed yet — auth modal overlays on top
       const [currentView, setCurrentView] = useState(
         localStorage.getItem('compadre_tutorial_done') ? 'assessment' : 'tutorial'
@@ -373,6 +373,10 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
       const [audienceText,  setAudienceText]  = useState('');
       const [decisionText,  setDecisionText]  = useState('');
 
+      // Portfolio state
+      const [portfolioSubmissions, setPortfolioSubmissions] = useState(null);
+      const [portfolioLoading,     setPortfolioLoading]     = useState(false);
+
       // =========================================================
       // Effects
       // =========================================================
@@ -382,6 +386,17 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
 
       useEffect(() => { scrollToBottom(); }, [messages]);
       useEffect(() => { inputRef.current?.focus(); }, []);
+
+      // Fetch portfolio submissions whenever the user navigates to the portfolio view
+      useEffect(() => {
+        if (currentView !== 'portfolio' || !sessionId) return;
+        setPortfolioLoading(true);
+        fetch(`/api/portfolio?session_id=${encodeURIComponent(sessionId)}`)
+          .then(r => r.json())
+          .then(data => { setPortfolioSubmissions(data.submissions || []); })
+          .catch(() => { setPortfolioSubmissions([]); })
+          .finally(() => { setPortfolioLoading(false); });
+      }, [currentView, sessionId]);
 
       // =========================================================
       // TEACHING MOMENT: Auth session lifecycle
@@ -841,7 +856,8 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
         tutorial: 'Welcome to Compadre',
         dashboard: 'Sprint Dashboard',
         sprint: currentSprint ? `Sprint ${currentSprint.id}: ${currentSprint.title}` : 'Sprint',
-        feedback: 'Feedback'
+        feedback: 'Feedback',
+        portfolio: 'My Portfolio'
       };
 
       const headerSubtitle = {
@@ -855,7 +871,8 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
           build:   'Analyze in Excel, visualize in Tableau',
           publish: 'Share your work and add it to your portfolio',
         }[sprintPhase] || 'Complete the deliverables and submit your work',
-        feedback: 'Here\'s what Compadre thinks of your work'
+        feedback: 'Here\'s what Compadre thinks of your work',
+        portfolio: 'Your published sprint work'
       };
 
       // =========================================================
@@ -2807,6 +2824,140 @@ Your job: Analyze the inspection data, find the patterns that matter, and build 
               </main>
             </ErrorBoundary>
           )}
+
+          {/* ======================================================= */}
+          {/* PORTFOLIO VIEW                                          */}
+          {/* ======================================================= */}
+          {currentView === 'portfolio' && (
+            <ErrorBoundary name="Portfolio">
+              <main id="main-content" className="flex-1 overflow-y-auto px-4 py-6">
+                <div className="max-w-4xl mx-auto">
+
+                  {portfolioLoading && (
+                    <div className="flex items-center justify-center py-20">
+                      <div className="text-center">
+                        <div className="w-8 h-8 border-2 border-moss border-t-transparent rounded-full animate-spin mx-auto mb-3" aria-hidden="true"></div>
+                        <p className="text-bark">Loading your work…</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {!portfolioLoading && portfolioSubmissions !== null && portfolioSubmissions.length === 0 && (
+                    <div className="bg-cream rounded-xl border border-stone p-10 text-center">
+                      <p className="text-4xl mb-4" aria-hidden="true">📂</p>
+                      <h2 className="font-display text-xl font-bold text-ink mb-2">Nothing here yet</h2>
+                      <p className="text-bark mb-6">Complete a sprint and publish your Tableau visualization — it'll appear here.</p>
+                      <button
+                        onClick={() => setCurrentView('dashboard')}
+                        className="px-6 py-3 bg-moss hover:bg-moss-dark text-cream rounded-xl font-semibold transition-colors focus:ring-2 focus:ring-moss focus:ring-offset-2"
+                      >
+                        Go to Sprint Dashboard
+                      </button>
+                    </div>
+                  )}
+
+                  {!portfolioLoading && portfolioSubmissions && portfolioSubmissions.length > 0 && (
+                    <div className="space-y-5">
+                      {portfolioSubmissions.map(sub => {
+                        const sprint = SPRINTS.find(s => s.id === sub.sprint_id);
+                        const tableauUrl = sub.submission_urls?.google_sheets || null;
+                        const submitted = new Date(sub.submitted_at).toLocaleDateString('en-US', {
+                          year: 'numeric', month: 'short', day: 'numeric'
+                        });
+                        const statusLabel = sub.status === 'evaluated' ? (sub.score >= 75 ? 'Passed' : 'Not yet') : 'Pending review';
+                        const statusColor = sub.status === 'evaluated'
+                          ? (sub.score >= 75 ? 'bg-sage text-cream' : 'bg-red-700 text-white')
+                          : 'bg-stone text-bark';
+
+                        return (
+                          <article key={sub.id} className="bg-cream rounded-xl border border-stone overflow-hidden">
+                            {/* Card header */}
+                            <div className="flex items-center justify-between px-6 py-4 border-b border-stone">
+                              <div className="flex items-center gap-3">
+                                <span className="bg-moss text-cream text-xs font-bold px-2 py-1 rounded-full">
+                                  Sprint {sub.sprint_id}
+                                </span>
+                                <h2 className="font-display font-bold text-ink text-lg leading-tight">
+                                  {sprint ? sprint.title : `Sprint ${sub.sprint_id}`}
+                                </h2>
+                              </div>
+                              <span className={`text-xs font-bold px-3 py-1 rounded-full ${statusColor}`}>
+                                {statusLabel}
+                              </span>
+                            </div>
+
+                            {/* Card body */}
+                            <div className="px-6 py-5 space-y-4">
+                              {/* Score (if evaluated) */}
+                              {sub.status === 'evaluated' && typeof sub.score === 'number' && (
+                                <div className="flex items-center gap-3">
+                                  <span className="text-sm text-bark font-medium">Score:</span>
+                                  <span className={`text-2xl font-bold ${getScoreColor(sub.score)}`}>{sub.score}</span>
+                                  <span className="text-sm text-bark">/100</span>
+                                </div>
+                              )}
+
+                              {/* Tableau link */}
+                              {tableauUrl && (
+                                <div>
+                                  <p className="text-xs font-bold uppercase tracking-widest text-bark mb-1">Tableau Visualization</p>
+                                  <a
+                                    href={tableauUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-amber-flask hover:underline text-sm break-all focus:ring-2 focus:ring-moss focus:ring-offset-2 rounded"
+                                  >
+                                    {tableauUrl}
+                                  </a>
+                                </div>
+                              )}
+
+                              {/* Memo excerpt */}
+                              {sub.submission_text && (
+                                <div>
+                                  <p className="text-xs font-bold uppercase tracking-widest text-bark mb-1">Executive Memo</p>
+                                  <p className="text-sm text-ink leading-relaxed line-clamp-3">
+                                    {sub.submission_text}
+                                  </p>
+                                </div>
+                              )}
+
+                              {/* Overall feedback (if evaluated) */}
+                              {sub.status === 'evaluated' && sub.feedback?.overall_feedback && (
+                                <div className="bg-parchment rounded-lg px-4 py-3 border-l-4 border-moss">
+                                  <p className="text-xs font-bold uppercase tracking-widest text-bark mb-1">Compadre's Take</p>
+                                  <p className="text-sm text-ink leading-relaxed">{sub.feedback.overall_feedback}</p>
+                                </div>
+                              )}
+
+                              {/* Footer meta */}
+                              <div className="flex items-center justify-between pt-2 border-t border-stone">
+                                <p className="text-xs text-bark">Submitted {submitted}</p>
+                                {sub.status !== 'evaluated' && (
+                                  <p className="text-xs text-bark italic">Evaluation in progress…</p>
+                                )}
+                              </div>
+                            </div>
+                          </article>
+                        );
+                      })}
+                    </div>
+                  )}
+
+                  <div className="mt-8 text-center">
+                    <button
+                      onClick={() => setCurrentView('dashboard')}
+                      className="px-6 py-3 bg-moss hover:bg-moss-dark text-cream rounded-xl font-semibold transition-colors focus:ring-2 focus:ring-moss focus:ring-offset-2"
+                    >
+                      ← Back to Dashboard
+                    </button>
+                  </div>
+
+                </div>
+              </main>
+            </ErrorBoundary>
+          )}
+
         </div>
       );
     }
