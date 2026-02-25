@@ -4,26 +4,51 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Compadre — Learn Data. Tell Stories. Build Your Portfolio.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'moss':        '#3D5A47',
+            'moss-dark':   '#2E4436',
+            'amber-flask': '#C17F24',
+            'sage':        '#5C8C6A',
+            'parchment':   '#F7F3EC',
+            'cream':       '#FDFAF4',
+            'ink':         '#1C2017',
+            'stone':       '#D4CEBD',
+            'bark':        '#7A6E5F',
+          },
+          fontFamily: {
+            'display': ['Lora', 'Georgia', 'serif'],
+            'body':    ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
   <style>
     body {
       margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-        'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
     }
-    .font-heading {
-      font-family: Georgia, 'Times New Roman', serif;
+    h1, h2, h3 {
+      font-family: 'Lora', Georgia, serif;
     }
   </style>
 </head>
-<body class="bg-gray-50 text-gray-900">
+<body class="bg-parchment text-ink">
 
   <!-- Skip to main content — keyboard/screen reader navigation -->
   <a
     href="#main-content"
-    class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-purple-600 focus:text-white focus:rounded-lg focus:font-semibold focus:shadow-lg"
+    class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-moss focus:text-cream focus:rounded-lg focus:font-semibold"
   >
     Skip to main content
   </a>
@@ -33,21 +58,21 @@
   <!-- ======================================================= -->
   <!-- Section 1: Hero                                          -->
   <!-- ======================================================= -->
-  <section class="relative overflow-hidden" style="background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);">
+  <section class="relative overflow-hidden bg-parchment">
     <div class="max-w-4xl mx-auto px-6 py-24 md:py-32">
       <div class="flex flex-col md:flex-row items-center gap-12">
         <!-- Text -->
         <div class="flex-1 text-center md:text-left">
-          <h1 class="font-heading text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight mb-6">
+          <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-ink leading-tight mb-6">
             Learn data. Tell stories. Build something real.
           </h1>
-          <p class="text-lg md:text-xl text-gray-700 mb-12 leading-relaxed">
+          <p class="text-lg md:text-xl text-bark mb-12 leading-relaxed">
             Compadre is your guide through six data sprints built around the principles from
             <em>Storytelling with Data</em>. Real datasets. Real projects. A portfolio you can actually share.
           </p>
           <a
             href="#get-started"
-            class="inline-block px-8 py-4 bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-lg font-semibold rounded-xl shadow-lg hover:from-purple-700 hover:to-indigo-700 hover:shadow-xl transition-all focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+            class="inline-block px-8 py-4 bg-moss text-cream text-lg font-semibold rounded-xl hover:bg-moss-dark transition-colors focus:ring-2 focus:ring-moss focus:ring-offset-2"
           >
             Get Started
           </a>
@@ -67,54 +92,54 @@
   <!-- ======================================================= -->
   <!-- Section 2: How It Works                                  -->
   <!-- ======================================================= -->
-  <section class="py-16 md:py-24 bg-white">
+  <section class="py-16 md:py-24 bg-cream border-t border-stone">
     <div class="max-w-4xl mx-auto px-6">
-      <h2 class="font-heading text-3xl md:text-4xl font-bold text-center text-gray-900 mb-16">
+      <h2 class="text-3xl md:text-4xl font-bold text-center text-ink mb-16">
         How It Works
       </h2>
 
       <div class="grid md:grid-cols-3 gap-8 md:gap-12">
         <!-- Step 1 -->
         <div class="text-center">
-          <div class="w-16 h-16 mx-auto mb-6 rounded-2xl bg-purple-100 flex items-center justify-center">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <div class="w-16 h-16 mx-auto mb-6 rounded-xl bg-parchment border border-stone flex items-center justify-center">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#3D5A47" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <path d="M9 11l3 3L22 4"></path>
               <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
             </svg>
           </div>
-          <span class="inline-block text-sm font-bold text-purple-600 bg-purple-50 px-3 py-1 rounded-full mb-3">Step 1</span>
-          <h3 class="text-xl font-bold text-gray-900 mb-2">Assess Your Skills</h3>
-          <p class="text-gray-600 leading-relaxed">
+          <span class="inline-block text-xs font-bold text-cream bg-moss px-3 py-1 rounded-full mb-3">Step 1</span>
+          <h3 class="text-xl font-bold text-ink mb-2">Assess Your Skills</h3>
+          <p class="text-bark leading-relaxed">
             A 10-minute AI conversation maps your starting point — no trick questions, just an honest baseline.
           </p>
         </div>
 
         <!-- Step 2 -->
         <div class="text-center">
-          <div class="w-16 h-16 mx-auto mb-6 rounded-2xl bg-indigo-100 flex items-center justify-center">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <div class="w-16 h-16 mx-auto mb-6 rounded-xl bg-parchment border border-stone flex items-center justify-center">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#C17F24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
               <line x1="8" y1="21" x2="16" y2="21"></line>
               <line x1="12" y1="17" x2="12" y2="21"></line>
             </svg>
           </div>
-          <span class="inline-block text-sm font-bold text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full mb-3">Step 2</span>
-          <h3 class="text-xl font-bold text-gray-900 mb-2">Work Real Projects</h3>
-          <p class="text-gray-600 leading-relaxed">
+          <span class="inline-block text-xs font-bold text-cream bg-moss px-3 py-1 rounded-full mb-3">Step 2</span>
+          <h3 class="text-xl font-bold text-ink mb-2">Work Real Projects</h3>
+          <p class="text-bark leading-relaxed">
             Business scenarios with real datasets, not toy exercises. Build portfolio pieces employers actually care about.
           </p>
         </div>
 
         <!-- Step 3 -->
         <div class="text-center">
-          <div class="w-16 h-16 mx-auto mb-6 rounded-2xl bg-emerald-100 flex items-center justify-center">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <div class="w-16 h-16 mx-auto mb-6 rounded-xl bg-parchment border border-stone flex items-center justify-center">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#5C8C6A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
             </svg>
           </div>
-          <span class="inline-block text-sm font-bold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full mb-3">Step 3</span>
-          <h3 class="text-xl font-bold text-gray-900 mb-2">Get AI Feedback</h3>
-          <p class="text-gray-600 leading-relaxed">
+          <span class="inline-block text-xs font-bold text-cream bg-moss px-3 py-1 rounded-full mb-3">Step 3</span>
+          <h3 class="text-xl font-bold text-ink mb-2">Get AI Feedback</h3>
+          <p class="text-bark leading-relaxed">
             Rubric-based evaluation with specific, actionable scores — like having a senior analyst review your work.
           </p>
         </div>
@@ -125,12 +150,12 @@
   <!-- ======================================================= -->
   <!-- Section 3: Sprint Curriculum                             -->
   <!-- ======================================================= -->
-  <section class="py-16 md:py-24" style="background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);">
+  <section class="py-16 md:py-24 bg-parchment border-t border-stone">
     <div class="max-w-4xl mx-auto px-6">
-      <h2 class="font-heading text-3xl md:text-4xl font-bold text-center text-gray-900 mb-4">
+      <h2 class="text-3xl md:text-4xl font-bold text-center text-ink mb-4">
         The Curriculum
       </h2>
-      <p class="text-center text-gray-600 mb-12 max-w-xl mx-auto">
+      <p class="text-center text-bark mb-12 max-w-xl mx-auto">
         Six sprints that take you from spreadsheets to a complete data analysis portfolio.
       </p>
 
@@ -138,81 +163,81 @@
         <!-- Sprint 1 — Active -->
         <a
           href="app.html?view=dashboard"
-          class="block rounded-xl p-6 shadow-md border-2 border-purple-300 bg-white hover:border-purple-500 hover:shadow-lg transition-all"
+          class="block rounded-xl p-6 border-2 border-moss bg-cream hover:border-moss-dark transition-colors"
         >
           <div class="flex items-center justify-between mb-3">
-            <span class="text-xs font-bold px-2 py-1 rounded-full bg-purple-100 text-purple-700">Sprint 1</span>
-            <span class="text-xs font-bold px-2 py-1 rounded-full bg-emerald-100 text-emerald-700">Start Here</span>
+            <span class="text-xs font-bold px-2 py-1 rounded-full bg-moss text-cream">Sprint 1</span>
+            <span class="text-xs font-bold px-2 py-1 rounded-full bg-sage text-cream">Start Here</span>
           </div>
-          <h3 class="font-bold text-gray-900 mb-2">Understand the Context</h3>
-          <p class="text-sm text-gray-600">Analyze NYC restaurant inspection data and build a visualization that helps the Health Commissioner decide where to focus resources.</p>
-          <p class="mt-3 text-xs font-semibold text-purple-600">Click to start</p>
+          <h3 class="font-bold text-ink mb-2">Understand the Context</h3>
+          <p class="text-sm text-bark">Analyze NYC restaurant inspection data and build a visualization that helps the Health Commissioner decide where to focus resources.</p>
+          <p class="mt-3 text-xs font-semibold text-moss">Click to start</p>
         </a>
 
         <!-- Sprints 2–6 — Coming Soon -->
-        <div class="rounded-xl p-6 shadow-md border-2 border-gray-200 bg-gray-50">
+        <div class="rounded-xl p-6 border-2 border-stone bg-parchment opacity-70">
           <div class="flex items-center justify-between mb-3">
-            <span class="text-xs font-bold px-2 py-1 rounded-full bg-gray-200 text-gray-700">Sprint 2</span>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-gray-500" aria-hidden="true">
+            <span class="text-xs font-bold px-2 py-1 rounded-full bg-stone text-bark">Sprint 2</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7A6E5F" stroke-width="2" aria-hidden="true">
               <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
               <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
             </svg>
           </div>
-          <h3 class="font-bold text-gray-600 mb-2">Choose the Right Visual</h3>
-          <p class="text-sm text-gray-600">Match your data to the right chart type so your audience actually understands what you're showing.</p>
-          <p class="mt-3 text-xs font-semibold text-gray-600">Coming Soon</p>
+          <h3 class="font-bold text-bark mb-2">Choose the Right Visual</h3>
+          <p class="text-sm text-bark">Match your data to the right chart type so your audience actually understands what you're showing.</p>
+          <p class="mt-3 text-xs font-semibold text-bark">Coming Soon</p>
         </div>
 
-        <div class="rounded-xl p-6 shadow-md border-2 border-gray-200 bg-gray-50">
+        <div class="rounded-xl p-6 border-2 border-stone bg-parchment opacity-70">
           <div class="flex items-center justify-between mb-3">
-            <span class="text-xs font-bold px-2 py-1 rounded-full bg-gray-200 text-gray-700">Sprint 3</span>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-gray-500" aria-hidden="true">
+            <span class="text-xs font-bold px-2 py-1 rounded-full bg-stone text-bark">Sprint 3</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7A6E5F" stroke-width="2" aria-hidden="true">
               <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
               <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
             </svg>
           </div>
-          <h3 class="font-bold text-gray-600 mb-2">Eliminate Clutter</h3>
-          <p class="text-sm text-gray-600">Strip away everything that doesn't serve the story. Less is more — and harder than it sounds.</p>
-          <p class="mt-3 text-xs font-semibold text-gray-600">Coming Soon</p>
+          <h3 class="font-bold text-bark mb-2">Eliminate Clutter</h3>
+          <p class="text-sm text-bark">Strip away everything that doesn't serve the story. Less is more — and harder than it sounds.</p>
+          <p class="mt-3 text-xs font-semibold text-bark">Coming Soon</p>
         </div>
 
-        <div class="rounded-xl p-6 shadow-md border-2 border-gray-200 bg-gray-50">
+        <div class="rounded-xl p-6 border-2 border-stone bg-parchment opacity-70">
           <div class="flex items-center justify-between mb-3">
-            <span class="text-xs font-bold px-2 py-1 rounded-full bg-gray-200 text-gray-700">Sprint 4</span>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-gray-500" aria-hidden="true">
+            <span class="text-xs font-bold px-2 py-1 rounded-full bg-stone text-bark">Sprint 4</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7A6E5F" stroke-width="2" aria-hidden="true">
               <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
               <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
             </svg>
           </div>
-          <h3 class="font-bold text-gray-600 mb-2">Focus Attention</h3>
-          <p class="text-sm text-gray-600">Use color, size, and positioning to guide your audience's eye to what matters most.</p>
-          <p class="mt-3 text-xs font-semibold text-gray-600">Coming Soon</p>
+          <h3 class="font-bold text-bark mb-2">Focus Attention</h3>
+          <p class="text-sm text-bark">Use color, size, and positioning to guide your audience's eye to what matters most.</p>
+          <p class="mt-3 text-xs font-semibold text-bark">Coming Soon</p>
         </div>
 
-        <div class="rounded-xl p-6 shadow-md border-2 border-gray-200 bg-gray-50">
+        <div class="rounded-xl p-6 border-2 border-stone bg-parchment opacity-70">
           <div class="flex items-center justify-between mb-3">
-            <span class="text-xs font-bold px-2 py-1 rounded-full bg-gray-200 text-gray-700">Sprint 5</span>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-gray-500" aria-hidden="true">
+            <span class="text-xs font-bold px-2 py-1 rounded-full bg-stone text-bark">Sprint 5</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7A6E5F" stroke-width="2" aria-hidden="true">
               <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
               <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
             </svg>
           </div>
-          <h3 class="font-bold text-gray-600 mb-2">Think Like a Designer</h3>
-          <p class="text-sm text-gray-600">Apply design principles to make your visualizations clear, trustworthy, and professional.</p>
-          <p class="mt-3 text-xs font-semibold text-gray-600">Coming Soon</p>
+          <h3 class="font-bold text-bark mb-2">Think Like a Designer</h3>
+          <p class="text-sm text-bark">Apply design principles to make your visualizations clear, trustworthy, and professional.</p>
+          <p class="mt-3 text-xs font-semibold text-bark">Coming Soon</p>
         </div>
 
-        <div class="rounded-xl p-6 shadow-md border-2 border-gray-200 bg-gray-50">
+        <div class="rounded-xl p-6 border-2 border-stone bg-parchment opacity-70">
           <div class="flex items-center justify-between mb-3">
-            <span class="text-xs font-bold px-2 py-1 rounded-full bg-gray-200 text-gray-700">Sprint 6</span>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-gray-500" aria-hidden="true">
+            <span class="text-xs font-bold px-2 py-1 rounded-full bg-stone text-bark">Sprint 6</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7A6E5F" stroke-width="2" aria-hidden="true">
               <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
               <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
             </svg>
           </div>
-          <h3 class="font-bold text-gray-600 mb-2">Tell a Story — Capstone</h3>
-          <p class="text-sm text-gray-600">Bring it all together. One dataset, one audience, one complete narrative. This is your portfolio centerpiece.</p>
-          <p class="mt-3 text-xs font-semibold text-gray-600">Coming Soon</p>
+          <h3 class="font-bold text-bark mb-2">Tell a Story — Capstone</h3>
+          <p class="text-sm text-bark">Bring it all together. One dataset, one audience, one complete narrative. This is your portfolio centerpiece.</p>
+          <p class="mt-3 text-xs font-semibold text-bark">Coming Soon</p>
         </div>
       </div>
     </div>
@@ -221,62 +246,62 @@
   <!-- ======================================================= -->
   <!-- Section 4: Who It's For                                  -->
   <!-- ======================================================= -->
-  <section class="py-16 md:py-24 bg-white">
+  <section class="py-16 md:py-24 bg-cream border-t border-stone">
     <div class="max-w-4xl mx-auto px-6">
-      <h2 class="font-heading text-3xl md:text-4xl font-bold text-center text-gray-900 mb-12">
+      <h2 class="text-3xl md:text-4xl font-bold text-center text-ink mb-12">
         Who It's For
       </h2>
 
       <div class="grid md:grid-cols-2 gap-6 max-w-2xl mx-auto">
         <div class="flex items-start gap-4">
-          <div class="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <div class="w-10 h-10 rounded-xl bg-parchment border border-stone flex items-center justify-center flex-shrink-0 mt-0.5">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3D5A47" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
               <circle cx="8.5" cy="7" r="4"></circle>
               <polyline points="17 11 19 13 23 9"></polyline>
             </svg>
           </div>
           <div>
-            <h3 class="font-bold text-gray-900 mb-1">Career switchers</h3>
-            <p class="text-gray-600 text-sm leading-relaxed">No CS degree? No problem. Compadre meets you where you are.</p>
+            <h3 class="font-bold text-ink mb-1">Career switchers</h3>
+            <p class="text-bark text-sm leading-relaxed">No CS degree? No problem. Compadre meets you where you are.</p>
           </div>
         </div>
 
         <div class="flex items-start gap-4">
-          <div class="w-10 h-10 rounded-xl bg-indigo-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <div class="w-10 h-10 rounded-xl bg-parchment border border-stone flex items-center justify-center flex-shrink-0 mt-0.5">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C17F24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
               <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
             </svg>
           </div>
           <div>
-            <h3 class="font-bold text-gray-900 mb-1">Self-taught learners who want structure</h3>
-            <p class="text-gray-600 text-sm leading-relaxed">Done watching random tutorials. Ready for a clear path with real feedback.</p>
+            <h3 class="font-bold text-ink mb-1">Self-taught learners who want structure</h3>
+            <p class="text-bark text-sm leading-relaxed">Done watching random tutorials. Ready for a clear path with real feedback.</p>
           </div>
         </div>
 
         <div class="flex items-start gap-4">
-          <div class="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <div class="w-10 h-10 rounded-xl bg-parchment border border-stone flex items-center justify-center flex-shrink-0 mt-0.5">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5C8C6A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
             </svg>
           </div>
           <div>
-            <h3 class="font-bold text-gray-900 mb-1">Tutorial fatigue survivors</h3>
-            <p class="text-gray-600 text-sm leading-relaxed">Tired of courses that don't lead to a portfolio. Here, every sprint produces real work.</p>
+            <h3 class="font-bold text-ink mb-1">Tutorial fatigue survivors</h3>
+            <p class="text-bark text-sm leading-relaxed">Tired of courses that don't lead to a portfolio. Here, every sprint produces real work.</p>
           </div>
         </div>
 
         <div class="flex items-start gap-4">
-          <div class="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <div class="w-10 h-10 rounded-xl bg-parchment border border-stone flex items-center justify-center flex-shrink-0 mt-0.5">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C17F24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <circle cx="12" cy="12" r="10"></circle>
               <polyline points="12 6 12 12 16 14"></polyline>
             </svg>
           </div>
           <div>
-            <h3 class="font-bold text-gray-900 mb-1">Apprenticeship-track candidates</h3>
-            <p class="text-gray-600 text-sm leading-relaxed">Preparing for data apprenticeships and need portfolio-ready projects to show.</p>
+            <h3 class="font-bold text-ink mb-1">Apprenticeship-track candidates</h3>
+            <p class="text-bark text-sm leading-relaxed">Preparing for data apprenticeships and need portfolio-ready projects to show.</p>
           </div>
         </div>
       </div>
@@ -286,31 +311,31 @@
   <!-- ======================================================= -->
   <!-- Section 5: Final CTA                                     -->
   <!-- ======================================================= -->
-  <section id="get-started" class="py-16 md:py-24" style="background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);">
+  <section id="get-started" class="py-16 md:py-24 bg-parchment border-t border-stone">
     <div class="max-w-2xl mx-auto px-6 text-center">
-      <h2 class="font-heading text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+      <h2 class="text-3xl md:text-4xl font-bold text-ink mb-4">
         Ready to meet your Compadre?
       </h2>
-      <p class="text-gray-600 mb-12 text-lg">
+      <p class="text-bark mb-12 text-lg">
         Take the assessment for a personalized sprint plan, or jump straight into Sprint 1. Either way, I've got you.
       </p>
 
       <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
         <a
           href="app.html"
-          class="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-lg font-semibold rounded-xl shadow-lg hover:from-purple-700 hover:to-indigo-700 hover:shadow-xl transition-all focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 text-center"
+          class="w-full sm:w-auto px-8 py-4 bg-moss text-cream text-lg font-semibold rounded-xl hover:bg-moss-dark transition-colors focus:ring-2 focus:ring-moss focus:ring-offset-2 text-center"
         >
           Take the Assessment
         </a>
         <a
           href="app.html?view=dashboard"
-          class="w-full sm:w-auto px-8 py-4 bg-white text-gray-900 text-lg font-semibold rounded-xl shadow-lg border-2 border-gray-300 hover:border-purple-400 hover:shadow-xl transition-all focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 text-center"
+          class="w-full sm:w-auto px-8 py-4 bg-cream text-ink text-lg font-semibold rounded-xl border-2 border-stone hover:border-moss transition-colors focus:ring-2 focus:ring-moss focus:ring-offset-2 text-center"
         >
           Skip to Sprint 1
         </a>
       </div>
 
-      <p class="text-sm text-gray-500">Free forever. No sign-up. No credit card.</p>
+      <p class="text-sm text-bark">Free forever. No sign-up. No credit card.</p>
     </div>
   </section>
 

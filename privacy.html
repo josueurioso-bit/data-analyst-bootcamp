@@ -3,46 +3,65 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Privacy Policy - Data Analyst Bootcamp</title>
+  <title>Privacy Policy — Compadre</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
   <style>
+    /* Lab Notebook palette */
+    :root {
+      --moss:        #3D5A47;
+      --moss-dark:   #2E4436;
+      --amber-flask: #C17F24;
+      --sage:        #5C8C6A;
+      --parchment:   #F7F3EC;
+      --cream:       #FDFAF4;
+      --ink:         #1C2017;
+      --stone:       #D4CEBD;
+      --bark:        #7A6E5F;
+    }
+
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
       max-width: 700px;
       margin: 40px auto;
       padding: 20px;
       line-height: 1.7;
-      color: #333;
-      background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
+      color: var(--ink);
+      background-color: var(--parchment);
       min-height: 100vh;
     }
 
+    h1, h2, h3 {
+      font-family: 'Lora', Georgia, serif;
+    }
+
     .container {
-      background: white;
+      background: var(--cream);
       padding: 40px;
-      border-radius: 16px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      border-radius: 12px;
+      border: 2px solid var(--stone);
     }
 
     h1 {
-      color: #6366f1;
+      color: var(--moss);
       font-size: 2em;
       margin-bottom: 8px;
-      font-family: Georgia, serif;
     }
 
     .subtitle {
-      color: #6b7280;
+      color: var(--bark);
       font-size: 0.95em;
       margin-bottom: 30px;
     }
 
     h2 {
-      color: #4f46e5;
+      color: var(--moss);
       font-size: 1.25em;
       margin-top: 35px;
       margin-bottom: 15px;
       padding-bottom: 8px;
-      border-bottom: 2px solid #e5e7eb;
+      border-bottom: 2px solid var(--stone);
     }
 
     p {
@@ -71,15 +90,15 @@
     }
 
     .info-box {
-      background-color: #eff6ff;
+      background-color: #EAF0EC;
       padding: 16px 20px;
-      border-left: 4px solid #3b82f6;
+      border-left: 4px solid var(--sage);
       margin: 20px 0;
       border-radius: 0 8px 8px 0;
     }
 
     .info-box strong {
-      color: #1e40af;
+      color: var(--moss);
     }
 
     .back-link {
@@ -87,17 +106,16 @@
       align-items: center;
       margin-top: 30px;
       padding: 12px 24px;
-      background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
-      color: white;
+      background: var(--moss);
+      color: var(--cream);
       text-decoration: none;
       font-weight: 500;
-      border-radius: 8px;
-      transition: transform 0.2s, box-shadow 0.2s;
+      border-radius: 10px;
+      transition: background-color 0.2s;
     }
 
     .back-link:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+      background: var(--moss-dark);
     }
 
     .back-link svg {
@@ -112,18 +130,20 @@
     }
 
     .five-c-item {
-      background: #f3f4f6;
+      background: var(--parchment);
       padding: 12px;
       border-radius: 8px;
+      border: 1px solid var(--stone);
       text-align: center;
       font-weight: 500;
-      color: #4b5563;
+      color: var(--bark);
     }
 
     .five-c-item span {
       display: block;
       font-size: 1.5em;
       margin-bottom: 4px;
+      color: var(--moss);
     }
   </style>
 </head>
